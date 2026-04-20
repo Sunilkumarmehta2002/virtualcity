@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕉️</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="देवनगरी - Virtual Hindu Mandir City | Digital Pilgrimage Experience" />
+    <meta name="theme-color" content="#FF6B00" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Sans+Devanagari:wght@100;200;300;400;500;600;700;800;900&family=Tillana:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+    
+    <title>देवनगरी | DEVNAGARI - Divine Temple City</title>
+    
+    <style>
+      /* ========== DIVINE CSS SYSTEM ========== */
+      :root {
+        --divine-gold: #FFD700;
+        --saffron: #FF6B00;
+        --deep-saffron: #FF4500;
+        --sindoor: #DC143C;
+        --mandir-maroon: #800000;
+        --lotus-pink: #FF69B4;
+        --cosmic-dark: #04010A;
+        --void-purple: #0D0020;
+        --temple-stone: #C8A870;
+        --sacred-white: #FFF8E7;
+        --copper: #B87333;
+        --emerald: #008000;
+        --sky-blue: #0047AB;
+        --gold-glow: rgba(255,215,0,0.6);
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--cosmic-dark);
+        font-family: 'Lora', serif;
+        color: var(--sacred-white);
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: var(--cosmic-dark); }
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--divine-gold), var(--saffron));
+        border-radius: 4px;
+      }
+
+      /* ========== OM GATE ENTRY SCREEN ========== */
+      #om-gate {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(ellipse at center, var(--void-purple) 0%, var(--cosmic-dark) 100%);
+        z-index: 1000;
+        transition: opacity 1s ease, transform 1s ease;
+      }
+
+      #om-gate.hidden {
+        opacity: 0;
+        transform: scale(1.5);
+        pointer-events: none;
+      }
+
+      #starfield-canvas {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+
+      .mandala-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .mandala {
+        width: min(600px, 90vw);
+        height: min(600px, 90vw);
+        border: 2px solid rgba(255, 215, 0, 0.2);
+        border-radius: 50%;
+        animation: rotateSlow 40s linear infinite;
+        position: relative;
+      }
+
+      .mandala::before {
+        content: '';
+        position: absolute;
+        inset: 30px;
+        border: 1px solid rgba(255, 215, 0, 0.15);
+        border-radius: 50%;
+        animation: rotateReverse 60s linear infinite;
+      }
+
+      .mandala::after {
+        content: '';
+        position: absolute;
+        inset: 60px;
+        border: 1px solid rgba(255, 215, 0, 0.1);
+        border-radius: 50%;
+      }
+
+      .mandala-inner {
+        position: absolute;
+        inset: 90px;
+        border: 1px dashed rgba(255, 107, 0, 0.2);
+        border-radius: 50%;
+        animation: rotateSlow 30s linear infinite;
+      }
+
+      @keyframes rotateSlow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes rotateReverse {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+      }
+
+      .om-container {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+      }
+
+      .om-symbol {
+        font-size: clamp(100px, 25vw, 180px);
+        color: var(--divine-gold);
+        text-shadow: 
+          0 0 20px var(--gold-glow),
+          0 0 40px var(--gold-glow),
+          0 0 60px var(--gold-glow),
+          0 0 80px rgba(255, 107, 0, 0.4);
+        animation: omPulse 3s ease-in-out infinite;
+        cursor: default;
+        user-select: none;
+      }
+
+      @keyframes omPulse {
+        0%, 100% { 
+          transform: scale(1); 
+          filter: drop-shadow(0 0 30px var(--gold-glow));
+        }
+        50% { 
+          transform: scale(1.08); 
+          filter: drop-shadow(0 0 50px var(--gold-glow));
+        }
+      }
+
+      .title {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: clamp(28px, 6vw, 52px);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--divine-gold), var(--saffron), var(--divine-gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-top: 20px;
+        text-shadow: none;
+      }
+
+      .tagline {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: clamp(14px, 3vw, 20px);
+        color: var(--sacred-white);
+        opacity: 0.9;
+        margin-top: 15px;
+        max-width: 90%;
+      }
+
+      .tagline-english {
+        font-family: 'Lora', serif;
+        font-style: italic;
+        font-size: clamp(12px, 2.5vw, 16px);
+        color: var(--temple-stone);
+        margin-top: 8px;
+      }
+
+      .entry-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 40px;
+        z-index: 10;
+      }
+
+      @media (min-width: 640px) {
+        .entry-buttons {
+          flex-direction: row;
+          gap: 20px;
+        }
+      }
+
+      .btn-divine {
+        background: linear-gradient(135deg, var(--divine-gold), var(--saffron));
+        color: var(--cosmic-dark);
+        border: 2px solid var(--divine-gold);
+        padding: 16px 32px;
+        font-family: 'Cinzel', serif;
+        font-weight: 600;
+        font-size: clamp(14px, 2vw, 16px);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px var(--gold-glow);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn-divine:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px var(--gold-glow), 0 0 50px var(--gold-glow);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--saffron);
+        border: 2px solid var(--saffron);
+        box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 107, 0, 0.1);
+        box-shadow: 0 0 25px rgba(255, 107, 0, 0.5);
+      }
+
+      /* Sound Toggle */
+      .sound-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1001;
+        background: rgba(4, 1, 10, 0.8);
+        border: 1px solid var(--divine-gold);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 24px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .sound-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px var(--gold-glow);
+      }
+
+      /* iOS Audio Prompt */
+      .audio-prompt {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(4, 1, 10, 0.9);
+        border: 1px solid var(--divine-gold);
+        border-radius: 30px;
+        padding: 12px 24px;
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 14px;
+        color: var(--sacred-white);
+        z-index: 1002;
+        cursor: pointer;
+        animation: float 3s ease-in-out infinite;
+        backdrop-filter: blur(10px);
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-10px); }
+      }
+
+      .audio-prompt.hidden {
+        display: none;
+      }
+
+      /* ========== MAIN APP CONTAINER ========== */
+      #app-container {
+        position: fixed;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        background: var(--cosmic-dark);
+      }
+
+      #app-container.visible {
+        display: flex;
+      }
+
+      /* Three.js Canvas Container */
+      #city-canvas {
+        flex: 1;
+        width: 100%;
+        position: relative;
+      }
+
+      /* ========== TOP BAR ========== */
+      .top-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 15px 20px;
+        background: linear-gradient(180deg, rgba(4, 1, 10, 0.9) 0%, transparent 100%);
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .greeting {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 14px;
+        color: var(--sacred-white);
+      }
+
+      .panchang-mini {
+        font-family: 'Lora', serif;
+        font-size: 12px;
+        color: var(--temple-stone);
+        text-align: right;
+      }
+
+      /* Sky Mode Toggle */
+      .sky-toggle {
+        display: flex;
+        gap: 8px;
+        background: rgba(4, 1, 10, 0.8);
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+      }
+
+      .sky-btn {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+        padding: 4px 8px;
+        border-radius: 12px;
+      }
+
+      .sky-btn.active {
+        opacity: 1;
+        background: rgba(255, 215, 0, 0.2);
+      }
+
+      .sky-btn:hover {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+
+      /* ========== TEMPLE INFO PANEL ========== */
+      .temple-panel {
+        position: absolute;
+        bottom: 100px;
+        left: 20px;
+        right: 20px;
+        max-width: 400px;
+        background: rgba(4, 1, 10, 0.95);
+        border: 2px solid var(--divine-gold);
+        border-radius: 16px;
+        padding: 20px;
+        z-index: 100;
+        transform: translateY(150%);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(20px);
+      }
+
+      .temple-panel.visible {
+        transform: translateY(0);
+      }
+
+      .temple-panel-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .temple-symbol {
+        font-size: 48px;
+        filter: drop-shadow(0 0 10px var(--gold-glow));
+      }
+
+      .temple-names h2 {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 24px;
+        color: var(--divine-gold);
+      }
+
+      .temple-names h3 {
+        font-family: 'Cinzel', serif;
+        font-size: 16px;
+        color: var(--temple-stone);
+        font-weight: 400;
+      }
+
+      .temple-mantra {
+        font-family: 'Tillana', cursive;
+        font-size: 18px;
+        color: var(--saffron);
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 107, 0, 0.1);
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+
+      .temple-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .temple-action-btn {
+        background: rgba(255, 215, 0, 0.1);
+        border: 1px solid var(--divine-gold);
+        color: var(--divine-gold);
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .temple-action-btn:hover {
+        background: rgba(255, 215, 0, 0.2);
+        transform: scale(1.05);
+      }
+
+      .close-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: var(--sacred-white);
+        font-size: 24px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+      }
+
+      .close-panel:hover {
+        opacity: 1;
+      }
+
+      /* ========== BOTTOM NAVIGATION ========== */
+      .bottom-nav {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(4, 1, 10, 0.95);
+        border-top: 1px solid rgba(255, 215, 0, 0.3);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+        z-index: 100;
+        backdrop-filter: blur(20px);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: var(--temple-stone);
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        background: none;
+        border: none;
+        font-family: inherit;
+      }
+
+      .nav-item:hover, .nav-item.active {
+        color: var(--divine-gold);
+        background: rgba(255, 215, 0, 0.1);
+      }
+
+      .nav-icon {
+        font-size: 24px;
+      }
+
+      .nav-label {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 11px;
+      }
+
+      /* ========== DARSHAN MODAL ========== */
+      .darshan-modal {
+        position: fixed;
+        inset: 0;
+        background: var(--cosmic-dark);
+        z-index: 2000;
+        display: none;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .darshan-modal.visible {
+        display: flex;
+      }
+
+      .darshan-header {
+        text-align: center;
+        padding: 30px 20px;
+        background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
+      }
+
+      .darshan-deity-name {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: clamp(32px, 8vw, 48px);
+        color: var(--divine-gold);
+        text-shadow: 0 0 20px var(--gold-glow);
+      }
+
+      .darshan-deity-english {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: clamp(18px, 4vw, 24px);
+        color: var(--temple-stone);
+        margin-top: 5px;
+      }
+
+      .darshan-mantra {
+        font-family: 'Tillana', cursive;
+        font-size: clamp(16px, 3vw, 20px);
+        color: var(--saffron);
+        margin-top: 15px;
+        animation: mantraReveal 2s ease-out;
+      }
+
+      @keyframes mantraReveal {
+        from { opacity: 0; letter-spacing: 10px; }
+        to { opacity: 1; letter-spacing: normal; }
+      }
+
+      .darshan-stage {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+        min-height: 400px;
+      }
+
+      .deity-symbol-large {
+        font-size: clamp(120px, 30vw, 200px);
+        filter: drop-shadow(0 0 30px var(--gold-glow));
+        animation: deityFloat 4s ease-in-out infinite;
+        z-index: 1;
+      }
+
+      @keyframes deityFloat {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-15px) scale(1.02); }
+      }
+
+      /* Aarti Plate */
+      .aarti-container {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .aarti-plate {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        border: 3px solid var(--divine-gold);
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--copper) 0%, var(--mandir-maroon) 100%);
+        animation: aartiRotate 4s ease-in-out infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes aartiRotate {
+        0%, 100% { transform: rotate(-15deg); }
+        50% { transform: rotate(15deg); }
+      }
+
+      .diya-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      .diya {
+        position: absolute;
+        font-size: 24px;
+        animation: diyaFlicker 0.5s ease-in-out infinite;
+      }
+
+      @keyframes diyaFlicker {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(0.9); }
+      }
+
+      /* Petal Rain */
+      .petal-container {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .petal {
+        position: absolute;
+        font-size: 20px;
+        animation: petalFall linear infinite;
+        opacity: 0.8;
+      }
+
+      @keyframes petalFall {
+        0% { 
+          transform: translateY(-50px) rotate(0deg); 
+          opacity: 1;
+        }
+        100% { 
+          transform: translateY(100vh) rotate(720deg); 
+          opacity: 0;
+        }
+      }
+
+      /* Incense Smoke */
+      .smoke {
+        position: absolute;
+        bottom: 30%;
+        width: 4px;
+        height: 60px;
+        background: linear-gradient(to top, rgba(200, 168, 112, 0.6), transparent);
+        filter: blur(3px);
+        animation: smokeRise 3s ease-out infinite;
+      }
+
+      @keyframes smokeRise {
+        0% { 
+          transform: translateY(0) scaleX(1); 
+          opacity: 0.6;
+        }
+        100% { 
+          transform: translateY(-100px) scaleX(3); 
+          opacity: 0;
+        }
+      }
+
+      .darshan-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(4, 1, 10, 0.8);
+      }
+
+      .darshan-action {
+        background: rgba(255, 215, 0, 0.1);
+        border: 1px solid var(--divine-gold);
+        color: var(--divine-gold);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .darshan-action:hover {
+        background: rgba(255, 215, 0, 0.2);
+        transform: scale(1.05);
+        box-shadow: 0 0 20px var(--gold-glow);
+      }
+
+      .darshan-action-icon {
+        font-size: 28px;
+      }
+
+      .darshan-action-label {
+        font-size: 12px;
+        color: var(--temple-stone);
+      }
+
+      /* Mala Counter */
+      .mala-counter {
+        text-align: center;
+        padding: 20px;
+        border-top: 1px solid rgba(255, 215, 0, 0.2);
+      }
+
+      .mala-count {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: 48px;
+        color: var(--divine-gold);
+        text-shadow: 0 0 10px var(--gold-glow);
+      }
+
+      .mala-label {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 14px;
+        color: var(--temple-stone);
+        margin-top: 5px;
+      }
+
+      .mala-progress {
+        width: 80%;
+        max-width: 300px;
+        height: 8px;
+        background: rgba(255, 215, 0, 0.2);
+        border-radius: 4px;
+        margin: 15px auto 0;
+        overflow: hidden;
+      }
+
+      .mala-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--divine-gold), var(--saffron));
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .darshan-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(4, 1, 10, 0.8);
+        border: 1px solid var(--divine-gold);
+        color: var(--divine-gold);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ========== PANCHANG PAGE ========== */
+      .panchang-page {
+        position: fixed;
+        inset: 0;
+        background: var(--cosmic-dark);
+        z-index: 1500;
+        display: none;
+        flex-direction: column;
+        overflow-y: auto;
+        padding-bottom: 80px;
+      }
+
+      .panchang-page.visible {
+        display: flex;
+      }
+
+      .panchang-header {
+        text-align: center;
+        padding: 30px 20px;
+        background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%);
+      }
+
+      .panchang-title {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: clamp(24px, 6vw, 36px);
+        background: linear-gradient(135deg, var(--divine-gold), var(--saffron));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .panchang-date {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 18px;
+        color: var(--sacred-white);
+        margin-top: 10px;
+      }
+
+      .moon-display {
+        width: 120px;
+        height: 120px;
+        margin: 20px auto;
+        position: relative;
+      }
+
+      .moon {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(90deg, #1a1a2e 50%, var(--sacred-white) 50%);
+        box-shadow: 0 0 30px rgba(255, 248, 231, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .moon-phase {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        transition: transform 0.5s ease;
+      }
+
+      .panchang-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        padding: 20px;
+      }
+
+      .panchang-item {
+        background: rgba(255, 215, 0, 0.05);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .panchang-item-label {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 12px;
+        color: var(--temple-stone);
+        margin-bottom: 5px;
+      }
+
+      .panchang-item-value {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 18px;
+        color: var(--divine-gold);
+      }
+
+      .panchang-item-english {
+        font-family: 'Lora', serif;
+        font-size: 12px;
+        color: var(--sacred-white);
+        opacity: 0.8;
+        margin-top: 3px;
+      }
+
+      .festival-section {
+        padding: 20px;
+      }
+
+      .festival-title {
+        font-family: 'Cinzel', serif;
+        font-size: 20px;
+        color: var(--divine-gold);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .festival-card {
+        background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 215, 0, 0.05));
+        border: 1px solid var(--saffron);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .festival-icon {
+        font-size: 36px;
+      }
+
+      .festival-info h4 {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 18px;
+        color: var(--sacred-white);
+      }
+
+      .festival-info p {
+        font-family: 'Lora', serif;
+        font-size: 13px;
+        color: var(--temple-stone);
+      }
+
+      .festival-days {
+        margin-left: auto;
+        background: var(--saffron);
+        color: var(--cosmic-dark);
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-family: 'Cinzel', serif;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      /* ========== PRASAD CARD ========== */
+      .prasad-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(4, 1, 10, 0.95);
+        z-index: 3000;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .prasad-modal.visible {
+        display: flex;
+      }
+
+      .prasad-card {
+        width: 100%;
+        max-width: 360px;
+        background: linear-gradient(180deg, var(--void-purple) 0%, var(--cosmic-dark) 100%);
+        border: 3px solid var(--divine-gold);
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .prasad-card::before {
+        content: '';
+        position: absolute;
+        inset: 10px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 16px;
+        pointer-events: none;
+      }
+
+      .prasad-header {
+        font-family: 'Cinzel Decorative', serif;
+        font-size: 14px;
+        color: var(--divine-gold);
+        letter-spacing: 2px;
+      }
+
+      .prasad-deity {
+        font-size: 80px;
+        margin: 20px 0;
+        filter: drop-shadow(0 0 20px var(--gold-glow));
+      }
+
+      .prasad-god-name {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 28px;
+        color: var(--divine-gold);
+      }
+
+      .prasad-temple {
+        font-family: 'Cinzel', serif;
+        font-size: 14px;
+        color: var(--temple-stone);
+        margin-top: 5px;
+      }
+
+      .prasad-message {
+        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-size: 20px;
+        color: var(--sacred-white);
+        margin: 25px 0 15px;
+      }
+
+      .prasad-blessing {
+        font-family: 'Lora', serif;
+        font-style: italic;
+        font-size: 14px;
+        color: var(--temple-stone);
+        line-height: 1.6;
+        padding: 0 10px;
+      }
+
+      .prasad-diyas {
+        font-size: 20px;
+        letter-spacing: 5px;
+        margin: 25px 0 15px;
+      }
+
+      .prasad-footer {
+        font-family: 'Cinzel', serif;
+        font-size: 12px;
+        color: rgba(255, 215, 0, 0.6);
+      }
+
+      .share-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 25px;
+      }
+
+      .share-btn {
+        background: rgba(255, 215, 0, 0.1);
+        border: 1px solid var(--divine-gold);
+        color: var(--divine-gold);
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-family: 'Lora', serif;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .share-btn:hover {
+        background: rgba(255, 215, 0, 0.2);
+        transform: scale(1.05);
+      }
+
+      .prasad-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: var(--sacred-white);
+        font-size: 28px;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      /* ========== RESPONSIVE ========== */
+      @media (min-width: 768px) {
+        .temple-panel {
+          left: auto;
+          right: 20px;
+          bottom: 120px;
+        }
+
+        .bottom-nav {
+          left: 50%;
+          transform: translateX(-50%);
+          max-width: 500px;
+          border-radius: 20px 20px 0 0;
+          border-left: 1px solid rgba(255, 215, 0, 0.3);
+          border-right: 1px solid rgba(255, 215, 0, 0.3);
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .bottom-nav {
+          top: 50%;
+          bottom: auto;
+          left: 20px;
+          right: auto;
+          transform: translateY(-50%);
+          flex-direction: column;
+          max-width: none;
+          width: auto;
+          padding: 20px 10px;
+          border-radius: 20px;
+          border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .nav-item {
+          padding: 12px 20px;
+        }
+      }
+
+      /* ========== UTILITY CLASSES ========== */
+      .hidden { display: none !important; }
+      .visible { display: flex !important; }
+    </style>
+  </head>
+  <body>
+    <!-- Sound Toggle -->
+    <button class="sound-toggle" id="soundToggle" title="Toggle Divine Sound">🔊</button>
+
+    <!-- ========== OM GATE ENTRY ========== -->
+    <div id="om-gate">
+      <canvas id="starfield-canvas"></canvas>
+      
+      <div class="mandala-container">
+        <div class="mandala">
+          <div class="mandala-inner"></div>
+        </div>
+      </div>
+
+      <div class="om-container">
+        <div class="om-symbol">ॐ</div>
+        <h1 class="title">देवनगरी | DEVNAGARI</h1>
+        <p class="tagline">दिव्य मंदिर नगरी में आपका स्वागत है</p>
+        <p class="tagline-english">Welcome to the Divine City of Temples</p>
+        
+        <div class="entry-buttons">
+          <button class="btn-divine" id="enterCity">
+            🚪 मंदिर नगरी में प्रवेश करें | Enter Sacred City
+          </button>
+          <button class="btn-divine btn-secondary" id="showPanchang">
+            📿 आज का पंचांग | Today's Panchang
+          </button>
+        </div>
+      </div>
+
+      <div class="audio-prompt" id="audioPrompt">
+        🙏 दिव्य ध्वनि के लिए टैप करें | Tap for Divine Sound
+      </div>
+    </div>
+
+    <!-- ========== MAIN APP ========== -->
+    <div id="app-container">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div>
+          <div class="greeting" id="greeting">🙏 नमस्ते</div>
+          <div class="panchang-mini" id="panchangMini">Loading...</div>
+        </div>
+        <div class="sky-toggle">
+          <button class="sky-btn" data-sky="dawn" title="Dawn">🌅</button>
+          <button class="sky-btn active" data-sky="dusk" title="Dusk">🌆</button>
+          <button class="sky-btn" data-sky="night" title="Night">🌙</button>
+        </div>
+      </div>
+
+      <!-- 3D City Canvas -->
+      <div id="city-canvas"></div>
+
+      <!-- Temple Info Panel -->
+      <div class="temple-panel" id="templePanel">
+        <button class="close-panel" id="closePanel">×</button>
+        <div class="temple-panel-header">
+          <span class="temple-symbol" id="panelSymbol">🕉️</span>
+          <div class="temple-names">
+            <h2 id="panelNameHindi">मंदिर</h2>
+            <h3 id="panelNameEnglish">Temple</h3>
+          </div>
+        </div>
+        <div class="temple-mantra" id="panelMantra">ॐ</div>
+        <div class="temple-actions">
+          <button class="temple-action-btn" id="btnDarshan">🙏 दर्शन करें</button>
+          <button class="temple-action-btn" id="btnAarti">🪔 आरती करें</button>
+          <button class="temple-action-btn" id="btnPrasad">🎁 प्रसाद लें</button>
+        </div>
+      </div>
+
+      <!-- Bottom Navigation -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-page="city">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-label">नगरी</span>
+        </button>
+        <button class="nav-item" data-page="panchang">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">पंचांग</span>
+        </button>
+        <button class="nav-item" data-page="darshan">
+          <span class="nav-icon">🙏</span>
+          <span class="nav-label">दर्शन</span>
+        </button>
+        <button class="nav-item" data-page="bhajan">
+          <span class="nav-icon">📿</span>
+          <span class="nav-label">भजन</span>
+        </button>
+        <button class="nav-item" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">सेटिंग</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ========== DARSHAN MODAL ========== -->
+    <div class="darshan-modal" id="darshanModal">
+      <button class="darshan-close" id="closeDarshan">×</button>
+      
+      <div class="darshan-header">
+        <h1 class="darshan-deity-name" id="darshanDeityHindi">श्री गणेश</h1>
+        <h2 class="darshan-deity-english" id="darshanDeityEnglish">Shri Ganesh</h2>
+        <p class="darshan-mantra" id="darshanMantra">ॐ गं गणपतये नमः</p>
+      </div>
+
+      <div class="darshan-stage">
+        <div class="petal-container" id="petalContainer"></div>
+        <div class="smoke" style="left: 45%;"></div>
+        <div class="smoke" style="left: 55%; animation-delay: 1s;"></div>
+        
+        <div class="deity-symbol-large" id="darshanSymbol">🕉️</div>
+        
+        <div class="aarti-container" id="aartiContainer" style="display: none;">
+          <div class="aarti-plate">
+            <div class="diya-ring" id="diyaRing"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mala-counter">
+        <div class="mala-count" id="malaCount">0</div>
+        <div class="mala-label">जप संख्या / Chant Count (of 108)</div>
+        <div class="mala-progress">
+          <div class="mala-progress-bar" id="malaProgress" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="darshan-actions">
+        <button class="darshan-action" id="actionBell">
+          <span class="darshan-action-icon">🔔</span>
+          <span>घंटा बजाएं</span>
+          <span class="darshan-action-label">Ring Bell</span>
+        </button>
+        <button class="darshan-action" id="actionDiya">
+          <span class="darshan-action-icon">🪔</span>
+          <span>दीया जलाएं</span>
+          <span class="darshan-action-label">Light Diya</span>
+        </button>
+        <button class="darshan-action" id="actionFlower">
+          <span class="darshan-action-icon">🌸</span>
+          <span>फूल चढ़ाएं</span>
+          <span class="darshan-action-label">Offer Flowers</span>
+        </button>
+        <button class="darshan-action" id="actionChant">
+          <span class="darshan-action-icon">📿</span>
+          <span>जप करें</span>
+          <span class="darshan-action-label">Chant Mantra</span>
+        </button>
+        <button class="darshan-action" id="actionAarti">
+          <span class="darshan-action-icon">🪔</span>
+          <span>आरती करें</span>
+          <span class="darshan-action-label">Perform Aarti</span>
+        </button>
+        <button class="darshan-action" id="actionPrasad">
+          <span class="darshan-action-icon">🎁</span>
+          <span>प्रसाद लें</span>
+          <span class="darshan-action-label">Take Prasad</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== PANCHANG PAGE ========== -->
+    <div class="panchang-page" id="panchangPage">
+      <div class="panchang-header">
+        <h1 class="panchang-title">📅 आज का पंचांग</h1>
+        <p class="panchang-date" id="panchangDate"></p>
+        
+        <div class="moon-display">
+          <div class="moon" id="moonPhase">
+            <div class="moon-phase"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panchang-grid" id="panchangGrid">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="festival-section">
+        <h3 class="festival-title">🎉 आने वाले त्योहार</h3>
+        <div id="festivalList">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" data-page="city">
+          <span class="nav-icon">🏛️</span>
+          <span class="nav-label">नगरी</span>
+        </button>
+        <button class="nav-item active" data-page="panchang">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">पंचांग</span>
+        </button>
+        <button class="nav-item" data-page="darshan">
+          <span class="nav-icon">🙏</span>
+          <span class="nav-label">दर्शन</span>
+        </button>
+        <button class="nav-item" data-page="bhajan">
+          <span class="nav-icon">📿</span>
+          <span class="nav-label">भजन</span>
+        </button>
+        <button class="nav-item" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">सेटिंग</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ========== PRASAD MODAL ========== -->
+    <div class="prasad-modal" id="prasadModal">
+      <button class="prasad-close" id="closePrasad">×</button>
+      
+      <div class="prasad-card" id="prasadCard">
+        <p class="prasad-header">🕉️ DEVNAGARI देवनगरी 🕉️</p>
+        <div class="prasad-deity" id="prasadDeity">🙏</div>
+        <h2 class="prasad-god-name" id="prasadGodName">देवता</h2>
+        <p class="prasad-temple" id="prasadTemple">मंदिर</p>
+        <p class="prasad-message">आपके लिए प्रसाद 🙏</p>
+        <p class="prasad-blessing" id="prasadBlessing">
+          भगवान आपको सदा स्वस्थ और सुखी रखें।
+        </p>
+        <p class="prasad-diyas">🪔🪔🪔🪔🪔</p>
+        <p class="prasad-footer">devnagari.app</p>
+      </div>
+
+      <div class="share-buttons">
+        <button class="share-btn" id="shareWhatsApp">
+          💚 WhatsApp
+        </button>
+        <button class="share-btn" id="shareDownload">
+          📥 Save Image
+        </button>
+        <button class="share-btn" id="shareCopy">
+          🔗 Copy Link
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script type="module">
+      import * as THREE from 'three';
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+      // ==================== TEMPLE DATA ====================
+      const TEMPLES = [
+        {
+          id: 'ganesh',
+          nameHindi: 'श्री गणेश मंदिर',
+          nameEnglish: 'Shri Ganesh Mandir',
+          god: { hindi: 'श्री गणेश', english: 'Lord Ganesh' },
+          symbol: '🙏',
+          mantra: 'ॐ गं गणपतये नमः',
+          color: 0xFF8C00,
+          lightColor: 0xFFAA33,
+          position: [0, 0, 0],
+          scale: 1.6,
+          day: 'Wednesday',
+          blessing: 'विघ्नहर्ता गणेश जी की कृपा आप पर सदा बनी रहे। सभी बाधाएं दूर हों।'
+        },
+        {
+          id: 'ram',
+          nameHindi: 'श्री राम मंदिर',
+          nameEnglish: 'Shri Ram Mandir',
+          god: { hindi: 'श्री राम', english: 'Lord Ram' },
+          symbol: '🏹',
+          mantra: 'श्री राम जय राम जय जय राम',
+          color: 0x1E90FF,
+          lightColor: 0x4169E1,
+          position: [0, 0, -16],
+          scale: 1.3,
+          day: 'Sunday',
+          blessing: 'मर्यादा पुरुषोत्तम श्री राम आपके जीवन में धर्म और सत्य का मार्ग प्रशस्त करें।'
+        },
+        {
+          id: 'krishna',
+          nameHindi: 'श्री कृष्ण मंदिर',
+          nameEnglish: 'Shri Krishna Mandir',
+          god: { hindi: 'श्री कृष्ण', english: 'Lord Krishna' },
+          symbol: '🦚',
+          mantra: 'हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे',
+          color: 0x228B22,
+          lightColor: 0x00CED1,
+          position: [11, 0, -11],
+          scale: 1.2,
+          day: 'Wednesday',
+          blessing: 'गोविंद की बंसी की धुन आपके मन में शांति और प्रेम भर दे।'
+        },
+        {
+          id: 'shiv',
+          nameHindi: 'श्री शिव मंदिर',
+          nameEnglish: 'Shri Shiv Mandir',
+          god: { hindi: 'भोलेनाथ', english: 'Lord Shiva' },
+          symbol: '🔱',
+          mantra: 'ॐ नमः शिवाय',
+          color: 0x8A2BE2,
+          lightColor: 0xC0C0C0,
+          position: [-11, 0, -11],
+          scale: 1.3,
+          day: 'Monday',
+          blessing: 'भोलेनाथ की कृपा से आपके सभी कष्ट दूर हों। हर हर महादेव!'
+        },
+        {
+          id: 'durga',
+          nameHindi: 'माँ दुर्गा मंदिर',
+          nameEnglish: 'Maa Durga Mandir',
+          god: { hindi: 'माँ दुर्गा', english: 'Goddess Durga' },
+          symbol: '🦁',
+          mantra: 'ॐ दुं दुर्गायै नमः',
+          color: 0xDC143C,
+          lightColor: 0xFF4500,
+          position: [16, 0, 0],
+          scale: 1.2,
+          day: 'Tuesday',
+          blessing: 'जगदम्बा माँ दुर्गा आपको शक्ति और साहस प्रदान करें।'
+        },
+        {
+          id: 'lakshmi',
+          nameHindi: 'माँ लक्ष्मी मंदिर',
+          nameEnglish: 'Maa Lakshmi Mandir',
+          god: { hindi: 'माँ लक्ष्मी', english: 'Goddess Lakshmi' },
+          symbol: '🪷',
+          mantra: 'ॐ श्रीं महालक्ष्म्यै नमः',
+          color: 0xFF69B4,
+          lightColor: 0xFFD700,
+          position: [11, 0, 11],
+          scale: 1.1,
+          day: 'Friday',
+          blessing: 'धन की देवी माँ लक्ष्मी आपके घर में सदा विराजमान रहें।'
+        },
+        {
+          id: 'hanuman',
+          nameHindi: 'श्री हनुमान मंदिर',
+          nameEnglish: 'Shri Hanuman Mandir',
+          god: { hindi: 'बजरंगबली', english: 'Lord Hanuman' },
+          symbol: '💪',
+          mantra: 'जय बजरंग बली',
+          color: 0xFF4500,
+          lightColor: 0xFF6347,
+          position: [0, 0, 16],
+          scale: 1.3,
+          day: 'Tuesday',
+          blessing: 'संकट मोचन हनुमान जी आपकी सभी विपदाओं को हरें।'
+        },
+        {
+          id: 'saraswati',
+          nameHindi: 'माँ सरस्वती मंदिर',
+          nameEnglish: 'Maa Saraswati Mandir',
+          god: { hindi: 'माँ सरस्वती', english: 'Goddess Saraswati' },
+          symbol: '📚',
+          mantra: 'ॐ ऐं सरस्वत्यै नमः',
+          color: 0xFFFFFF,
+          lightColor: 0x87CEEB,
+          position: [-11, 0, 11],
+          scale: 1.1,
+          day: 'Thursday',
+          blessing: 'विद्या की देवी माँ सरस्वती आपको ज्ञान और बुद्धि प्रदान करें।'
+        },
+        {
+          id: 'vishnu',
+          nameHindi: 'श्री विष्णु मंदिर',
+          nameEnglish: 'Shri Vishnu Mandir',
+          god: { hindi: 'श्री विष्णु', english: 'Lord Vishnu' },
+          symbol: '🐚',
+          mantra: 'ॐ नमो नारायणाय',
+          color: 0x000080,
+          lightColor: 0x4169E1,
+          position: [-16, 0, 0],
+          scale: 1.2,
+          day: 'Thursday',
+          blessing: 'पालनहार श्री विष्णु भगवान आपकी रक्षा करें।'
+        },
+        {
+          id: 'surya',
+          nameHindi: 'श्री सूर्य मंदिर',
+          nameEnglish: 'Shri Surya Mandir',
+          god: { hindi: 'सूर्य देव', english: 'Sun God' },
+          symbol: '☀️',
+          mantra: 'ॐ सूर्याय नमः',
+          color: 0xFFB347,
+          lightColor: 0xFFD700,
+          position: [8, 0, 8],
+          scale: 1.0,
+          day: 'Sunday',
+          blessing: 'सूर्य देव आपके जीवन में प्रकाश और ऊर्जा भरें।'
+        }
+      ];
+
+      // ==================== PANCHANG DATA ====================
+      const TITHIS = ['प्रतिपदा', 'द्वितीया', 'तृतीया', 'चतुर्थी', 'पंचमी', 'षष्ठी', 'सप्तमी', 'अष्टमी', 'नवमी', 'दशमी', 'एकादशी', 'द्वादशी', 'त्रयोदशी', 'चतुर्दशी', 'पूर्णिमा', 'अमावस्या'];
+      const NAKSHATRAS = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशिरा', 'आर्द्रा', 'पुनर्वसु', 'पुष्य', 'आश्लेषा', 'मघा', 'पूर्वा फाल्गुनी', 'उत्तरा फाल्गुनी', 'हस्त', 'चित्रा', 'स्वाती', 'विशाखा', 'अनुराधा', 'ज्येष्ठा', 'मूल', 'पूर्वाषाढ़ा', 'उत्तराषाढ़ा', 'श्रवण', 'धनिष्ठा', 'शतभिषा', 'पूर्वा भाद्रपद', 'उत्तरा भाद्रपद', 'रेवती'];
+      const VARAS = [
+        { hindi: 'रविवार', english: 'Sunday', deity: 'सूर्य देव' },
+        { hindi: 'सोमवार', english: 'Monday', deity: 'भगवान शिव' },
+        { hindi: 'मंगलवार', english: 'Tuesday', deity: 'हनुमान जी' },
+        { hindi: 'बुधवार', english: 'Wednesday', deity: 'गणेश जी' },
+        { hindi: 'गुरुवार', english: 'Thursday', deity: 'विष्णु भगवान' },
+        { hindi: 'शुक्रवार', english: 'Friday', deity: 'माँ लक्ष्मी' },
+        { hindi: 'शनिवार', english: 'Saturday', deity: 'शनि देव' }
+      ];
+      const MONTHS = ['चैत्र', 'वैशाख', 'ज्येष्ठ', 'आषाढ़', 'श्रावण', 'भाद्रपद', 'आश्विन', 'कार्तिक', 'मार्गशीर्ष', 'पौष', 'माघ', 'फाल्गुन'];
+      
+      const FESTIVALS = [
+        { name: 'राम नवमी', english: 'Ram Navami', icon: '🏹', month: 3, day: 17 },
+        { name: 'हनुमान जयंती', english: 'Hanuman Jayanti', icon: '💪', month: 3, day: 23 },
+        { name: 'अक्षय तृतीया', english: 'Akshaya Tritiya', icon: '🪙', month: 4, day: 10 },
+        { name: 'गंगा दशहरा', english: 'Ganga Dussehra', icon: '🌊', month: 5, day: 16 },
+        { name: 'रथ यात्रा', english: 'Rath Yatra', icon: '🛕', month: 6, day: 7 },
+        { name: 'गुरु पूर्णिमा', english: 'Guru Purnima', icon: '🙏', month: 6, day: 21 },
+        { name: 'नाग पंचमी', english: 'Nag Panchami', icon: '🐍', month: 7, day: 9 },
+        { name: 'रक्षा बंधन', english: 'Raksha Bandhan', icon: '🎀', month: 7, day: 19 },
+        { name: 'जन्माष्टमी', english: 'Janmashtami', icon: '🦚', month: 7, day: 26 },
+        { name: 'गणेश चतुर्थी', english: 'Ganesh Chaturthi', icon: '🙏', month: 8, day: 7 },
+        { name: 'नवरात्रि', english: 'Navratri', icon: '🔱', month: 9, day: 3 },
+        { name: 'दशहरा', english: 'Dussehra', icon: '🏹', month: 9, day: 12 },
+        { name: 'करवा चौथ', english: 'Karva Chauth', icon: '🌙', month: 9, day: 20 },
+        { name: 'दीपावली', english: 'Diwali', icon: '🪔', month: 10, day: 1 },
+        { name: 'गोवर्धन पूजा', english: 'Govardhan Puja', icon: '⛰️', month: 10, day: 2 },
+        { name: 'भाई दूज', english: 'Bhai Dooj', icon: '👫', month: 10, day: 3 },
+        { name: 'छठ पूजा', english: 'Chhath Puja', icon: '☀️', month: 10, day: 7 },
+        { name: 'देव उठनी एकादशी', english: 'Dev Uthani Ekadashi', icon: '🙏', month: 10, day: 12 },
+        { name: 'मकर संक्रांति', english: 'Makar Sankranti', icon: '🪁', month: 0, day: 14 },
+        { name: 'बसंत पंचमी', english: 'Basant Panchami', icon: '📚', month: 1, day: 2 },
+        { name: 'महा शिवरात्रि', english: 'Maha Shivratri', icon: '🔱', month: 1, day: 26 },
+        { name: 'होली', english: 'Holi', icon: '🎨', month: 2, day: 14 }
+      ];
+
+      // ==================== STATE ====================
+      let audioContext = null;
+      let isSoundOn = false;
+      let currentTemple = null;
+      let malaCount = 0;
+      let scene, camera, renderer, controls;
+      let templeObjects = [];
+      let skyMode = 'dusk';
+
+      // ==================== AUDIO ENGINE ====================
+      function initAudio() {
+        if (audioContext) return;
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      function playOmSound() {
+        if (!audioContext || !isSoundOn) return;
+        
+        const now = audioContext.currentTime;
+        
+        // Base drone at 136Hz (sacred frequency)
+        const osc1 = audioContext.createOscillator();
+        osc1.frequency.value = 136;
+        osc1.type = 'sine';
+        
+        // Harmonic at 272Hz
+        const osc2 = audioContext.createOscillator();
+        osc2.frequency.value = 272;
+        osc2.type = 'sine';
+        
+        // Higher harmonic at 432Hz
+        const osc3 = audioContext.createOscillator();
+        osc3.frequency.value = 432;
+        osc3.type = 'sine';
+        
+        // Gain nodes
+        const gain1 = audioContext.createGain();
+        const gain2 = audioContext.createGain();
+        const gain3 = audioContext.createGain();
+        const masterGain = audioContext.createGain();
+        
+        // Connect
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        osc3.connect(gain3);
+        gain1.connect(masterGain);
+        gain2.connect(masterGain);
+        gain3.connect(masterGain);
+        masterGain.connect(audioContext.destination);
+        
+        // Envelope
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.3, now + 2);
+        gain1.gain.linearRampToValueAtTime(0.1, now + 6);
+        
+        gain2.gain.setValueAtTime(0, now);
+        gain2.gain.linearRampToValueAtTime(0.15, now + 2);
+        gain2.gain.linearRampToValueAtTime(0.05, now + 6);
+        
+        gain3.gain.setValueAtTime(0, now);
+        gain3.gain.linearRampToValueAtTime(0.1, now + 2);
+        gain3.gain.linearRampToValueAtTime(0.03, now + 6);
+        
+        masterGain.gain.value = 0.5;
+        
+        // Start and stop
+        osc1.start(now);
+        osc2.start(now);
+        osc3.start(now);
+        osc1.stop(now + 7);
+        osc2.stop(now + 7);
+        osc3.stop(now + 7);
+      }
+
+      function playBellSound() {
+        if (!audioContext || !isSoundOn) return;
+        
+        const now = audioContext.currentTime;
+        
+        // Bell frequencies
+        const frequencies = [880, 1320, 1760, 2200];
+        
+        frequencies.forEach((freq, i) => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          
+          osc.frequency.value = freq;
+          osc.type = 'sine';
+          
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          
+          gain.gain.setValueAtTime(0.3 - i * 0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 2);
+          
+          osc.start(now);
+          osc.stop(now + 2);
+        });
+      }
+
+      function playConchSound() {
+        if (!audioContext || !isSoundOn) return;
+        
+        const now = audioContext.currentTime;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(280, now + 0.5);
+        osc.frequency.linearRampToValueAtTime(220, now + 3);
+        osc.type = 'sawtooth';
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.3);
+        gain.gain.linearRampToValueAtTime(0.2, now + 2);
+        gain.gain.linearRampToValueAtTime(0, now + 3);
+        
+        osc.start(now);
+        osc.stop(now + 3);
+      }
+
+      // ==================== STARFIELD ====================
+      function initStarfield() {
+        const canvas = document.getElementById('starfield-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            speed: Math.random() * 0.5 + 0.1,
+            opacity: Math.random()
+          });
+        }
+        
+        function animate() {
+          ctx.fillStyle = 'rgba(4, 1, 10, 0.1)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          stars.forEach(star => {
+            star.opacity += (Math.random() - 0.5) * 0.1;
+            star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+            
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 215, 0, ${star.opacity})`;
+            ctx.fill();
+            
+            star.y += star.speed;
+            if (star.y > canvas.height) {
+              star.y = 0;
+              star.x = Math.random() * canvas.width;
+            }
+          });
+          
+          requestAnimationFrame(animate);
+        }
+        animate();
+      }
+
+      // ==================== 3D CITY ====================
+      function initCity() {
+        const container = document.getElementById('city-canvas');
+        
+        // Scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0D0020, 0.015);
+        
+        // Camera
+        camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(30, 25, 30);
+        
+        // Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+        
+        // Controls
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 10;
+        controls.maxDistance = 80;
+        controls.maxPolarAngle = Math.PI / 2.2;
+        
+        // Lighting
+        updateSkyLighting();
+        
+        // Ground
+        createGround();
+        
+        // Central Pillar
+        createBrahmSthal();
+        
+        // Temples
+        TEMPLES.forEach(temple => createTemple(temple));
+        
+        // Trees
+        createTrees();
+        
+        // Resize handler
+        window.addEventListener('resize', () => {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+        
+        // Click handler
+        renderer.domElement.addEventListener('click', onTempleClick);
+        renderer.domElement.addEventListener('touchend', onTempleClick);
+        
+        // Animation loop
+        function animate() {
+          requestAnimationFrame(animate);
+          controls.update();
+          
+          // Rotate chakras
+          scene.traverse(obj => {
+            if (obj.userData.isChakra) {
+              obj.rotation.y += 0.02;
+            }
+            if (obj.userData.isFlag) {
+              obj.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
+            }
+          });
+          
+          renderer.render(scene, camera);
+        }
+        animate();
+      }
+
+      function updateSkyLighting() {
+        // Remove existing lights
+        scene.children = scene.children.filter(child => !(child instanceof THREE.Light));
+        
+        let ambientColor, ambientIntensity, dirColor, dirIntensity, bgColor;
+        
+        switch(skyMode) {
+          case 'dawn':
+            ambientColor = 0xFFB6C1;
+            ambientIntensity = 0.4;
+            dirColor = 0xFFA07A;
+            dirIntensity = 0.8;
+            bgColor = 0x1a0a1a;
+            break;
+          case 'day':
+            ambientColor = 0xFFFFFF;
+            ambientIntensity = 0.6;
+            dirColor = 0xFFFFE0;
+            dirIntensity = 1.0;
+            bgColor = 0x87CEEB;
+            break;
+          case 'dusk':
+            ambientColor = 0xFFAA55;
+            ambientIntensity = 0.3;
+            dirColor = 0xFF6B00;
+            dirIntensity = 0.6;
+            bgColor = 0x0D0020;
+            break;
+          case 'night':
+            ambientColor = 0x4444AA;
+            ambientIntensity = 0.2;
+            dirColor = 0xCCCCFF;
+            dirIntensity = 0.3;
+            bgColor = 0x04010A;
+            break;
+        }
+        
+        scene.background = new THREE.Color(bgColor);
+        
+        const ambient = new THREE.AmbientLight(ambientColor, ambientIntensity);
+        scene.add(ambient);
+        
+        const directional = new THREE.DirectionalLight(dirColor, dirIntensity);
+        directional.position.set(20, 30, 10);
+        directional.castShadow = true;
+        scene.add(directional);
+        
+        // Add point lights for temples
+        templeObjects.forEach(obj => {
+          if (obj.userData.temple) {
+            const intensity = skyMode === 'night' ? 2 : (skyMode === 'dusk' ? 1.5 : 0.5);
+            const light = new THREE.PointLight(obj.userData.temple.lightColor, intensity, 15);
+            light.position.copy(obj.position);
+            light.position.y += 5;
+            scene.add(light);
+          }
+        });
+      }
+
+      function createGround() {
+        // Main ground
+        const groundGeo = new THREE.CircleGeometry(40, 64);
+        const groundMat = new THREE.MeshStandardMaterial({
+          color: 0x1a1a2e,
+          roughness: 0.9,
+          metalness: 0.1
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Lotus mandala pattern
+        const mandalaGeo = new THREE.RingGeometry(5, 25, 8, 1);
+        const mandalaMat = new THREE.MeshBasicMaterial({
+          color: 0xFFD700,
+          transparent: true,
+          opacity: 0.15,
+          side: THREE.DoubleSide
+        });
+        const mandala = new THREE.Mesh(mandalaGeo, mandalaMat);
+        mandala.rotation.x = -Math.PI / 2;
+        mandala.position.y = 0.01;
+        scene.add(mandala);
+        
+        // Inner ring
+        const innerRing = new THREE.Mesh(
+          new THREE.RingGeometry(3, 4, 32),
+          new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.2, side: THREE.DoubleSide })
+        );
+        innerRing.rotation.x = -Math.PI / 2;
+        innerRing.position.y = 0.02;
+        scene.add(innerRing);
+        
+        // Paths
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          const pathGeo = new THREE.PlaneGeometry(2, 30);
+          const pathMat = new THREE.MeshStandardMaterial({
+            color: 0xC8A870,
+            roughness: 0.8
+          });
+          const path = new THREE.Mesh(pathGeo, pathMat);
+          path.rotation.x = -Math.PI / 2;
+          path.rotation.z = angle;
+          path.position.y = 0.01;
+          scene.add(path);
+        }
+      }
+
+      function createBrahmSthal() {
+        // Base tiers
+        for (let i = 0; i < 3; i++) {
+          const size = 3 - i * 0.5;
+          const tierGeo = new THREE.CylinderGeometry(size, size + 0.2, 0.5, 8);
+          const tierMat = new THREE.MeshStandardMaterial({
+            color: 0xC8A870,
+            roughness: 0.7,
+            metalness: 0.2
+          });
+          const tier = new THREE.Mesh(tierGeo, tierMat);
+          tier.position.y = i * 0.5 + 0.25;
+          tier.castShadow = true;
+          scene.add(tier);
+        }
+        
+        // Central pillar
+        const pillarGeo = new THREE.CylinderGeometry(0.5, 0.6, 6, 8);
+        const pillarMat = new THREE.MeshStandardMaterial({
+          color: 0xB87333,
+          roughness: 0.5,
+          metalness: 0.6
+        });
+        const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+        pillar.position.y = 4.5;
+        pillar.castShadow = true;
+        scene.add(pillar);
+        
+        // Om sphere
+        const omGeo = new THREE.SphereGeometry(1, 32, 32);
+        const omMat = new THREE.MeshStandardMaterial({
+          color: 0xFFD700,
+          emissive: 0xFFAA00,
+          emissiveIntensity: 0.5,
+          roughness: 0.3,
+          metalness: 0.8
+        });
+        const omSphere = new THREE.Mesh(omGeo, omMat);
+        omSphere.position.y = 8.5;
+        scene.add(omSphere);
+        
+        // Om light
+        const omLight = new THREE.PointLight(0xFFD700, 2, 20);
+        omLight.position.y = 8.5;
+        scene.add(omLight);
+        
+        // Rotating chakras
+        for (let i = 0; i < 3; i++) {
+          const chakraGeo = new THREE.TorusGeometry(1.5 - i * 0.3, 0.05, 8, 32);
+          const chakraMat = new THREE.MeshStandardMaterial({
+            color: 0xFFD700,
+            emissive: 0xFFAA00,
+            emissiveIntensity: 0.3,
+            metalness: 0.9
+          });
+          const chakra = new THREE.Mesh(chakraGeo, chakraMat);
+          chakra.position.y = 5 + i * 1.5;
+          chakra.rotation.x = Math.PI / 4;
+          chakra.userData.isChakra = true;
+          scene.add(chakra);
+        }
+      }
+
+      function createTemple(temple) {
+        const group = new THREE.Group();
+        group.position.set(...temple.position);
+        group.userData.temple = temple;
+        group.userData.isTemple = true;
+        
+        const scale = temple.scale;
+        
+        // Base platform
+        for (let i = 0; i < 3; i++) {
+          const baseGeo = new THREE.BoxGeometry((4 - i * 0.3) * scale, 0.3, (4 - i * 0.3) * scale);
+          const baseMat = new THREE.MeshStandardMaterial({
+            color: 0xC8A870,
+            roughness: 0.8
+          });
+          const base = new THREE.Mesh(baseGeo, baseMat);
+          base.position.y = i * 0.3 + 0.15;
+          base.castShadow = true;
+          base.receiveShadow = true;
+          group.add(base);
+        }
+        
+        // Main hall (Mandapa)
+        const hallGeo = new THREE.BoxGeometry(3 * scale, 3 * scale, 3 * scale);
+        const hallMat = new THREE.MeshStandardMaterial({
+          color: 0xFFF8E7,
+          roughness: 0.7
+        });
+        const hall = new THREE.Mesh(hallGeo, hallMat);
+        hall.position.y = 1 + 1.5 * scale;
+        hall.castShadow = true;
+        group.add(hall);
+        
+        // Shikhara (spire)
+        const spireHeight = 4 * scale;
+        const spireGeo = new THREE.ConeGeometry(1.5 * scale, spireHeight, 8);
+        const spireMat = new THREE.MeshStandardMaterial({
+          color: temple.color,
+          roughness: 0.5,
+          metalness: 0.3
+        });
+        const spire = new THREE.Mesh(spireGeo, spireMat);
+        spire.position.y = 1 + 3 * scale + spireHeight / 2;
+        spire.castShadow = true;
+        group.add(spire);
+        
+        // Kalash (finial)
+        const kalashGeo = new THREE.SphereGeometry(0.3 * scale, 16, 16);
+        const kalashMat = new THREE.MeshStandardMaterial({
+          color: 0xFFD700,
+          metalness: 0.9,
+          roughness: 0.2
+        });
+        const kalash = new THREE.Mesh(kalashGeo, kalashMat);
+        kalash.position.y = 1 + 3 * scale + spireHeight + 0.3 * scale;
+        group.add(kalash);
+        
+        // Flag
+        const flagPoleGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.5 * scale);
+        const flagPoleMat = new THREE.MeshStandardMaterial({ color: 0xB87333 });
+        const flagPole = new THREE.Mesh(flagPoleGeo, flagPoleMat);
+        flagPole.position.set(0, 1 + 3 * scale + spireHeight + 0.8 * scale, 0);
+        group.add(flagPole);
+        
+        const flagGeo = new THREE.PlaneGeometry(0.6 * scale, 0.4 * scale);
+        const flagMat = new THREE.MeshStandardMaterial({
+          color: 0xFF6B00,
+          side: THREE.DoubleSide
+        });
+        const flag = new THREE.Mesh(flagGeo, flagMat);
+        flag.position.set(0.3 * scale, 1 + 3 * scale + spireHeight + 1.2 * scale, 0);
+        flag.userData.isFlag = true;
+        group.add(flag);
+        
+        // Entrance pillars
+        [-0.8, 0.8].forEach(x => {
+          const pillarGeo = new THREE.CylinderGeometry(0.15 * scale, 0.15 * scale, 2.5 * scale);
+          const pillarMat = new THREE.MeshStandardMaterial({
+            color: 0xC8A870,
+            roughness: 0.6
+          });
+          const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+          pillar.position.set(x * scale, 1 + 1.25 * scale, 1.6 * scale);
+          pillar.castShadow = true;
+          group.add(pillar);
+        });
+        
+        // Corner diyas
+        [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([x, z]) => {
+          const diyaGeo = new THREE.ConeGeometry(0.1 * scale, 0.15 * scale, 8);
+          const diyaMat = new THREE.MeshStandardMaterial({
+            color: 0xB87333,
+            emissive: 0xFF6600,
+            emissiveIntensity: 0.5
+          });
+          const diya = new THREE.Mesh(diyaGeo, diyaMat);
+          diya.position.set(x * 1.8 * scale, 1, z * 1.8 * scale);
+          group.add(diya);
+          
+          const flameLight = new THREE.PointLight(0xFF6600, 0.5, 3);
+          flameLight.position.copy(diya.position);
+          flameLight.position.y += 0.2;
+          group.add(flameLight);
+        });
+        
+        scene.add(group);
+        templeObjects.push(group);
+      }
+
+      function createTrees() {
+        for (let i = 0; i < 20; i++) {
+          const angle = (i / 20) * Math.PI * 2;
+          const radius = 32 + Math.random() * 5;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
+          
+          // Trunk
+          const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 2);
+          const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3728 });
+          const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+          trunk.position.set(x, 1, z);
+          trunk.castShadow = true;
+          scene.add(trunk);
+          
+          // Foliage
+          const foliageGeo = new THREE.ConeGeometry(1.5, 4, 8);
+          const foliageMat = new THREE.MeshStandardMaterial({
+            color: 0x228B22,
+            roughness: 0.8
+          });
+          const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+          foliage.position.set(x, 4, z);
+          foliage.castShadow = true;
+          scene.add(foliage);
+        }
+      }
+
+      function onTempleClick(event) {
+        event.preventDefault();
+        
+        const rect = renderer.domElement.getBoundingClientRect();
+        const x = ((event.clientX || event.changedTouches?.[0]?.clientX) - rect.left) / rect.width * 2 - 1;
+        const y = -((event.clientY || event.changedTouches?.[0]?.clientY) - rect.top) / rect.height * 2 + 1;
+        
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        
+        for (const intersect of intersects) {
+          let obj = intersect.object;
+          while (obj.parent && !obj.userData.temple) {
+            obj = obj.parent;
+          }
+          if (obj.userData.temple) {
+            selectTemple(obj.userData.temple);
+            
+            // Fly camera to temple
+            const targetPos = new THREE.Vector3(...obj.userData.temple.position);
+            targetPos.y += 5;
+            targetPos.z += 15;
+            targetPos.x += 10;
+            
+            controls.target.set(...obj.userData.temple.position);
+            break;
+          }
+        }
+      }
+
+      function selectTemple(temple) {
+        currentTemple = temple;
+        
+        document.getElementById('panelSymbol').textContent = temple.symbol;
+        document.getElementById('panelNameHindi').textContent = temple.nameHindi;
+        document.getElementById('panelNameEnglish').textContent = temple.nameEnglish;
+        document.getElementById('panelMantra').textContent = temple.mantra;
+        
+        document.getElementById('templePanel').classList.add('visible');
+        
+        playBellSound();
+      }
+
+      // ==================== DARSHAN ====================
+      function openDarshan(temple) {
+        currentTemple = temple;
+        
+        document.getElementById('darshanDeityHindi').textContent = temple.god.hindi;
+        document.getElementById('darshanDeityEnglish').textContent = temple.god.english;
+        document.getElementById('darshanMantra').textContent = temple.mantra;
+        document.getElementById('darshanSymbol').textContent = temple.symbol;
+        
+        document.getElementById('darshanModal').classList.add('visible');
+        
+        malaCount = 0;
+        updateMalaCount();
+        
+        startPetals();
+        playConchSound();
+      }
+
+      function updateMalaCount() {
+        document.getElementById('malaCount').textContent = malaCount;
+        document.getElementById('malaProgress').style.width = `${(malaCount / 108) * 100}%`;
+        
+        if (malaCount === 108) {
+          playBellSound();
+          setTimeout(() => playBellSound(), 300);
+          setTimeout(() => playBellSound(), 600);
+        }
+      }
+
+      function startPetals() {
+        const container = document.getElementById('petalContainer');
+        container.innerHTML = '';
+        
+        const petals = ['🌸', '🌺', '🌹', '🏵️', '💐'];
+        
+        for (let i = 0; i < 20; i++) {
+          setTimeout(() => {
+            const petal = document.createElement('span');
+            petal.className = 'petal';
+            petal.textContent = petals[Math.floor(Math.random() * petals.length)];
+            petal.style.left = `${Math.random() * 100}%`;
+            petal.style.animationDuration = `${5 + Math.random() * 5}s`;
+            petal.style.animationDelay = `${Math.random() * 2}s`;
+            container.appendChild(petal);
+            
+            setTimeout(() => petal.remove(), 10000);
+          }, i * 500);
+        }
+      }
+
+      function performAarti() {
+        const container = document.getElementById('aartiContainer');
+        const ring = document.getElementById('diyaRing');
+        
+        ring.innerHTML = '';
+        
+        // Create 8 diyas in a circle
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          const diya = document.createElement('span');
+          diya.className = 'diya';
+          diya.textContent = '🪔';
+          diya.style.left = `${50 + Math.cos(angle) * 40}%`;
+          diya.style.top = `${50 + Math.sin(angle) * 40}%`;
+          diya.style.transform = 'translate(-50%, -50%)';
+          diya.style.animationDelay = `${i * 0.1}s`;
+          ring.appendChild(diya);
+        }
+        
+        container.style.display = 'flex';
+        playBellSound();
+        
+        setTimeout(() => {
+          container.style.display = 'none';
+        }, 8000);
+      }
+
+      // ==================== PANCHANG ====================
+      function getPanchang() {
+        const now = new Date();
+        const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        
+        // Simplified calculations (real panchang needs astronomical data)
+        const tithiIndex = (dayOfYear + 5) % 16;
+        const nakshatraIndex = (dayOfYear + 3) % 27;
+        const monthIndex = (now.getMonth() + 10) % 12;
+        const vara = VARAS[now.getDay()];
+        
+        const paksha = tithiIndex < 15 ? 'शुक्ल पक्ष' : 'कृष्ण पक्ष';
+        
+        return {
+          tithi: { hindi: TITHIS[tithiIndex], english: `Day ${tithiIndex + 1}` },
+          nakshatra: { hindi: NAKSHATRAS[nakshatraIndex], english: NAKSHATRAS[nakshatraIndex] },
+          vara: vara,
+          masa: { hindi: MONTHS[monthIndex], english: MONTHS[monthIndex] },
+          paksha: paksha,
+          moonPhase: tithiIndex / 15, // 0-1 for display
+          samvat: { vikram: now.getFullYear() + 57, shaka: now.getFullYear() - 78 }
+        };
+      }
+
+      function updatePanchangDisplay() {
+        const panchang = getPanchang();
+        const now = new Date();
+        
+        // Mini display
+        document.getElementById('panchangMini').textContent = 
+          `${panchang.tithi.hindi} | ${panchang.vara.hindi} | ${panchang.nakshatra.hindi}`;
+        
+        // Full display
+        document.getElementById('panchangDate').textContent = 
+          `${now.toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+        
+        // Grid
+        const grid = document.getElementById('panchangGrid');
+        grid.innerHTML = `
+          <div class="panchang-item">
+            <div class="panchang-item-label">तिथि</div>
+            <div class="panchang-item-value">${panchang.tithi.hindi}</div>
+            <div class="panchang-item-english">${panchang.paksha}</div>
+          </div>
+          <div class="panchang-item">
+            <div class="panchang-item-label">वार</div>
+            <div class="panchang-item-value">${panchang.vara.hindi}</div>
+            <div class="panchang-item-english">${panchang.vara.english}</div>
+          </div>
+          <div class="panchang-item">
+            <div class="panchang-item-label">नक्षत्र</div>
+            <div class="panchang-item-value">${panchang.nakshatra.hindi}</div>
+          </div>
+          <div class="panchang-item">
+            <div class="panchang-item-label">मास</div>
+            <div class="panchang-item-value">${panchang.masa.hindi}</div>
+          </div>
+          <div class="panchang-item">
+            <div class="panchang-item-label">आज के देवता</div>
+            <div class="panchang-item-value">${panchang.vara.deity}</div>
+          </div>
+          <div class="panchang-item">
+            <div class="panchang-item-label">विक्रम संवत</div>
+            <div class="panchang-item-value">${panchang.samvat.vikram}</div>
+          </div>
+        `;
+        
+        // Festivals
+        const festivalList = document.getElementById('festivalList');
+        const currentMonth = now.getMonth();
+        const upcomingFestivals = FESTIVALS
+          .filter(f => f.month >= currentMonth || (f.month < currentMonth && f.month < 3))
+          .slice(0, 5);
+        
+        festivalList.innerHTML = upcomingFestivals.map(f => {
+          const festDate = new Date(now.getFullYear(), f.month, f.day);
+          if (festDate < now) festDate.setFullYear(now.getFullYear() + 1);
+          const daysAway = Math.ceil((festDate - now) / (1000 * 60 * 60 * 24));
+          
+          return `
+            <div class="festival-card">
+              <span class="festival-icon">${f.icon}</span>
+              <div class="festival-info">
+                <h4>${f.name}</h4>
+                <p>${f.english}</p>
+              </div>
+              <span class="festival-days">${daysAway} दिन</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // ==================== PRASAD ====================
+      function openPrasad(temple) {
+        document.getElementById('prasadDeity').textContent = temple.symbol;
+        document.getElementById('prasadGodName').textContent = temple.god.hindi;
+        document.getElementById('prasadTemple').textContent = temple.nameHindi;
+        document.getElementById('prasadBlessing').textContent = temple.blessing;
+        
+        document.getElementById('prasadModal').classList.add('visible');
+      }
+
+      function sharePrasad(platform) {
+        const temple = currentTemple || TEMPLES[0];
+        const message = `🙏 ${temple.god.hindi} जी का प्रसाद 🪔\nमैंने ${temple.nameHindi} में दर्शन किए। आपके लिए भी प्रसाद है!\n${temple.blessing}\n\n🕉️ देवनगरी - devnagari.app`;
+        
+        switch(platform) {
+          case 'whatsapp':
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+            break;
+          case 'copy':
+            navigator.clipboard.writeText(message);
+            alert('लिंक कॉपी हो गया! | Link copied!');
+            break;
+          case 'download':
+            // Would generate canvas image in full implementation
+            alert('प्रसाद कार्ड डाउनलोड हो रहा है...');
+            break;
+        }
+      }
+
+      // ==================== GREETING ====================
+      function updateGreeting() {
+        const hour = new Date().getHours();
+        let greeting;
+        
+        if (hour < 5) greeting = '🌙 शुभ रात्रि';
+        else if (hour < 12) greeting = '🌅 सुप्रभात';
+        else if (hour < 17) greeting = '☀️ नमस्ते';
+        else if (hour < 20) greeting = '🌆 शुभ संध्या';
+        else greeting = '🌙 शुभ रात्रि';
+        
+        document.getElementById('greeting').textContent = greeting;
+      }
+
+      // ==================== EVENT LISTENERS ====================
+      function initEventListeners() {
+        // Sound toggle
+        document.getElementById('soundToggle').addEventListener('click', () => {
+          initAudio();
+          isSoundOn = !isSoundOn;
+          document.getElementById('soundToggle').textContent = isSoundOn ? '🔊' : '🔇';
+          if (isSoundOn) playOmSound();
+        });
+        
+        // Audio prompt for iOS
+        document.getElementById('audioPrompt').addEventListener('click', () => {
+          initAudio();
+          isSoundOn = true;
+          document.getElementById('soundToggle').textContent = '🔊';
+          document.getElementById('audioPrompt').classList.add('hidden');
+          playOmSound();
+        });
+        
+        // Enter city
+        document.getElementById('enterCity').addEventListener('click', () => {
+          document.getElementById('om-gate').classList.add('hidden');
+          document.getElementById('app-container').classList.add('visible');
+          initCity();
+          updatePanchangDisplay();
+          updateGreeting();
+          if (isSoundOn) playConchSound();
+        });
+        
+        // Show panchang from entry
+        document.getElementById('showPanchang').addEventListener('click', () => {
+          document.getElementById('om-gate').classList.add('hidden');
+          document.getElementById('panchangPage').classList.add('visible');
+          updatePanchangDisplay();
+        });
+        
+        // Close temple panel
+        document.getElementById('closePanel').addEventListener('click', () => {
+          document.getElementById('templePanel').classList.remove('visible');
+        });
+        
+        // Temple panel actions
+        document.getElementById('btnDarshan').addEventListener('click', () => {
+          if (currentTemple) openDarshan(currentTemple);
+        });
+        
+        document.getElementById('btnAarti').addEventListener('click', () => {
+          if (currentTemple) {
+            openDarshan(currentTemple);
+            setTimeout(performAarti, 1000);
+          }
+        });
+        
+        document.getElementById('btnPrasad').addEventListener('click', () => {
+          if (currentTemple) openPrasad(currentTemple);
+        });
+        
+        // Close darshan
+        document.getElementById('closeDarshan').addEventListener('click', () => {
+          document.getElementById('darshanModal').classList.remove('visible');
+        });
+        
+        // Darshan actions
+        document.getElementById('actionBell').addEventListener('click', () => {
+          playBellSound();
+        });
+        
+        document.getElementById('actionDiya').addEventListener('click', () => {
+          // Add visual diya effect
+          const stage = document.querySelector('.darshan-stage');
+          const diya = document.createElement('span');
+          diya.className = 'diya';
+          diya.textContent = '🪔';
+          diya.style.position = 'absolute';
+          diya.style.fontSize = '40px';
+          diya.style.left = `${30 + Math.random() * 40}%`;
+          diya.style.bottom = '20%';
+          stage.appendChild(diya);
+          playBellSound();
+        });
+        
+        document.getElementById('actionFlower').addEventListener('click', () => {
+          startPetals();
+        });
+        
+        document.getElementById('actionChant').addEventListener('click', () => {
+          malaCount = Math.min(108, malaCount + 1);
+          updateMalaCount();
+          if (isSoundOn && malaCount % 10 === 0) playBellSound();
+        });
+        
+        document.getElementById('actionAarti').addEventListener('click', performAarti);
+        
+        document.getElementById('actionPrasad').addEventListener('click', () => {
+          document.getElementById('darshanModal').classList.remove('visible');
+          if (currentTemple) openPrasad(currentTemple);
+        });
+        
+        // Close prasad
+        document.getElementById('closePrasad').addEventListener('click', () => {
+          document.getElementById('prasadModal').classList.remove('visible');
+        });
+        
+        // Share buttons
+        document.getElementById('shareWhatsApp').addEventListener('click', () => sharePrasad('whatsapp'));
+        document.getElementById('shareDownload').addEventListener('click', () => sharePrasad('download'));
+        document.getElementById('shareCopy').addEventListener('click', () => sharePrasad('copy'));
+        
+        // Sky toggle
+        document.querySelectorAll('.sky-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.sky-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            skyMode = btn.dataset.sky;
+            if (scene) updateSkyLighting();
+          });
+        });
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const page = item.dataset.page;
+            
+            // Hide all pages
+            document.getElementById('panchangPage').classList.remove('visible');
+            document.getElementById('darshanModal').classList.remove('visible');
+            
+            if (page === 'city') {
+              document.getElementById('app-container').classList.add('visible');
+            } else if (page === 'panchang') {
+              document.getElementById('panchangPage').classList.add('visible');
+              updatePanchangDisplay();
+            } else if (page === 'darshan') {
+              // Open today's recommended temple
+              const today = new Date().getDay();
+              const templeOfDay = TEMPLES.find(t => t.day === VARAS[today].english) || TEMPLES[0];
+              openDarshan(templeOfDay);
+            }
+            
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+          });
+        });
+      }
+
+      // ==================== INIT ====================
+      function init() {
+        initStarfield();
+        initEventListeners();
+        
+        // Check if iOS for audio prompt
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (!isIOS) {
+          document.getElementById('audioPrompt').classList.add('hidden');
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>
