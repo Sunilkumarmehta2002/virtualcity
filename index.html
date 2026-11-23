@@ -2391,7 +2391,7 @@
           const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 0.8, 16), stoneM); ped.position.set(0, 0.4, 1.35); al.add(ped);
           const lot = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.9, 0.2, 16), gold); lot.position.set(0, 0.9, 1.35); al.add(lot);
           const dya = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb54a })); dya.position.set(1.0, 0.3, 2.1); al.add(dya);
-          const lb = label(n.id === 'parvati' ? 'उमा-महेश्वर' : n.h, n.id === 'parvati' ? 'Shiva & Parvati' : n.e, ['ganesh', 'parvati'].includes(n.id) ? '' : 'मूर्ति शीघ्र · statue pending'); lb.position.set(0, 3.7, 0.7); al.add(lb);
+          const lb = label(n.id === 'parvati' ? 'उमा-महेश्वर' : n.h, n.id === 'parvati' ? 'Shiva & Parvati' : n.e, n.id === 'ganesh' ? '' : 'मूर्ति शीघ्र · statue pending'); lb.position.set(0, 3.7, 0.7); al.add(lb);
           slots.push({ id: n.id, grp: al, base: new THREE.Vector3(x, 1.0, side * (W / 2) + inward * 1.35) });
           GAL.circles.push([GAL.ox + x, side * (W / 2) + inward * 1.35, 1.2]);
         });
@@ -2417,7 +2417,7 @@
         }).catch(() => {});
         }
         loadMuseumScan('ganesh', 'models/ganesha.json', 1.9, 0xc8b496);
-        loadMuseumScan('parvati', 'models/uma.json', 2.25, 0xbf9570);
+        // Uma-Maheshvara retained as an experimental asset, not displayed until mesh QA passes.
       }
       function setupGalleryBtn() {
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
@@ -3260,4 +3260,4 @@
       init();
     </script>
   </body>
-            </html>
+                           </html>
