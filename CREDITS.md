@@ -9,3 +9,12 @@ Recordings are used under open licences. Files in `audio/` are mono, low-bitrate
 The converted audio files `audio/omnava.js` and `audio/sherawali.js` are adaptations and are licensed CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/ . This does not change the licence of the rest of the project.
 
 Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Internet Archive community upload credited to a commercial devotional singer) was removed because the uploader's authority to release it could not be verified.
+
+
+## Ganesha 3D scan
+- Ganesha, 10th-11th century CE, volcanic stone, Java. Scan by the Minneapolis Institute of Art.
+- Source: https://sketchfab.com/3d-models/ganesha-10th-11th-c-ce-375c670515684977b6ec05be115366ac
+- Download and licence record: https://commons.wikimedia.org/wiki/File:Ganesha%2C_10th_-_11th_C_CE_-_3D_model_by_Minneapolis_Institute_of_Art_-_Sketchfab.stl
+- Licence: CC0, verified from Wikimedia Commons file metadata.
+- Adaptation: welded vertices, 16-bit position quantization, indexed mesh, scaled and rotated for display; neutral stone material rather than original texture. 63,950 triangles. Stored as models/ganesha.json (about 766 KB before transfer compression).
+- This is a historical Javanese depiction, not a claim that all traditions depict Ganesha this way.
