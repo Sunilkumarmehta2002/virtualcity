@@ -44,3 +44,8 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Surya, the Sun God, early700s, Kashmir. Cleveland Museum of Art1965.557, brass sculpture with silver eyes and copper lips. Museum: https://www.clevelandart.org/art/1965.557
 - Original open-use model: https://sketchfab.com/3d-models/none-0f5e1ad4a1214e0c88d480e8945da422 . Embedded GLB metadata states CC0-1.0 and Cleveland Museum attribution.
 - Acquired via https://www.artheonmuseum.org/artwork/1965-557-surya-the-sun-god-0f5e1a . Geometry retained124,404 triangles, quantized16-bit positions/indices, source orientation and display scale adjusted. Recreated brass-style material, not original photo texture, inlays or paint. Six compressed text chunks decoded on first visit, about1.27MB before transfer compression.
+
+## Vishnu on Garuda
+- Minneapolis Institute of Art99.216.7, Cambodia,12th–13th century, bronze. Museum identity: https://collections.artsmia.org/art/8321/vishnu-on-garuda-cambodia
+- Original scan, CC0 licence checked on source: https://sketchfab.com/3d-models/vishnu-on-garuda-12-13th-c-ce-19f2d33eb9d44d1fa8551b7d95929b0f
+- Acquired via https://www.artheonmuseum.org/artwork/vishnu-on-garuda-12-13th-c-ce-19f2d3 . Embedded GLB metadata corroborates source, title and CC0.64,000 triangles kept,16-bit quantization, reorientation/display scale, recreated bronze-style material, not original texture or paint. Three on-demand compressed chunks, about715kB before transfer compression. Historical small bronze enlarged for gallery display.
