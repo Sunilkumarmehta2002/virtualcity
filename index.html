@@ -1960,20 +1960,27 @@
       function updateLabelVisibility() {
         const labels = scene.children.filter(o => o.userData.isLabel);
         const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
-        const lw = w < 600 ? 120 : 190, lh = w < 600 ? 40 : 60;
         const items = labels.map(l => ({ l, d: camera.position.distanceTo(l.position) })).sort((a, b) => a.d - b.d);
         const placed = [];
+        const topSafe = w < 600 ? 82 : 78, botSafe = w < 600 ? 105 : 24;
+        const sideSafe = w < 600 ? 8 : 125;
+        const focal = h / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
         items.forEach(({ l, d }) => {
           const k = Math.min(Math.max(d * 0.06, 2.0), 4.2);
           const mk = w < 600 ? 0.72 : 1;
           l.scale.set(k * 3.2 * mk, k * mk, 1);
+          _lp.copy(l.position).applyMatrix4(camera.matrixWorldInverse);
+          const depth = -_lp.z;
+          const hw = l.scale.x * focal / Math.max(depth, 0.01) / 2;
+          const hh = l.scale.y * focal / Math.max(depth, 0.01) / 2;
           _lp.copy(l.position).project(camera);
           const x = (_lp.x * 0.5 + 0.5) * w, y = (-_lp.y * 0.5 + 0.5) * h;
-          const topSafe = w < 600 ? 78 : 70, botSafe = w < 600 ? 100 : 20;
-          const ok = _lp.z < 1 && Math.abs(_lp.x) < 1.05 && y > topSafe && y < h - botSafe &&
-            !placed.some(r => Math.abs(r.x - x) < lw && Math.abs(r.y - y) < lh);
+          const rect = { left: x - hw - 5, right: x + hw + 5, top: y - hh - 5, bottom: y + hh + 5 };
+          const ok = !walk.hall && depth > camera.near && _lp.z < 1 && rect.left > sideSafe && rect.right < w - 8 &&
+            rect.top > topSafe && rect.bottom < h - botSafe &&
+            !placed.some(r => rect.left < r.right && rect.right > r.left && rect.top < r.bottom && rect.bottom > r.top);
           l.visible = ok;
-          if (ok) placed.push({ x, y });
+          if (ok) placed.push(rect);
         });
       }
 
@@ -2272,7 +2279,7 @@
             b.title = 'Walking (tap to return to city view)';
             hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
-            walk.hall = false; controls.enabled = true;
+            walk.hall = false; document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
             camera.rotation.order = 'XYZ';
             camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
             walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
@@ -2410,14 +2417,17 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && walk.hall) { walk.hall = false; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); return; }
+          if (walk.on && walk.hall) { walk.hall = false; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
           if (!walk.on) wb.click();
-          enterGallery(); gb.classList.add('active');
+          enterGallery(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
       }
       function enterGallery() {
         buildGallery();
         walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
+        const hint = document.getElementById('walkHint');
+        hint.textContent = 'Prototype gallery · Ganesha: first left niche · tap 🪔 again to leave · drag to look, joystick / WASD to walk';
+        hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 10000);
       }
 
       let _envLast = performance.now();
@@ -3244,4 +3254,4 @@
       init();
     </script>
   </body>
-</html>
+          </html>
