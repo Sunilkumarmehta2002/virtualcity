@@ -62,3 +62,12 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Download mirror: https://www.artheonmuseum.org/artwork/hanuman-anjaneya-idol-1d75f1
 - Adaptations: retained all five mesh parts and 144,710 triangles; 16-bit position quantization, indexed geometry, gzip/base64 storage, rotation and scale for display. New brown material study replaces the scan textures. This is not a museum attribution or a claim of original surface colour.
 - Stored in eight models/hanuman-*.txt chunks, loaded only when entering this shrine. About 1.72MB total encoded transfer.
+
+
+## Krishna, MUEC 3D scan
+- Scan by Giravolt. Bronze Krishna, Tamil Nadu, 13th-14th century, Ethnological Museum of the Cultures of the World, Barcelona (MUEC). Identity and dating from the original scan description.
+- Original source: https://sketchfab.com/3d-models/krishna-muec-002635095eb14f929d74333806ab47d2
+- CC BY4.0: https://creativecommons.org/licenses/by/4.0/
+- Download mirror: https://www.artheonmuseum.org/artwork/krishna-muec-002635
+- Changes: combined mesh parts, welded vertices at 0.0001 source-unit precision, simplified from 450,000 to 59,999 triangles, quantized positions16bit, gzip/base64 storage, rotated/scaled for display. New bronze-style material replaces the original scan texture; not a claim of original surface colour.
+- Three models/krishna-*.txt chunks,641,220 encoded bytes, loaded on demand.
