@@ -32,3 +32,10 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Pinned v1 LOD1 files loaded from those source pages, about 1.3MB combined. GLTFLoader, KTX2Loader and Meshopt decoder use the existing pinned Three.js0.160.0 dependency.
 - Independently cloned skinned models, idle/walk animation blending, movement speed matched to the source walk cycle (1.3m/s), and existing city collision/yielding wrappers retained.
 - These are stylized modern visitors, not photoreal people or a finished varied devotional crowd. If a download fails the prior procedural crowd remains as a fallback.
+
+## Shiva Nataraja 3D scan
+- Nataraja, Shiva as Lord of the Dance, 1000s, Tamil Nadu, Chola period, bronze. Cleveland Museum of Art1930.331; scan by Dale Utt for the museum.
+- Museum identification: https://www.clevelandart.org/art/1930.331
+- Original model and verified CC0 dedication: https://sketchfab.com/3d-models/1930331-nataraja-shiva-as-the-lord-of-dance-6862a3c673d4434a8dc39ced2a5b5720
+- Downloaded from https://www.artheonmuseum.org/artwork/1930-331-nataraja-shiva-as-the-lord-of-dance-6862a3 . GLB metadata independently identifies original model, museum and CC0.
+- Adaptation:98,795 triangles preserved,16-bit quantized positions/indices, source orientation applied and display scale adjusted; recreated bronze-style material, not original photographic texture or painted surface. Geometry compressed into five repository text chunks, decoded only when the Shiva bay is visited. About1.07MB before transfer compression. No claim of authentic original surface colour.
