@@ -38,6 +38,24 @@
       .city-legend { transition: opacity 1s; }
       .city-legend.faded { opacity: 0; }
       @media (max-width: 600px) { .city-legend small { display: none; } .city-legend { top: 60px; font-size: 12px; padding: 6px 10px; } }
+
+      .bhajan-modal { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center;
+        background: rgba(4,1,10,0.82); backdrop-filter: blur(8px); }
+      .bhajan-modal.visible { display: flex; }
+      .bhajan-card { width: min(94vw, 460px); max-height: 88vh; overflow-y: auto; background: #0d0420; border: 2px solid var(--divine-gold);
+        border-radius: 18px; padding: 20px; color: #FFE9A8; font-family: 'Noto Sans Devanagari','Lora',sans-serif; }
+      .bhajan-card h2 { font-size: 22px; color: var(--divine-gold); margin-bottom: 4px; }
+      .bhajan-card .sub { font-size: 13px; opacity: .8; margin-bottom: 14px; }
+      .bhajan-track { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: rgba(255,215,0,0.08);
+        border: 1px solid rgba(255,215,0,0.35); color: #FFE9A8; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; font: inherit; }
+      .bhajan-track.playing { background: rgba(255,107,0,0.25); border-color: var(--saffron); }
+      .bhajan-track small { display: block; opacity: .7; font-size: 11px; }
+      .bhajan-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 14px; }
+      .bhajan-row input[type=range] { flex: 1; accent-color: #FFD700; }
+      .bhajan-btn { background: rgba(255,215,0,0.12); border: 1px solid var(--divine-gold); color: var(--divine-gold); border-radius: 10px;
+        padding: 8px 14px; cursor: pointer; font: inherit; }
+      .bhajan-credits { font-size: 11px; opacity: .75; line-height: 1.5; margin-top: 12px; }
+      .bhajan-credits a { color: #FFD700; }
       .city-legend small { color: #fff; opacity: .85; font-size: 11px; }
       :root {
         --divine-gold: #FFD700;
@@ -1201,6 +1219,26 @@
           <button class="temple-action-btn" id="btnPrasad">🎁 प्रसाद लें</button>
         </div>
       </div>
+
+
+    <div class="bhajan-modal" id="bhajanModal">
+      <div class="bhajan-card">
+        <h2>🎶 भजन और ध्वनि</h2>
+        <div class="sub">Bhajan &amp; temple sound. Starts only when you tap play.</div>
+        <button class="bhajan-track" data-track="aarti">🪔 <span>Aarti Puja (Santoshi Maa)<small>Live recording, 2:32</small></span></button>
+        <button class="bhajan-track" data-track="omnava">🔱 <span>Om Navashivam<small>Traditional song, Kumaon, 1:55</small></span></button>
+        <button class="bhajan-track" data-track="sherawali">🦁 <span>Sherawali Maa<small>Traditional song, Kumaon, 0:51</small></span></button>
+        <div class="bhajan-row"><span>🔔</span><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
+        <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn">🔊</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
+        <div class="bhajan-row"><button class="bhajan-btn" id="stopBtn">⏹ Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div>
+        <div class="bhajan-credits">Recordings are used under open licences, shortened to mono MP3 where noted:<br>
+        Temple bell: "Indian Temple Bell" by ganiket, Freesound, <a href="https://freesound.org/people/ganiket/sounds/466652/" target="_blank" rel="noopener">CC0</a>.<br>
+        Aarti Puja, deity Santoshi: Shri hari om sharan ji, Wikimedia Commons, <a href="https://commons.wikimedia.org/wiki/File:Aarti_Puja,_deity_Santoshi.ogg" target="_blank" rel="noopener">CC0</a>.<br>
+        Om Navashivam and Sherawali Maa: Yann, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+        (<a href="https://commons.wikimedia.org/wiki/File:Om_Navashivam,_traditional_hindu_song,_Kumaon,_Uttarakhand,_India.ogg" target="_blank" rel="noopener">source 1</a>,
+        <a href="https://commons.wikimedia.org/wiki/File:Sherawali_Maa,_traditional_hindu_song,_Kumaon,_Uttarakhand.oga" target="_blank" rel="noopener">source 2</a>). Converted to mono MP3.</div>
+      </div>
+    </div>
 
       <!-- Bottom Navigation -->
       <nav class="bottom-nav">
@@ -2632,6 +2670,8 @@
             } else if (page === 'panchang') {
               document.getElementById('panchangPage').classList.add('visible');
               updatePanchangDisplay();
+            } else if (page === 'bhajan') {
+              openBhajan();
             } else if (page === 'darshan') {
               // Open today's recommended temple
               const today = new Date().getDay();
@@ -2646,10 +2686,60 @@
         });
       }
 
+
+      // ==================== BHAJAN PLAYER (open-licence recordings) ====================
+      const TRACKS = {
+        aarti: () => import('./audio/aarti.js'),
+        omnava: () => import('./audio/omnava.js'),
+        sherawali: () => import('./audio/sherawali.js'),
+        bell: () => import('./audio/bell.js')
+      };
+      const bh = { music: null, ambience: null, current: null, volume: 0.6, muted: false, ambienceOn: false };
+      function applyVolume() {
+        const v = bh.muted ? 0 : bh.volume;
+        if (bh.music) bh.music.volume = v;
+        if (bh.ambience) bh.ambience.volume = Math.min(1, v * 0.5);
+        document.getElementById('muteBtn').textContent = bh.muted || bh.volume === 0 ? '🔇' : '🔊';
+      }
+      async function playTrack(key) {
+        const btns = document.querySelectorAll('.bhajan-track');
+        if (bh.current === key && bh.music && !bh.music.paused) { bh.music.pause(); bh.current = null; btns.forEach(b => b.classList.remove('playing')); return; }
+        const mod = await TRACKS[key]();
+        if (bh.music) bh.music.pause();
+        bh.music = new Audio(mod.default);
+        bh.music.loop = true;
+        bh.current = key;
+        applyVolume();
+        try { await bh.music.play(); } catch (e) { bh.current = null; return; }
+        btns.forEach(b => b.classList.toggle('playing', b.dataset.track === key));
+      }
+      async function toggleAmbience() {
+        const btn = document.getElementById('ambienceBtn');
+        if (bh.ambienceOn) { bh.ambience.pause(); bh.ambienceOn = false; btn.textContent = 'Off'; return; }
+        if (!bh.ambience) { bh.ambience = new Audio((await TRACKS.bell()).default); bh.ambience.loop = true; }
+        applyVolume();
+        try { await bh.ambience.play(); bh.ambienceOn = true; btn.textContent = 'On'; } catch (e) { /* needs a tap */ }
+      }
+      function stopAllAudio() {
+        if (bh.music) bh.music.pause();
+        bh.current = null;
+        document.querySelectorAll('.bhajan-track').forEach(b => b.classList.remove('playing'));
+      }
+      function openBhajan() { document.getElementById('bhajanModal').classList.add('visible'); }
+      function initBhajanEvents() {
+        document.querySelectorAll('.bhajan-track').forEach(b => b.addEventListener('click', () => playTrack(b.dataset.track)));
+        document.getElementById('ambienceBtn').addEventListener('click', toggleAmbience);
+        document.getElementById('stopBtn').addEventListener('click', stopAllAudio);
+        document.getElementById('closeBhajan').addEventListener('click', () => document.getElementById('bhajanModal').classList.remove('visible'));
+        document.getElementById('muteBtn').addEventListener('click', () => { bh.muted = !bh.muted; applyVolume(); });
+        document.getElementById('volumeSlider').addEventListener('input', e => { bh.volume = e.target.value / 100; bh.muted = false; applyVolume(); });
+      }
+
       // ==================== INIT ====================
       function init() {
         initStarfield();
         initEventListeners();
+        initBhajanEvents();
         
         // Check if iOS for audio prompt
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
