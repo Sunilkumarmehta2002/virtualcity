@@ -15,3 +15,5 @@ Ganesh, Ram, Krishna, Shiv, Durga, Lakshmi, Hanuman, Saraswati, Vishnu, Surya, P
 - Label safety fix: use actual projected sprite bounds to avoid clipped/overlapping labels and toolbar collisions; hide outdoor labels inside the gallery. Gallery entry has on-screen control guidance. Tree trunks are outside the current walkable radius, so garden exploration and tree collision remain future work. Phone frame rate unmeasured.
 
 - Museum scan expansion: joint Shiva and Parvati (Uma-Maheshvara) sourced and converted, but not displayed: simplified mesh failed visual QA. One of fourteen niches populated, thirteen still pending. CC0 source and adaptations in CREDITS.md. The gallery remains a shared prototype hall.
+
+- Garden walking: expanded the outdoor walkable area to include the trees. Player and devotees share solid trunk and lantern-post boundaries; devotees can choose garden routes. People and architecture remain low-poly. Physical-phone performance still unmeasured.
