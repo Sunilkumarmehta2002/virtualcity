@@ -1505,6 +1505,62 @@
           scale: 1.0,
           day: 'Sunday',
           blessing: 'सूर्य देव आपके जीवन में प्रकाश और ऊर्जा भरें।'
+        },
+        {
+          id: 'parvati',
+          nameHindi: 'माँ पार्वती मंदिर',
+          nameEnglish: 'Maa Parvati Mandir',
+          god: { hindi: 'माँ पार्वती', english: 'Goddess Parvati' },
+          symbol: '🌸',
+          mantra: 'ॐ उमायै नमः',
+          color: 0xE75480,
+          lightColor: 0xFFB6C1,
+          position: [19, 0, -19],
+          scale: 1.1,
+          day: 'Monday',
+          blessing: 'शिवप्रिया माँ पार्वती आपके परिवार में प्रेम और सौभाग्य बनाए रखें।'
+        },
+        {
+          id: 'kartikeya',
+          nameHindi: 'श्री कार्तिकेय मंदिर',
+          nameEnglish: 'Shri Kartikeya Mandir',
+          god: { hindi: 'कार्तिकेय (मुरुगन)', english: 'Lord Kartikeya' },
+          symbol: '🦚',
+          mantra: 'ॐ शरवणभवाय नमः',
+          color: 0xB22222,
+          lightColor: 0xFFD27F,
+          position: [-19, 0, -19],
+          scale: 1.1,
+          day: 'Tuesday',
+          blessing: 'देवसेनापति कार्तिकेय आपको विजय, साहस और अनुशासन दें।'
+        },
+        {
+          id: 'kali',
+          nameHindi: 'माँ काली मंदिर',
+          nameEnglish: 'Maa Kali Mandir',
+          god: { hindi: 'माँ काली', english: 'Goddess Kali' },
+          symbol: '🌑',
+          mantra: 'ॐ क्रीं कालिकायै नमः',
+          color: 0x2B0A3D,
+          lightColor: 0xFF3030,
+          position: [-19, 0, 19],
+          scale: 1.1,
+          day: 'Saturday',
+          blessing: 'माँ काली आपके भय और बुराइयों का नाश करें।'
+        },
+        {
+          id: 'ganga',
+          nameHindi: 'माँ गंगा मंदिर',
+          nameEnglish: 'Maa Ganga Mandir',
+          god: { hindi: 'माँ गंगा', english: 'Goddess Ganga' },
+          symbol: '🌊',
+          mantra: 'ॐ नमो गंगायै विश्वरूपिण्यै नारायण्यै नमो नमः',
+          color: 0x40C4FF,
+          lightColor: 0xE0F7FF,
+          position: [19, 0, 19],
+          scale: 1.1,
+          day: 'Monday',
+          blessing: 'पतितपावनी माँ गंगा आपके मन और जीवन को निर्मल करें।'
         }
       ];
 
@@ -1761,6 +1817,9 @@
         
         // Trees
         createTrees();
+
+        // Name labels and today's deity beacon
+        addTempleLabels();
         
         // Resize handler
         window.addEventListener('resize', () => {
@@ -1783,6 +1842,9 @@
             if (obj.userData.isChakra) {
               obj.rotation.y += 0.02;
             }
+            if (obj.userData.isTodayRing) {
+              obj.material.opacity = 0.4 + Math.sin(Date.now() * 0.003) * 0.25;
+            }
             if (obj.userData.isFlag) {
               obj.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
             }
@@ -1791,6 +1853,50 @@
           renderer.render(scene, camera);
         }
         animate();
+      }
+
+      function makeLabelSprite(text, sub) {
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 160;
+        const g = c.getContext('2d');
+        g.fillStyle = 'rgba(20,5,30,0.65)';
+        g.beginPath();
+        g.roundRect(8, 8, 496, 144, 28);
+        g.fill();
+        g.strokeStyle = '#FFD700';
+        g.lineWidth = 3;
+        g.stroke();
+        g.textAlign = 'center';
+        g.fillStyle = '#FFE9A8';
+        g.font = '600 52px "Noto Sans Devanagari", sans-serif';
+        g.fillText(text, 256, 78);
+        g.fillStyle = '#FFFFFF';
+        g.font = '500 30px Lora, serif';
+        g.fillText(sub, 256, 124);
+        const tex = new THREE.CanvasTexture(c);
+        const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+        sp.scale.set(7, 2.2, 1);
+        sp.renderOrder = 10;
+        return sp;
+      }
+
+      function addTempleLabels() {
+        const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+        TEMPLES.forEach(t => {
+          const label = makeLabelSprite(t.god.hindi, t.god.english);
+          label.position.set(t.position[0], 4 + t.scale * 3.6, t.position[2]);
+          scene.add(label);
+          if (t.day === today) {
+            const ring = new THREE.Mesh(
+              new THREE.RingGeometry(3.6 * t.scale, 4.2 * t.scale, 48),
+              new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
+            );
+            ring.rotation.x = -Math.PI / 2;
+            ring.position.set(t.position[0], 0.05, t.position[2]);
+            ring.userData.isTodayRing = true;
+            scene.add(ring);
+          }
+        });
       }
 
       function updateSkyLighting() {
