@@ -1209,7 +1209,7 @@
           <button class="sky-btn" data-sky="day" title="Day">☀️</button>
           <button class="sky-btn active" data-sky="dusk" title="Dusk">🌆</button>
           <button class="sky-btn" data-sky="night" title="Night">🌙</button>
-          <button class="follow-btn" id="followBtn" title="Follow an animal">🦌</button>
+          <button class="follow-btn" id="followBtn" title="Follow a devotee">🧍</button>
           <button class="walk-btn" id="walkBtn" title="Walk through the city">🚶</button>
         </div>
       </div>
@@ -2091,6 +2091,32 @@
         return t;
       }
 
+      function makePerson(skin, robe, female) {
+        const g = new THREE.Group();
+        const mat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 });
+        const add = (geo, c, x, y, z, parent) => { const o = new THREE.Mesh(geo, mat(c)); o.position.set(x, y, z); o.castShadow = true; (parent || g).add(o); return o; };
+        const legs = [];
+        add(new THREE.BoxGeometry(0.42, 0.62, 0.24), robe, 0, 1.2, 0);
+        add(new THREE.SphereGeometry(0.13, 12, 10), skin, 0, 1.64, 0);
+        add(new THREE.SphereGeometry(0.14, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), 0x1a1210, 0, 1.67, -0.01);
+        add(new THREE.CylinderGeometry(0.05, 0.06, 0.1, 8), skin, 0, 1.54, 0);
+        [-1, 1].forEach(sx => {
+          const arm = new THREE.Group(); arm.position.set(sx * 0.26, 1.46, 0); g.add(arm);
+          add(new THREE.BoxGeometry(0.09, 0.55, 0.09), skin, 0, -0.27, 0, arm); legs.push(arm);
+        });
+        if (female) {
+          add(new THREE.CylinderGeometry(0.2, 0.34, 0.9, 12), robe, 0, 0.48, 0);
+          add(new THREE.BoxGeometry(0.1, 0.5, 0.05), 0xffd24a, 0.1, 1.25, 0.13).rotation.z = 0.3;
+        } else {
+          [-1, 1].forEach(sx => {
+            const leg = new THREE.Group(); leg.position.set(sx * 0.1, 0.9, 0); g.add(leg);
+            add(new THREE.BoxGeometry(0.15, 0.85, 0.16), 0xf4efe2, 0, -0.43, 0, leg); legs.push(leg);
+          });
+        }
+        g.userData.legs = legs; g.userData.female = female;
+        return g;
+      }
+
       function makeAnimal(type) {
         const g = new THREE.Group();
         const m = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8 });
@@ -2160,16 +2186,17 @@
           }
         }
 
-        // Animals wander the lawn
-        const kinds = ['deer', 'deer', 'deer', 'cow', 'cow', 'peacock', 'peacock', 'peacock'];
-        kinds.forEach((k, i) => {
-          const an = makeAnimal(k);
-          const a = (i / kinds.length) * Math.PI * 2;
-          an.position.set(Math.cos(a) * 31, 0, Math.sin(a) * 31);
-          an.userData.kind = k; an.userData.target = null; an.userData.wait = Math.random() * 3;
-          an.scale.setScalar(1.9);
-          scene.add(an); envAnimals.push(an);
-        });
+        // Devotees walk the grounds (solid people: they route around temples and lantern posts)
+        const skins = [0xc68642, 0xa9714b, 0x8d5524, 0xd9a066, 0xb07a4f];
+        const robes = [0xf2f2ee, 0xff8c1a, 0xe8b923, 0xb5203b, 0x2f6fb0, 0x3b8f5a, 0xd4478a, 0x7a3fa0, 0xf5deb3, 0xe05a1c];
+        for (let i = 0; i < 12; i++) {
+          const pr = makePerson(skins[i % skins.length], robes[i % robes.length], i % 2 === 1);
+          const a = (i / 12) * Math.PI * 2, r = 29;
+          pr.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+          pr.userData.kind = i % 2 ? 'devotee (saree)' : 'devotee'; pr.userData.target = null; pr.userData.wait = Math.random() * 3;
+          pr.userData.sp = 0.9 + Math.random() * 0.4;
+          scene.add(pr); envAnimals.push(pr);
+        }
 
         // Lantern posts around the plaza edge (glow after dusk)
         lanterns = new THREE.InstancedMesh(new THREE.SphereGeometry(0.28, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffc860 }), 32);
@@ -2208,13 +2235,13 @@
         b.addEventListener('click', () => {
           followIdx++;
           if (followIdx >= envAnimals.length) {
-            followIdx = -1; b.classList.remove('active'); b.title = 'Follow an animal';
+            followIdx = -1; b.classList.remove('active'); b.title = 'Follow a devotee';
             const d = new THREE.Vector3(0, 0, 0).sub(controls.target); controls.target.set(0, 0, 0); camera.position.add(d);
             return;
           }
           b.classList.add('active');
           const k = envAnimals[followIdx].userData.kind;
-          b.title = 'Following ' + k + ' (tap for next)';
+          b.title = 'Following a ' + k + ' (tap for next)';
           const p = envAnimals[followIdx].position;
           controls.target.set(p.x, 1, p.z);
           const far = camera.aspect < 1 ? 4 : 6;
@@ -2234,7 +2261,7 @@
           joy.style.display = walk.on ? 'block' : 'none';
           if (walk.on) {
             walk.saved = { p: camera.position.clone(), t: controls.target.clone() };
-            followIdx = -1; const fb = document.getElementById('followBtn'); if (fb) { fb.classList.remove('active'); fb.title = 'Follow an animal'; }
+            followIdx = -1; const fb = document.getElementById('followBtn'); if (fb) { fb.classList.remove('active'); fb.title = 'Follow a devotee'; }
             controls.enabled = false;
             walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0;
             walk.boxes = templeObjects.filter(o => o.userData.temple).map(o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o).expandByScalar(0.8); });
@@ -2307,22 +2334,43 @@
           controls.target.x += dx; controls.target.z += dz; controls.target.y = 1;
           camera.position.x += dx; camera.position.z += dz;
         }
-        envAnimals.forEach(an => {
+        if (!window._pplObs) {
+          const boxes = templeObjects.filter(o => o.userData.temple).map(o => { o.updateMatrixWorld(true); const bb = new THREE.Box3().setFromObject(o); bb.expandByScalar(1.1); return bb; });
+          const posts = []; for (let li = 0; li < 32; li++) { const la = (li / 32) * Math.PI * 2; posts.push([Math.cos(la) * 25.2, Math.sin(la) * 25.2]); }
+          window._pplObs = { boxes, posts };
+        }
+        const OB = window._pplObs;
+        const blocked = (x, z) => {
+          if (Math.hypot(x, z) > 31) return true;
+          for (const bb of OB.boxes) if (x > bb.min.x && x < bb.max.x && z > bb.min.z && z < bb.max.z) return true;
+          for (const p of OB.posts) if (Math.hypot(x - p[0], z - p[1]) < 0.7) return true;
+          return false;
+        };
+        const clearLine = (x0, z0, x1, z1) => { for (let q = 1; q <= 24; q++) { if (blocked(x0 + (x1 - x0) * q / 24, z0 + (z1 - z0) * q / 24)) return false; } return true; };
+        envAnimals.forEach((an, ai) => {
           const u = an.userData;
           if (u.wait > 0) { u.wait -= dt; return; }
           if (!u.target) {
-            const a = Math.random() * Math.PI * 2, r = 27.5 + Math.random() * 8;
-            u.target = new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r);
+            for (let n = 0; n < 25 && !u.target; n++) {
+              const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 26;
+              const tx = Math.cos(a) * r, tz = Math.sin(a) * r;
+              if (!blocked(tx, tz) && clearLine(an.position.x, an.position.z, tx, tz)) u.target = new THREE.Vector3(tx, 0, tz);
+            }
+            if (!u.target) { u.wait = 1; return; }
           }
           const dx = u.target.x - an.position.x, dz = u.target.z - an.position.z;
           const d = Math.hypot(dx, dz);
-          if (d < 0.5) { u.target = null; u.wait = 2 + Math.random() * 5; u.legs && 0; return; }
-          const sp = (u.kind === 'peacock' ? 0.9 : 1.3) * dt;
+          if (d < 0.4) { u.target = null; u.wait = 2 + Math.random() * 5; an.userData.legs.forEach(l => { l.rotation.x = 0; }); return; }
+          const sp = u.sp * dt;
           const want = Math.atan2(dx, dz);
           let da = want - an.rotation.y; da = Math.atan2(Math.sin(da), Math.cos(da));
-          an.rotation.y += da * Math.min(1, dt * 3);
-          an.position.x += Math.sin(an.rotation.y) * sp; an.position.z += Math.cos(an.rotation.y) * sp;
-          an.userData.legs.forEach((l, i) => { l.rotation.x = Math.sin(t * 6 + i * (i % 2 ? 3.14 : 0)) * 0.4; });
+          an.rotation.y += da * Math.min(1, dt * 4);
+          const nx = an.position.x + Math.sin(an.rotation.y) * sp, nz = an.position.z + Math.cos(an.rotation.y) * sp;
+          let hit = blocked(nx, nz);
+          if (!hit) for (let oj = 0; oj < envAnimals.length; oj++) { if (oj !== ai && Math.hypot(nx - envAnimals[oj].position.x, nz - envAnimals[oj].position.z) < 0.7) { hit = true; break; } }
+          if (hit) { u.target = null; u.wait = 0.4 + Math.random(); return; }
+          an.position.x = nx; an.position.z = nz;
+          an.userData.legs.forEach((l, i) => { l.rotation.x = Math.sin(t * 5 * u.sp + (i % 2) * 3.14) * 0.5; });
         });
         if (fireflies && fireflies.visible) {
           const p = fireflies.geometry.attributes.position; const ph = fireflies.userData.ph;
