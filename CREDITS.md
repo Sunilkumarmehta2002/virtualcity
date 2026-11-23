@@ -71,3 +71,13 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Download mirror: https://www.artheonmuseum.org/artwork/krishna-muec-002635
 - Changes: combined mesh parts, welded vertices at 0.0001 source-unit precision, simplified from 450,000 to 59,999 triangles, quantized positions16bit, gzip/base64 storage, rotated/scaled for display. New bronze-style material replaces the original scan texture; not a claim of original surface colour.
 - Three models/krishna-*.txt chunks,641,220 encoded bytes, loaded on demand.
+
+
+## Parvati plaster-statue scan
+- Hindu Goddess Parvati Statue, scan by Tyler Jackson (tyjajack),2018. The source identifies a plaster statue, not a museum antiquity.
+- Original source: https://sketchfab.com/3d-models/hindu-goddess-parvati-statue-b23e43fc97374278b94687921f904fd1
+- Archive/download: https://zenodo.org/records/10266866 (Objaverse1.0/Sketchfab archive).
+- CC BY4.0: https://creativecommons.org/licenses/by/4.0/
+- Changes: applied source transforms, merged mesh parts and welded seams, simplified from200000 to70000 triangles,16bit quantized positions, gzip/base64 storage, scaled for display. New stone-style material replaces original scan texture. No claim of original historical colour.
+- Four models/parvati66-*.txt chunks,749840 encoded bytes, fetched on demand.
+- This is NOT the rejected Uma-Maheshvara scan. Both older CC0 and improved2023 BY-SA Uma candidates remain excluded pending geometry/completeness review.
