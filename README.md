@@ -41,3 +41,5 @@ Ganesh, Ram, Krishna, Shiv, Durga, Lakshmi, Hanuman, Saraswati, Vishnu, Surya, P
 - Fifth statue: Lakshmi, an artist-created sculpture by Baardus, CC BY4.0. Four-armed figure on lotus, original28,653 triangles retained, two on-demand compressed chunks. New artistic stone/metal materials, not a museum scan or historic original texture. Five statues available, nine named shrine bays empty. Regional colour-paint treatment and faithful temple interiors remain pending.
 
 - Hanuman/Anjaneya meditating idol: sixth statue, Addere Creations photo scan under CC BY4.0. Geometry retained in five parts; new brown material rather than original scan texture. Eight of14 shrine bays remain empty. Credits and licence links appear at this shrine and in CREDITS.md. Physical-phone performance unmeasured.
+
+- Krishna, MUEC: seventh statue, Giravolt CC BY4.0 museum scan of a Tamil Nadu bronze,13th–14th century. Simplified to59,999 triangles, new bronze-style material, corrected front orientation. Seven of14 bays now have statues; seven remain pending. Painted details and faithful temple interiors still unfinished.
