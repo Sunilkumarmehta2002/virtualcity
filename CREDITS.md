@@ -53,3 +53,12 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 ## Lakshmi artist sculpture
 - Indian Goddes Lakshmi statue by Baardus. Original: https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99 . Author: https://sketchfab.com/baardus . Licensed Creative Commons Attribution4.0: https://creativecommons.org/licenses/by/4.0/ . Original licence checked directly on the model page; embedded metadata corroborates title, author, source and licence.
 - Acquired via https://www.artheonmuseum.org/artwork/indian-goddes-lakshmi-statue-a3d5c2 . Artist-created model, not a museum photogrammetry scan or claim of a historical regional style. Changes: geometry quantized16-bit, retained28,653 triangles in two material groups, normalized size and position, new artistic stone/metal materials replacing original textures. Two on-demand compressed chunks, about295kB before transfer compression. No claim of authentic historical surface or completed multi-colour devotional paint.
+
+
+## Hanuman/Anjaneya 3D scan
+- Hanuman/Anjaneya Idol by Addere Creations, from their 51-photo scan.
+- Original source and licence: https://sketchfab.com/3d-models/hanumananjaneya-idol-1d75f15d1cba49738c1a13e9e2846cb0
+- CC BY4.0: https://creativecommons.org/licenses/by/4.0/
+- Download mirror: https://www.artheonmuseum.org/artwork/hanuman-anjaneya-idol-1d75f1
+- Adaptations: retained all five mesh parts and 144,710 triangles; 16-bit position quantization, indexed geometry, gzip/base64 storage, rotation and scale for display. New brown material study replaces the scan textures. This is not a museum attribution or a claim of original surface colour.
+- Stored in eight models/hanuman-*.txt chunks, loaded only when entering this shrine. About 1.72MB total encoded transfer.
