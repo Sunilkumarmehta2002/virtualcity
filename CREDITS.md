@@ -39,3 +39,8 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Original model and verified CC0 dedication: https://sketchfab.com/3d-models/1930331-nataraja-shiva-as-the-lord-of-dance-6862a3c673d4434a8dc39ced2a5b5720
 - Downloaded from https://www.artheonmuseum.org/artwork/1930-331-nataraja-shiva-as-the-lord-of-dance-6862a3 . GLB metadata independently identifies original model, museum and CC0.
 - Adaptation:98,795 triangles preserved,16-bit quantized positions/indices, source orientation applied and display scale adjusted; recreated bronze-style material, not original photographic texture or painted surface. Geometry compressed into five repository text chunks, decoded only when the Shiva bay is visited. About1.07MB before transfer compression. No claim of authentic original surface colour.
+
+## Surya 3D scan
+- Surya, the Sun God, early700s, Kashmir. Cleveland Museum of Art1965.557, brass sculpture with silver eyes and copper lips. Museum: https://www.clevelandart.org/art/1965.557
+- Original open-use model: https://sketchfab.com/3d-models/none-0f5e1ad4a1214e0c88d480e8945da422 . Embedded GLB metadata states CC0-1.0 and Cleveland Museum attribution.
+- Acquired via https://www.artheonmuseum.org/artwork/1965-557-surya-the-sun-god-0f5e1a . Geometry retained124,404 triangles, quantized16-bit positions/indices, source orientation and display scale adjusted. Recreated brass-style material, not original photo texture, inlays or paint. Six compressed text chunks decoded on first visit, about1.27MB before transfer compression.
