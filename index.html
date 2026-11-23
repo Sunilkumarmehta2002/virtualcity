@@ -419,9 +419,14 @@
       #walkJoy { display:none; position:fixed; left:24px; bottom:110px; width:116px; height:116px; border-radius:50%; background:rgba(20,10,40,0.45); border:2px solid rgba(255,215,0,0.5); z-index:30; touch-action:none; }
       @media (min-width:700px) { #walkJoy { left:auto; right:36px; bottom:40px; } }
       #walkKnob { position:absolute; left:38px; top:38px; width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
-      #galleryGuide { display:none; position:fixed; top:82px; left:50%; transform:translateX(-50%); z-index:32; background:rgba(20,10,40,.92); border:1px solid #9b7c23; border-radius:12px; padding:8px; color:#ffe9a8; max-width:calc(100vw - 32px); box-sizing:border-box; font-size:12px; text-align:center; }
+      #galleryGuide { display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:32; background:rgba(20,10,40,.92); border:1px solid #9b7c23; border-radius:12px; padding:8px; color:#ffe9a8; max-width:calc(100vw - 32px); box-sizing:border-box; font-size:12px; text-align:center; }
       #galleryGuide select, #galleryGuide button { background:#30203c; color:#fff1c4; border:1px solid #9b7c23; border-radius:6px; padding:7px; max-width:100%; }
       #galleryGuide small { display:block; margin-top:5px; }
+      @media(max-width:699px) {
+        #galleryGuide { bottom:92px; width:calc(100vw - 24px); max-width:370px; }
+        #galleryGuide select { width:calc(100% - 86px); }
+        body.in-gallery #walkJoy { bottom:200px; }
+      }
       #walkHint { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:240px; z-index:30; background:rgba(20,10,40,0.7); color:#ffe9a8; padding:6px 12px; border-radius:12px; font-size:12px; pointer-events:none; white-space:normal; width:max-content; max-width:calc(100vw - 32px); box-sizing:border-box; text-align:center; }
       .top-bar { padding-right: 80px; }
       @media (max-width: 600px) {
@@ -2288,7 +2293,7 @@
             b.title = 'Walking (tap to return to city view)';
             hint.textContent = 'Drag to look · joystick or WASD to walk · gardens are open'; hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
-            walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
+            walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
             camera.rotation.order = 'XYZ';
             camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
             walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
@@ -2360,7 +2365,7 @@
           const k=Math.round((walk.x-GAL.ox+21)/7), inBay=Math.abs(walk.z)>3.65 && k>=0 && k<7;
           const sel=document.getElementById('gallerySelect');
           if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
-          else { sel.selectedIndex=-1; document.getElementById('galleryStatus').textContent='Connecting passage · 14 shrine bays · 1 statue, 13 pending'; }
+          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';status.textContent='Connecting passage · 14 shrine bays · 1 statue, 13 pending'; }
         }
         camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
@@ -2475,7 +2480,7 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && walk.hall) { walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
+          if (walk.on && walk.hall) { walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
           if (!walk.on) wb.click();
           enterGallery(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
@@ -2489,6 +2494,7 @@
         updateGalleryStatus(id);
       }
       function updateGalleryStatus(id) {
+        document.getElementById('galleryStatus').dataset.zone=id;
         document.getElementById('galleryStatus').textContent = id !== 'ganesh' ? 'Prototype niche · statue not yet added' : GAL.scanStatus === 'ready' ? 'CC0 museum scan · Ganesha · Java, 10th–11th century' : GAL.scanStatus === 'error' ? 'Statue could not load · check connection and reload' : 'Loading Ganesha museum scan…';
       }
       function enterGallery() {
@@ -2499,7 +2505,7 @@
           sel.addEventListener('change', () => visitGalleryNiche(sel.value));
           document.getElementById('galleryExit').addEventListener('click', () => document.getElementById('galBtn').click());
         }
-        document.getElementById('galleryGuide').style.display = 'block';
+        document.getElementById('galleryGuide').style.display = 'block'; document.body.classList.add('in-gallery');
         document.getElementById('galleryStatus').textContent = 'Prototype hall · 1 statue, 13 pending · choose a niche';
         sel.selectedIndex = -1;
         walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
@@ -3338,4 +3344,4 @@
       init();
     </script>
   </body>
-          </html>
+                     </html>
