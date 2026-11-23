@@ -2356,6 +2356,12 @@
         });
         if (m > 0.05) walk.t += dt * 8;
         walk.x = nx; walk.z = nz;
+        if (walk.hall) {
+          const k=Math.round((walk.x-GAL.ox+21)/7), inBay=Math.abs(walk.z)>3.65 && k>=0 && k<7;
+          const sel=document.getElementById('gallerySelect');
+          if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
+          else { sel.selectedIndex=-1; document.getElementById('galleryStatus').textContent='Connecting passage · 14 shrine bays · 1 statue, 13 pending'; }
+        }
         camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
       }
