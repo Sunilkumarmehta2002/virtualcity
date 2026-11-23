@@ -1438,6 +1438,10 @@
     <!-- ========== JAVASCRIPT ========== -->
     <script type="module">
       import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+      import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+      import { clone as cloneSkin } from 'three/addons/utils/SkeletonUtils.js';
       import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
       // ==================== TEMPLE DATA ====================
@@ -2112,6 +2116,30 @@
         return t;
       }
 
+      function upgradeVisitors(){
+        const ktx=new KTX2Loader().setTranscoderPath('https://unpkg.com/three@0.160.0/examples/jsm/libs/basis/').detectSupport(renderer);
+        const loader=new GLTFLoader().setKTX2Loader(ktx).setMeshoptDecoder(MeshoptDecoder);
+        Promise.all(['https://tevy.dev/models/casual-walker/v1/lod1.glb','https://tevy.dev/models/hiker/v1/lod1.glb'].map(file=>loader.loadAsync(file))).then(models=>{
+          const scale=1;
+          envAnimals.forEach((person,i)=>{
+            person.children.slice().forEach(child=>person.remove(child));
+            const gltf=models[i%2],body=cloneSkin(gltf.scene);body.scale.setScalar(scale);person.add(body);
+            const mixer=new THREE.AnimationMixer(body),actions={};
+            gltf.animations.forEach(c=>{actions[c.name]=mixer.clipAction(c);});
+            person.userData.mixer=mixer;person.userData.actions=actions;person.userData.currentAction=null;
+            person.userData.legs=[];person.userData.kind='animated visitor';
+            body.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;}});
+          });
+          window.__vc.humanModel={source:'tevy.dev Casual Walker and Hiker',status:'ready',lod:1};ktx.dispose();
+        }).catch(error=>{console.warn('Visitor model unavailable',error);window.__vc.humanModel={status:'failed'};ktx.dispose();});
+      }
+      function visitorAnimation(u,moving,dt){
+        if(!u.mixer)return;const name=moving?'walk':'idle';
+        if(u.currentAction!==name){if(u.currentAction)u.actions[u.currentAction]?.fadeOut(.25);u.actions[name]?.reset().fadeIn(.25).play();u.currentAction=name;}
+        if(u.actions.walk)u.actions.walk.timeScale=u.sp/1.3;
+        u.mixer.update(dt);
+      }
+
       function makePerson(skin, robe, female) {
         const g = new THREE.Group();
         const mat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 });
@@ -2235,6 +2263,7 @@
         setupGalleryBtn();
         window.__vc = { scene, camera, controls, envAnimals, outdoorSolids, walk, get fireflies() { return fireflies; } };
 
+        upgradeVisitors();
         // Fireflies (jugnu)
         const N = 140; const pos = new Float32Array(N * 3); const ph = [];
         for (let i = 0; i < N; i++) {
@@ -2584,6 +2613,7 @@
         const clearLine = (x0, z0, x1, z1) => { for (let q = 1; q <= 24; q++) { if (blocked(x0 + (x1 - x0) * q / 24, z0 + (z1 - z0) * q / 24)) return false; } return true; };
         envAnimals.forEach((an, ai) => {
           const u = an.userData;
+          visitorAnimation(u,!!u.moving,dt);u.moving=false;
           if (u.wait > 0) { u.wait -= dt; return; }
           if (!u.target) {
             for (let n = 0; n < 25 && !u.target; n++) {
@@ -2605,7 +2635,7 @@
           if (!hit) for (let oj = 0; oj < envAnimals.length; oj++) { if (oj !== ai && Math.hypot(nx - envAnimals[oj].position.x, nz - envAnimals[oj].position.z) < 0.7) { hit = true; break; } }
           if (!hit && walk.on && Math.hypot(nx - walk.x, nz - walk.z) < 1.1) hit = true;
           if (hit) { u.target = null; u.wait = 0.4 + Math.random(); return; }
-          an.position.x = nx; an.position.z = nz;
+          u.moving=true;an.position.x = nx; an.position.z = nz;
           an.userData.legs.forEach((l, i) => { l.rotation.x = Math.sin(t * 5 * u.sp + (i % 2) * 3.14) * 0.5; });
         });
         if (fireflies && fireflies.visible) {
@@ -3388,4 +3418,4 @@
       init();
     </script>
   </body>
-          </html>
+              </html>
