@@ -17,3 +17,5 @@ Ganesh, Ram, Krishna, Shiv, Durga, Lakshmi, Hanuman, Saraswati, Vishnu, Surya, P
 - Museum scan expansion: joint Shiva and Parvati (Uma-Maheshvara) sourced and converted, but not displayed: simplified mesh failed visual QA. One of fourteen niches populated, thirteen still pending. CC0 source and adaptations in CREDITS.md. The gallery remains a shared prototype hall.
 
 - Garden walking: expanded the outdoor walkable area to include the trees. Player and devotees share solid trunk and lantern-post boundaries; devotees can choose garden routes. People and architecture remain low-poly. Physical-phone performance still unmeasured.
+
+- Gallery wayfinding: persistent deity chooser and Exit button; each temple's info panel can open its matching gallery niche. The chooser places the visitor in front of the selected niche, with truthful statue status. This is a navigation aid, not connected architectural interiors. Ganesha remains the only displayed scan.
