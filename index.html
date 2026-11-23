@@ -419,6 +419,9 @@
       #walkJoy { display:none; position:fixed; left:24px; bottom:110px; width:116px; height:116px; border-radius:50%; background:rgba(20,10,40,0.45); border:2px solid rgba(255,215,0,0.5); z-index:30; touch-action:none; }
       @media (min-width:700px) { #walkJoy { left:auto; right:36px; bottom:40px; } }
       #walkKnob { position:absolute; left:38px; top:38px; width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
+      #galleryGuide { display:none; position:fixed; top:82px; left:50%; transform:translateX(-50%); z-index:32; background:rgba(20,10,40,.92); border:1px solid #9b7c23; border-radius:12px; padding:8px; color:#ffe9a8; max-width:calc(100vw - 32px); box-sizing:border-box; font-size:12px; text-align:center; }
+      #galleryGuide select, #galleryGuide button { background:#30203c; color:#fff1c4; border:1px solid #9b7c23; border-radius:6px; padding:7px; max-width:100%; }
+      #galleryGuide small { display:block; margin-top:5px; }
       #walkHint { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:240px; z-index:30; background:rgba(20,10,40,0.7); color:#ffe9a8; padding:6px 12px; border-radius:12px; font-size:12px; pointer-events:none; white-space:normal; width:max-content; max-width:calc(100vw - 32px); box-sizing:border-box; text-align:center; }
       .top-bar { padding-right: 80px; }
       @media (max-width: 600px) {
@@ -1198,6 +1201,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
+      <div id="galleryGuide"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryExit">बाहर · Exit</button><small id="galleryStatus"></small></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
         <div>
@@ -1231,6 +1235,7 @@
         </div>
         <div class="temple-mantra" id="panelMantra">ॐ</div>
         <div class="temple-actions">
+          <button class="temple-action-btn" id="btnGallery">🏛️ Gallery niche</button>
           <button class="temple-action-btn" id="btnDarshan">🙏 दर्शन करें</button>
           <button class="temple-action-btn" id="btnAarti">🪔 आरती करें</button>
           <button class="temple-action-btn" id="btnPrasad">🎁 प्रसाद लें</button>
@@ -2283,7 +2288,7 @@
             b.title = 'Walking (tap to return to city view)';
             hint.textContent = 'Drag to look · joystick or WASD to walk · gardens are open'; hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
-            walk.hall = false; document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
+            walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
             camera.rotation.order = 'XYZ';
             camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
             walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
@@ -2430,13 +2435,30 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && walk.hall) { walk.hall = false; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
+          if (walk.on && walk.hall) { walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
           if (!walk.on) wb.click();
           enterGallery(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
       }
+      function visitGalleryNiche(id) {
+        const i = TEMPLES.findIndex(t => t.id === id); if (i < 0) return;
+        const side = i < 7 ? -1 : 1, k = i % 7;
+        walk.x = GAL.ox - 21 + k * 7; walk.z = side * 5.5;
+        walk.yaw = side < 0 ? 0 : Math.PI; walk.pitch = 0;
+        document.getElementById('gallerySelect').value = id;
+        document.getElementById('galleryStatus').textContent = id === 'ganesh' ? 'CC0 museum scan · Ganesha · Java, 10th–11th century' : 'Prototype niche · statue not yet added';
+      }
       function enterGallery() {
         buildGallery();
+        const sel = document.getElementById('gallerySelect');
+        if (!sel.options.length) {
+          TEMPLES.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = t.god.hindi + ' · ' + t.god.english; sel.add(o); });
+          sel.addEventListener('change', () => visitGalleryNiche(sel.value));
+          document.getElementById('galleryExit').addEventListener('click', () => document.getElementById('galBtn').click());
+        }
+        document.getElementById('galleryGuide').style.display = 'block';
+        document.getElementById('galleryStatus').textContent = 'Prototype hall · 1 statue, 13 pending · choose a niche';
+        sel.selectedIndex = -1;
         walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
         const hint = document.getElementById('walkHint');
         hint.textContent = 'Prototype gallery · Ganesha: first left niche · tap 🪔 again to leave · drag to look, joystick / WASD to walk';
@@ -3096,6 +3118,12 @@
           document.getElementById('templePanel').classList.remove('visible');
         });
         
+        document.getElementById('btnGallery').addEventListener('click', () => {
+          if (!currentTemple) return;
+          document.getElementById('templePanel').classList.remove('visible');
+          if (!walk.hall) document.getElementById('galBtn').click();
+          visitGalleryNiche(currentTemple.id);
+        });
         // Temple panel actions
         document.getElementById('btnDarshan').addEventListener('click', () => {
           if (currentTemple) openDarshan(currentTemple);
@@ -3267,4 +3295,4 @@
       init();
     </script>
   </body>
-        </html>
+  </html>
