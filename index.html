@@ -34,6 +34,7 @@
         font-family: 'Noto Sans Devanagari', 'Lora', sans-serif; }
       #templePanel.temple-panel { display: block !important; max-height: 60vh; overflow-y: auto; }
       #templePanel .temple-panel-header { margin-bottom: 10px; }
+      #templePanel.temple-panel:not(.visible) { transform: translateY(calc(100% + 160px)); pointer-events: none; }
       .city-legend { transition: opacity 1s; }
       .city-legend.faded { opacity: 0; }
       @media (max-width: 600px) { .city-legend small { display: none; } .city-legend { top: 60px; font-size: 12px; padding: 6px 10px; } }
