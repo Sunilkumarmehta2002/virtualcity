@@ -2399,8 +2399,13 @@
         };
         // Individual shrine bays share one level, walkable central passage.
         // Collision boxes include a 0.3m visitor radius, so bodies clear the stone.
+        const bayFaceMats = {};
         const bayWall = (x,z,w,d) => {
-          const faceMat = (span) => { const mat=wallM.clone(); if(wallM.map){mat.map=wallM.map.clone();mat.map.repeat.set(span/3,1.8);mat.map.needsUpdate=true;mat.emissiveMap=mat.map;} return mat; };
+          const faceMat = (span) => {
+            if(bayFaceMats[span]) return bayFaceMats[span];
+            const mat=wallM.clone(); bayFaceMats[span]=mat;
+            new THREE.TextureLoader().load('https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/large_sandstone_blocks/large_sandstone_blocks_diff_1k.jpg',t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(span/3,1.8);t.colorSpace=THREE.SRGBColorSpace;mat.map=t;mat.emissiveMap=t;mat.needsUpdate=true;});return mat;
+          };
           const m = new THREE.Mesh(new THREE.BoxGeometry(w,5.8,d),[faceMat(d),faceMat(d),stoneM,stoneM,faceMat(w),faceMat(w)]); m.position.set(x,2.9,z); m.receiveShadow=true; g.add(m);
           GAL.boxes.push([GAL.ox+x-w/2-.3,GAL.ox+x+w/2+.3,z-d/2-.3,z+d/2+.3]);
         };
@@ -3327,4 +3332,4 @@
       init();
     </script>
   </body>
-            </html>
+          </html>
