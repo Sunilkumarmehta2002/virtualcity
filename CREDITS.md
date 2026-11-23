@@ -18,3 +18,11 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Licence: CC0, verified from Wikimedia Commons file metadata.
 - Adaptation: welded vertices, 16-bit position quantization, indexed mesh, scaled and rotated for display; neutral stone material rather than original texture. 63,950 triangles. Stored as models/ganesha.json (about 766 KB before transfer compression).
 - This is a historical Javanese depiction, not a claim that all traditions depict Ganesha this way.
+
+
+## Uma-Maheshvara 3D scan
+- Uma-Maheshvara (Shiva and Parvati together), sandstone, India, 10th-11th century CE. Minneapolis Institute of Art.
+- Museum: https://collections.artsmia.org/art/5369/uma-maheshvara-india
+- CC0 download and licence: https://commons.wikimedia.org/wiki/File:Uma-Maheshvara%2C_10th_-_11th_C_CE_-_3D_model_by_Minneapolis_Institute_of_Art_-_Sketchfab.stl
+- Adaptation: welded vertices, 16-bit position quantization and indexed mesh, rotated/scaled for display with neutral sandstone material. simplified from 99,994 to 16,625 triangles using vertex clustering, 7,585 vertices, about 194 KB JSON. Original surface colour is not reproduced.
+- Displayed in Parvati's niche with a joint Shiva and Parvati label, not as a solo Parvati statue.
