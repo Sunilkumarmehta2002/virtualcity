@@ -395,7 +395,7 @@
         border: 1px solid rgba(255, 215, 0, 0.3);
       }
 
-      .sky-btn {
+      .sky-btn, .follow-btn {
         background: none;
         border: none;
         font-size: 18px;
@@ -406,12 +406,12 @@
         border-radius: 12px;
       }
 
-      .sky-btn.active {
+      .sky-btn.active, .follow-btn.active {
         opacity: 1;
         background: rgba(255, 215, 0, 0.2);
       }
 
-      .sky-btn:hover {
+      .sky-btn:hover, .follow-btn:hover {
         opacity: 1;
         transform: scale(1.1);
       }
@@ -1196,6 +1196,7 @@
           <button class="sky-btn" data-sky="day" title="Day">☀️</button>
           <button class="sky-btn active" data-sky="dusk" title="Dusk">🌆</button>
           <button class="sky-btn" data-sky="night" title="Night">🌙</button>
+          <button class="follow-btn" id="followBtn" title="Follow an animal">🦌</button>
         </div>
       </div>
 
@@ -2031,9 +2032,9 @@
         // Add point lights for temples
         templeObjects.forEach(obj => {
           if (obj.userData.temple) {
-            if (skyMode === 'day') return;
+            if (skyMode === 'day' || (templeObjects.indexOf(obj) % 3) !== 0) return;
             const intensity = skyMode === 'night' ? 2 : (skyMode === 'dusk' ? 1.5 : 0.8);
-            const light = new THREE.PointLight(obj.userData.temple.lightColor, intensity, 15);
+            const light = new THREE.PointLight(obj.userData.temple.lightColor, intensity * 1.8, 30);
             light.position.copy(obj.position);
             light.position.y += 5;
             scene.add(light);
@@ -2160,6 +2161,7 @@
           dummy.position.y = 2.3; dummy.updateMatrix(); lanterns.setMatrixAt(i, dummy.matrix);
         }
         scene.add(posts); scene.add(lanterns); lanterns.visible = false;
+        setupFollow();
         window.__vc = { scene, camera, controls, envAnimals, get fireflies() { return fireflies; } };
 
         // Fireflies (jugnu)
@@ -2175,10 +2177,36 @@
         scene.add(fireflies);
       }
 
+      let followIdx = -1;
+      function setupFollow() {
+        const b = document.getElementById('followBtn');
+        if (!b) return;
+        b.addEventListener('click', () => {
+          followIdx++;
+          if (followIdx >= envAnimals.length) {
+            followIdx = -1; b.classList.remove('active'); b.title = 'Follow an animal';
+            const d = new THREE.Vector3(0, 0, 0).sub(controls.target); controls.target.set(0, 0, 0); camera.position.add(d);
+            return;
+          }
+          b.classList.add('active');
+          const k = envAnimals[followIdx].userData.kind;
+          b.title = 'Following ' + k + ' (tap for next)';
+          const p = envAnimals[followIdx].position;
+          controls.target.set(p.x, 1, p.z);
+          camera.position.set(p.x + 7, 5, p.z + 7);
+        });
+      }
+
       let _envLast = performance.now();
       function envTick() {
         const now = performance.now(); const dt = Math.min(0.1, (now - _envLast) / 1000); _envLast = now;
         const t = now / 1000;
+        if (followIdx >= 0 && envAnimals[followIdx]) {
+          const p = envAnimals[followIdx].position;
+          const dx = (p.x - controls.target.x) * 0.1, dz = (p.z - controls.target.z) * 0.1;
+          controls.target.x += dx; controls.target.z += dz; controls.target.y = 1;
+          camera.position.x += dx; camera.position.z += dz;
+        }
         envAnimals.forEach(an => {
           const u = an.userData;
           if (u.wait > 0) { u.wait -= dt; return; }
