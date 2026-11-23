@@ -1850,6 +1850,8 @@
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.35;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
@@ -2026,6 +2028,8 @@
         
         scene.background = new THREE.Color(bgColor);
         if (scene.fog) scene.fog.color.setHex(bgColor);
+        if (scene.fog) scene.fog.density = (skyMode === 'day') ? 0.0035 : 0.006;
+        renderer.toneMappingExposure = (skyMode === 'night') ? 2.1 : (skyMode === 'dawn' ? 1.6 : 1.35);
         if (fireflies) fireflies.visible = (skyMode === 'dusk' || skyMode === 'night');
         if (lanterns) lanterns.visible = (skyMode === 'dusk' || skyMode === 'night' || skyMode === 'dawn');
         ambientIntensity *= 1.7; dirIntensity *= 1.35;
