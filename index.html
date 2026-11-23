@@ -1215,7 +1215,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="galleryGuide"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button> <button id="galleryExit">बाहर · Exit</button><small id="galleryStatus"></small></div>
+      <div id="galleryGuide"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button> <button id="galleryExit">बाहर · Exit</button><small id="galleryStatus"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div>
       <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
@@ -2419,7 +2419,7 @@
           const k=Math.round((walk.x-GAL.ox+21)/7), inBay=Math.abs(walk.z)>3.65 && k>=0 && k<7;
           const sel=document.getElementById('gallerySelect');
           if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
-          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryAarti').hidden=true;stopGalleryAarti();status.textContent='Connecting passage · 14 shrine bays · 5 statues available · 9 statues pending'; }
+          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;stopGalleryAarti();status.textContent='Connecting passage · 14 shrine bays · 5 statues available · 9 statues pending'; }
         }
         camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
@@ -2670,6 +2670,7 @@
       }
       function updateGalleryStatus(id) {
         if(id==='shiv'&&GAL.scans.shiv==='pending')GAL.loadShiva();if(id==='surya'&&GAL.scans.surya==='pending')GAL.loadSurya();if(id==='vishnu'&&GAL.scans.vishnu==='pending')GAL.loadVishnu();if(id==='lakshmi'&&GAL.scans.lakshmi==='pending')GAL.loadLakshmi();
+        document.getElementById('galleryCredit').hidden=id!=='lakshmi';
         const aartiBtn=document.getElementById('galleryAarti');aartiBtn.hidden=id!=='ganesh'||GAL.scans.ganesh!=='ready';
         if(id!=='ganesh') stopGalleryAarti();
         document.getElementById('galleryStatus').dataset.zone=id;
@@ -2684,7 +2685,7 @@
           sel.addEventListener('change', () => visitGalleryNiche(sel.value));
           document.getElementById('galleryExit').addEventListener('click', () => document.getElementById('galBtn').click());
         }
-        document.getElementById('galleryAarti').hidden=true;
+        document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;
         document.getElementById('galleryGuide').style.display = 'block'; document.body.classList.add('in-gallery');
         document.getElementById('galleryStatus').textContent = 'Prototype hall · 5 statues available · 9 statues pending · choose a niche';
         sel.selectedIndex = -1;
@@ -3526,4 +3527,4 @@
       init();
     </script>
   </body>
-            </html>
+                                                                                                                                                                                                                                              </html>
