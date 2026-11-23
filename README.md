@@ -9,3 +9,4 @@ Ganesh, Ram, Krishna, Shiv, Durga, Lakshmi, Hanuman, Saraswati, Vishnu, Surya, P
 
 ## Daily log
 - Day 1: four new temples (Parvati, Kartikeya, Kali, Ganga), floating Hindi/English name labels, and a pulsing gold ring around today's deity.
+- Day 2 (23 Nov 2026): CC0 stone textures from Poly Haven (see CREDITS.md), temple shikhara, gardens and trees, wandering animals (low-poly, blocky), automatic IST day/night sky with manual buttons, jugnu lights and lanterns, a follow-an-animal camera, ACES filmic lighting with day haze, and a walk mode (first person, joystick or WASD, drag to look, temple collision). Still low-poly, not photorealistic. Phone performance is not yet measured.
