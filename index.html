@@ -2412,6 +2412,7 @@
           const bb = geo.boundingBox; geo.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
           const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide, roughness: 0.85, emissive: 0x3a2f24 }));
           const sc = height / (bb.max.y - bb.min.y); mesh.scale.setScalar(sc); mesh.position.set(0, 1.0, 1.35); mesh.castShadow = true;
+          if (id === 'parvati') mesh.rotation.y = Math.PI;
           slot.grp.add(mesh); window.__vc.statues = window.__vc.statues || {}; window.__vc.statues[id] = mesh; if (id === 'ganesh') window.__vc.statue = mesh;
         }).catch(() => {});
         }
@@ -3259,4 +3260,4 @@
       init();
     </script>
   </body>
-                           </html>
+            </html>
