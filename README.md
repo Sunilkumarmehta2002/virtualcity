@@ -43,3 +43,5 @@ Ganesh, Ram, Krishna, Shiv, Durga, Lakshmi, Hanuman, Saraswati, Vishnu, Surya, P
 - Hanuman/Anjaneya meditating idol: sixth statue, Addere Creations photo scan under CC BY4.0. Geometry retained in five parts; new brown material rather than original scan texture. Eight of14 shrine bays remain empty. Credits and licence links appear at this shrine and in CREDITS.md. Physical-phone performance unmeasured.
 
 - Krishna, MUEC: seventh statue, Giravolt CC BY4.0 museum scan of a Tamil Nadu bronze,13th–14th century. Simplified to59,999 triangles, new bronze-style material, corrected front orientation. Seven of14 bays now have statues; seven remain pending. Painted details and faithful temple interiors still unfinished.
+
+- Parvati eighth statue: Tyler Jackson CC BY4.0 scan of a plaster statue, archived by Zenodo/Objaverse.70000 triangles, on-demand geometry, new stone-style material. This is distinct from rejected Uma-Maheshvara geometry. Eight of14 bays populated, six pending. Original textures/paint and faithful temple interiors remain unfinished; physical-phone performance untested.
