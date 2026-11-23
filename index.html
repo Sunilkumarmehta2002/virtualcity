@@ -2031,7 +2031,8 @@
         // Add point lights for temples
         templeObjects.forEach(obj => {
           if (obj.userData.temple) {
-            const intensity = skyMode === 'night' ? 2 : (skyMode === 'dusk' ? 1.5 : 0.5);
+            if (skyMode === 'day') return;
+            const intensity = skyMode === 'night' ? 2 : (skyMode === 'dusk' ? 1.5 : 0.8);
             const light = new THREE.PointLight(obj.userData.temple.lightColor, intensity, 15);
             light.position.copy(obj.position);
             light.position.y += 5;
@@ -2281,7 +2282,7 @@
           });
           const tier = new THREE.Mesh(tierGeo, tierMat);
           tier.position.y = i * 0.5 + 0.25;
-          tier.castShadow = true;
+          tier.castShadow = false;
           scene.add(tier);
         }
         
@@ -2465,10 +2466,6 @@
           diya.position.set(x * 1.8 * scale, 1, z * 1.8 * scale);
           group.add(diya);
           
-          const flameLight = new THREE.PointLight(0xFF6600, 0.5, 3);
-          flameLight.position.copy(diya.position);
-          flameLight.position.y += 0.2;
-          group.add(flameLight);
         });
         
         scene.add(group);
