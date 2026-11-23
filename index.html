@@ -2508,7 +2508,8 @@
         const r=galleryRitual;if(!r.active)return;
         if(!walk.hall||document.getElementById('gallerySelect').value!=='ganesh'||t-r.start>24){stopGalleryAarti();return;}
         const e=t-r.start,a=e*1.5,fade=Math.min(1,e*2,(24-e)*2);
-        r.group.position.set(GAL.ox-21+Math.sin(a)*.52,1.4+Math.cos(a)*.28,-8.0);
+        const small=innerWidth<700;r.group.scale.setScalar(small?.72:1);
+        r.group.position.set(GAL.ox-21+Math.sin(a)*(small?.28:.52),1.4+Math.cos(a)*.28,-8.0);
         r.group.rotation.z=Math.sin(a)*-.08;r.flame.rotation.y=walk.yaw;
         r.flame.material.uniforms.time.value=t;r.flame.scale.set(1+Math.sin(t*17)*.07,1+Math.sin(t*23)*.08,1);
         r.glow.intensity=(1.7+Math.sin(t*19)*.2)*fade;
@@ -3387,4 +3388,4 @@
       init();
     </script>
   </body>
-                              </html>
+          </html>
