@@ -2317,6 +2317,10 @@
             if (mn === dl) nx = bx.min.x; else if (mn === dr) nx = bx.max.x; else if (mn === dt2) nz = bx.min.z; else nz = bx.max.z;
           }
         });
+        envAnimals.forEach(pp => {
+          const ex = nx - pp.position.x, ez = nz - pp.position.z, ed = Math.hypot(ex, ez);
+          if (ed < 0.6 && ed > 0.0001) { nx = pp.position.x + ex / ed * 0.6; nz = pp.position.z + ez / ed * 0.6; }
+        });
         if (m > 0.05) walk.t += dt * 8;
         walk.x = nx; walk.z = nz;
         camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
@@ -2368,6 +2372,7 @@
           const nx = an.position.x + Math.sin(an.rotation.y) * sp, nz = an.position.z + Math.cos(an.rotation.y) * sp;
           let hit = blocked(nx, nz);
           if (!hit) for (let oj = 0; oj < envAnimals.length; oj++) { if (oj !== ai && Math.hypot(nx - envAnimals[oj].position.x, nz - envAnimals[oj].position.z) < 0.7) { hit = true; break; } }
+          if (!hit && walk.on && Math.hypot(nx - walk.x, nz - walk.z) < 1.1) hit = true;
           if (hit) { u.target = null; u.wait = 0.4 + Math.random(); return; }
           an.position.x = nx; an.position.z = nz;
           an.userData.legs.forEach((l, i) => { l.rotation.x = Math.sin(t * 5 * u.sp + (i % 2) * 3.14) * 0.5; });
