@@ -416,6 +416,14 @@
         transform: scale(1.1);
       }
 
+
+      #viewZoom { position:fixed; right:16px; bottom:145px; z-index:31; display:flex; flex-direction:column; gap:4px; padding:5px; border:1px solid #9b7c23; border-radius:12px; background:rgba(20,10,40,.9); align-items:center; }
+      #viewZoom button { width:44px; height:44px; border:1px solid #9b7c23; border-radius:7px; color:#fff1c4; background:#30203c; font-size:23px; cursor:pointer; touch-action:manipulation; }
+      #viewZoom button:disabled { opacity:.4; cursor:default; }
+      #viewZoom button:focus-visible { outline:2px solid #ffe173; outline-offset:2px; }
+      #viewZoom small { color:#fff1c4; font:11px Arial,sans-serif; }
+      #viewZoom #zoomReset { font-size:11px; }
+      @media(max-width:699px) { #viewZoom { bottom:250px; right:10px; } }
       #walkJoy { display:none; position:fixed; left:24px; bottom:110px; width:116px; height:116px; border-radius:50%; background:rgba(20,10,40,0.45); border:2px solid rgba(255,215,0,0.5); z-index:30; touch-action:none; }
       @media (min-width:700px) { #walkJoy { left:auto; right:36px; bottom:40px; } }
       #walkKnob { position:absolute; left:38px; top:38px; width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
@@ -1208,6 +1216,7 @@
     <div id="app-container">
       <!-- Top Bar -->
       <div id="galleryGuide"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button> <button id="galleryExit">बाहर · Exit</button><small id="galleryStatus"></small></div>
+      <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
         <div>
@@ -2261,6 +2270,7 @@
         setupFollow();
         setupWalk();
         setupGalleryBtn();
+        setupViewZoom();
         window.__vc = { scene, camera, controls, envAnimals, outdoorSolids, walk, get fireflies() { return fireflies; } };
 
         upgradeVisitors();
@@ -2282,6 +2292,20 @@
       }
 
       let followIdx = -1;
+      // Optical zoom changes the lens only, never moves through collision boundaries.
+      function setupViewZoom() {
+        const near = document.getElementById('zoomIn'), far = document.getElementById('zoomOut'), reset = document.getElementById('zoomReset');
+        function apply(value) {
+          camera.fov = THREE.MathUtils.clamp(value, 30, 80); camera.updateProjectionMatrix();
+          near.disabled = camera.fov <= 30; far.disabled = camera.fov >= 80;
+          document.getElementById('zoomLevel').textContent = (Math.tan(Math.PI/6) / Math.tan(THREE.MathUtils.degToRad(camera.fov/2))).toFixed(1) + '×';
+        }
+        near.addEventListener('click', () => apply(camera.fov - 5));
+        far.addEventListener('click', () => apply(camera.fov + 5));
+        reset.addEventListener('click', () => apply(60));
+        apply(60);
+      }
+
       function setupFollow() {
         const b = document.getElementById('followBtn');
         if (!b) return;
@@ -3480,4 +3504,4 @@
       init();
     </script>
   </body>
-            </html>
+  </html>
