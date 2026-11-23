@@ -1193,6 +1193,7 @@
         </div>
         <div class="sky-toggle">
           <button class="sky-btn" data-sky="dawn" title="Dawn">🌅</button>
+          <button class="sky-btn" data-sky="day" title="Day">☀️</button>
           <button class="sky-btn active" data-sky="dusk" title="Dusk">🌆</button>
           <button class="sky-btn" data-sky="night" title="Night">🌙</button>
         </div>
@@ -1834,6 +1835,7 @@
         // Camera
         camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
         camera.position.set(30, 25, 30);
+        if (container.clientWidth < 600) camera.position.set(46, 40, 46);
         
         // Renderer
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1869,6 +1871,7 @@
         // Trees
         createTrees();
         createEnvironment();
+        updateSkyLighting();
 
         // Name labels and today's deity beacon
         addTempleLabels();
@@ -1939,12 +1942,13 @@
       function updateLabelVisibility() {
         const labels = scene.children.filter(o => o.userData.isLabel);
         const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
-        const lw = w < 600 ? 130 : 190, lh = w < 600 ? 44 : 60;
+        const lw = w < 600 ? 120 : 190, lh = w < 600 ? 40 : 60;
         const items = labels.map(l => ({ l, d: camera.position.distanceTo(l.position) })).sort((a, b) => a.d - b.d);
         const placed = [];
         items.forEach(({ l, d }) => {
           const k = Math.min(Math.max(d * 0.06, 2.0), 4.2);
-          l.scale.set(k * 3.2, k, 1);
+          const mk = w < 600 ? 0.72 : 1;
+          l.scale.set(k * 3.2 * mk, k * mk, 1);
           _lp.copy(l.position).project(camera);
           const x = (_lp.x * 0.5 + 0.5) * w, y = (-_lp.y * 0.5 + 0.5) * h;
           const ok = _lp.z < 1 && Math.abs(_lp.x) < 1.05 && Math.abs(_lp.y) < 1.05 &&
@@ -2002,8 +2006,8 @@
             bgColor = 0x2b1550;
             break;
           case 'night':
-            ambientColor = 0x4444AA;
-            ambientIntensity = 0.7;
+            ambientColor = 0x6a6ad0;
+            ambientIntensity = 1.0;
             dirColor = 0xCCCCFF;
             dirIntensity = 0.6;
             bgColor = 0x0a0620;
@@ -2013,6 +2017,7 @@
         scene.background = new THREE.Color(bgColor);
         if (scene.fog) scene.fog.color.setHex(bgColor);
         if (fireflies) fireflies.visible = (skyMode === 'dusk' || skyMode === 'night');
+        if (lanterns) lanterns.visible = (skyMode === 'dusk' || skyMode === 'night' || skyMode === 'dawn');
         ambientIntensity *= 1.7; dirIntensity *= 1.35;
         
         const ambient = new THREE.AmbientLight(ambientColor, ambientIntensity);
@@ -2038,6 +2043,7 @@
       // ---------- Living environment: gardens, trees, animals, fireflies, IST sky ----------
       const envAnimals = [];
       let fireflies = null;
+      let lanterns = null;
       let skyManual = false;
 
       function istSkyMode() {
@@ -2140,8 +2146,20 @@
           const a = (i / kinds.length) * Math.PI * 2;
           an.position.set(Math.cos(a) * 31, 0, Math.sin(a) * 31);
           an.userData.kind = k; an.userData.target = null; an.userData.wait = Math.random() * 3;
+          an.scale.setScalar(1.9);
           scene.add(an); envAnimals.push(an);
         });
+
+        // Lantern posts around the plaza edge (glow after dusk)
+        lanterns = new THREE.InstancedMesh(new THREE.SphereGeometry(0.28, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffc860 }), 32);
+        const posts = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.06, 0.08, 2.2, 6), new THREE.MeshStandardMaterial({ color: 0x3a2a1a }), 32);
+        for (let i = 0; i < 32; i++) {
+          const a = (i / 32) * Math.PI * 2, r = 25.2;
+          dummy.position.set(Math.cos(a) * r, 1.1, Math.sin(a) * r); dummy.scale.setScalar(1); dummy.updateMatrix(); posts.setMatrixAt(i, dummy.matrix);
+          dummy.position.y = 2.3; dummy.updateMatrix(); lanterns.setMatrixAt(i, dummy.matrix);
+        }
+        scene.add(posts); scene.add(lanterns); lanterns.visible = false;
+        window.__vc = { scene, camera, controls, envAnimals, get fireflies() { return fireflies; } };
 
         // Fireflies (jugnu)
         const N = 140; const pos = new Float32Array(N * 3); const ph = [];
@@ -2164,7 +2182,7 @@
           const u = an.userData;
           if (u.wait > 0) { u.wait -= dt; return; }
           if (!u.target) {
-            const a = Math.random() * Math.PI * 2, r = 28 + Math.random() * 10;
+            const a = Math.random() * Math.PI * 2, r = 27.5 + Math.random() * 8;
             u.target = new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r);
           }
           const dx = u.target.x - an.position.x, dz = u.target.z - an.position.z;
