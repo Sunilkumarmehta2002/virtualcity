@@ -1958,9 +1958,9 @@
           const k = Math.min(Math.max(d * 0.06, 2.0), 4.2);
           const mk = w < 600 ? 0.72 : 1;
           l.scale.set(k * 3.2 * mk, k * mk, 1);
-          _lp.copy(l.position).project(camera);
-          const x = (_lp.x * 0.5 + 0.5) * w, y = (-_lp.y * 0.5 + 0.5) * h;
-          const ok = _lp.z < 1 && Math.abs(_lp.x) < 1.05 && Math.abs(_lp.y) < 1.05 &&
+          _lp.copy(l.position).project(cam          const topSafe = w < 600 ? 78 : 70, botSafe = w < 600 ? 100 : 20;
+          const ok = _lp.z < 1 && Math.abs(_lp.x) < 1.05 && y > topSafe && y < h - botSafe &&
+     const ok = _lp.z < 1 && Math.abs(_lp.x) < 1.05 && Math.abs(_lp.y) < 1.05 &&
             !placed.some(r => Math.abs(r.x - x) < lw && Math.abs(r.y - y) < lh);
           l.visible = ok;
           if (ok) placed.push({ x, y });
@@ -2199,8 +2199,9 @@
           b.classList.add('active');
           const k = envAnimals[followIdx].userData.kind;
           b.title = 'Following ' + k + ' (tap for next)';
-          const p = envAnimals[followIdx].position;
-          controls.target.set(p.x, 1, p.z);
+          const          const far = camera.aspect < 1 ? 11 : 7;
+          camera.position.set(p.x + far, far * 0.7, p.z + far);
+ols.target.set(p.x, 1, p.z);
           camera.position.set(p.x + 7, 5, p.z + 7);
         });
       }
