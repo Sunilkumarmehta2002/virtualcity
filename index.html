@@ -416,6 +416,14 @@
         transform: scale(1.1);
       }
 
+      .top-bar { padding-right: 80px; }
+      @media (max-width: 600px) {
+        .top-bar { padding: 10px 76px 10px 12px; gap: 6px; }
+        .sky-toggle { gap: 0; padding: 4px 4px; border-radius: 16px; }
+        .sky-btn, .follow-btn { font-size: 15px; padding: 3px 5px; }
+        .panchang-mini { font-size: 10px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      }
+
       /* ========== TEMPLE INFO PANEL ========== */
       .temple-panel {
         position: absolute;
