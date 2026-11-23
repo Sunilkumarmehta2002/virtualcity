@@ -28,6 +28,16 @@
     
     <style>
       /* ========== DIVINE CSS SYSTEM ========== */
+      .city-legend { position: fixed; left: 50%; top: 64px; transform: translateX(-50%); max-width: min(92vw, 520px);
+        background: rgba(20,5,30,0.78); color: #FFE9A8; border: 1px solid rgba(255,215,0,0.5); border-radius: 12px;
+        padding: 8px 14px; font-size: 13px; text-align: center; z-index: 40; pointer-events: none;
+        font-family: 'Noto Sans Devanagari', 'Lora', sans-serif; }
+      #templePanel.temple-panel { display: block !important; max-height: 60vh; overflow-y: auto; }
+      #templePanel .temple-panel-header { margin-bottom: 10px; }
+      .city-legend { transition: opacity 1s; }
+      .city-legend.faded { opacity: 0; }
+      @media (max-width: 600px) { .city-legend small { display: none; } .city-legend { top: 60px; font-size: 12px; padding: 6px 10px; } }
+      .city-legend small { color: #fff; opacity: .85; font-size: 11px; }
       :root {
         --divine-gold: #FFD700;
         --saffron: #FF6B00;
@@ -1171,6 +1181,7 @@
 
       <!-- 3D City Canvas -->
       <div id="city-canvas"></div>
+      <div class="city-legend" id="cityLegend">सुनहरा घेरा: आज के दिन से जुड़ी भक्ति परंपरा<br><small>Gold ring: temples linked to today in devotional tradition (varies by region and sect). Tap a temple to open it.</small></div>
 
       <!-- Temple Info Panel -->
       <div class="temple-panel" id="templePanel">
@@ -1781,7 +1792,7 @@
         
         // Scene
         scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x0D0020, 0.015);
+        scene.fog = new THREE.FogExp2(0x2b1550, 0.006);
         
         // Camera
         camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -1850,6 +1861,7 @@
             }
           });
           
+          updateLabelVisibility();
           renderer.render(scene, camera);
         }
         animate();
@@ -1876,8 +1888,28 @@
         const tex = new THREE.CanvasTexture(c);
         const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
         sp.scale.set(7, 2.2, 1);
+        sp.userData.isLabel = true;
         sp.renderOrder = 10;
         return sp;
+      }
+
+      const _lp = new THREE.Vector3();
+      function updateLabelVisibility() {
+        const labels = scene.children.filter(o => o.userData.isLabel);
+        const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
+        const lw = w < 600 ? 130 : 190, lh = w < 600 ? 44 : 60;
+        const items = labels.map(l => ({ l, d: camera.position.distanceTo(l.position) })).sort((a, b) => a.d - b.d);
+        const placed = [];
+        items.forEach(({ l, d }) => {
+          const k = Math.min(Math.max(d * 0.06, 2.0), 4.2);
+          l.scale.set(k * 3.2, k, 1);
+          _lp.copy(l.position).project(camera);
+          const x = (_lp.x * 0.5 + 0.5) * w, y = (-_lp.y * 0.5 + 0.5) * h;
+          const ok = _lp.z < 1 && Math.abs(_lp.x) < 1.05 && Math.abs(_lp.y) < 1.05 &&
+            !placed.some(r => Math.abs(r.x - x) < lw && Math.abs(r.y - y) < lh);
+          l.visible = ok;
+          if (ok) placed.push({ x, y });
+        });
       }
 
       function addTempleLabels() {
@@ -1908,10 +1940,10 @@
         switch(skyMode) {
           case 'dawn':
             ambientColor = 0xFFB6C1;
-            ambientIntensity = 0.4;
+            ambientIntensity = 0.9;
             dirColor = 0xFFA07A;
-            dirIntensity = 0.8;
-            bgColor = 0x1a0a1a;
+            dirIntensity = 1.0;
+            bgColor = 0x3a1a3a;
             break;
           case 'day':
             ambientColor = 0xFFFFFF;
@@ -1922,17 +1954,17 @@
             break;
           case 'dusk':
             ambientColor = 0xFFAA55;
-            ambientIntensity = 0.3;
-            dirColor = 0xFF6B00;
-            dirIntensity = 0.6;
-            bgColor = 0x0D0020;
+            ambientIntensity = 1.0;
+            dirColor = 0xFF9040;
+            dirIntensity = 1.1;
+            bgColor = 0x2b1550;
             break;
           case 'night':
             ambientColor = 0x4444AA;
-            ambientIntensity = 0.2;
+            ambientIntensity = 0.7;
             dirColor = 0xCCCCFF;
-            dirIntensity = 0.3;
-            bgColor = 0x04010A;
+            dirIntensity = 0.6;
+            bgColor = 0x0a0620;
             break;
         }
         
@@ -1962,7 +1994,7 @@
         // Main ground
         const groundGeo = new THREE.CircleGeometry(40, 64);
         const groundMat = new THREE.MeshStandardMaterial({
-          color: 0x1a1a2e,
+          color: 0x3a3358,
           roughness: 0.9,
           metalness: 0.1
         });
@@ -2490,6 +2522,7 @@
           document.getElementById('om-gate').classList.add('hidden');
           document.getElementById('app-container').classList.add('visible');
           initCity();
+          setTimeout(() => document.getElementById('cityLegend').classList.add('faded'), 10000);
           updatePanchangDisplay();
           updateGreeting();
           if (isSoundOn) playConchSound();
