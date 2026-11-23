@@ -395,7 +395,7 @@
         border: 1px solid rgba(255, 215, 0, 0.3);
       }
 
-      .sky-btn, .follow-btn {
+      .sky-btn, .follow-btn, .walk-btn {
         background: none;
         border: none;
         font-size: 18px;
@@ -406,21 +406,24 @@
         border-radius: 12px;
       }
 
-      .sky-btn.active, .follow-btn.active {
+      .sky-btn.active, .follow-btn.active, .walk-btn.active {
         opacity: 1;
         background: rgba(255, 215, 0, 0.2);
       }
 
-      .sky-btn:hover, .follow-btn:hover {
+      .sky-btn:hover, .follow-btn:hover, .walk-btn:hover {
         opacity: 1;
         transform: scale(1.1);
       }
 
+      #walkJoy { display:none; position:fixed; left:24px; bottom:110px; width:116px; height:116px; border-radius:50%; background:rgba(20,10,40,0.45); border:2px solid rgba(255,215,0,0.5); z-index:30; touch-action:none; }
+      #walkKnob { position:absolute; left:38px; top:38px; width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
+      #walkHint { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:240px; z-index:30; background:rgba(20,10,40,0.7); color:#ffe9a8; padding:6px 12px; border-radius:12px; font-size:12px; pointer-events:none; white-space:nowrap; }
       .top-bar { padding-right: 80px; }
       @media (max-width: 600px) {
         .top-bar { padding: 10px 76px 10px 12px; gap: 6px; }
         .sky-toggle { gap: 0; padding: 4px 4px; border-radius: 16px; }
-        .sky-btn, .follow-btn { font-size: 15px; padding: 3px 5px; }
+        .sky-btn, .follow-btn, .walk-btn { font-size: 15px; padding: 3px 4px; }
         .panchang-mini { font-size: 10px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       }
 
@@ -1194,6 +1197,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
+      <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
         <div>
           <div class="greeting" id="greeting">🙏 नमस्ते</div>
@@ -1205,6 +1209,7 @@
           <button class="sky-btn active" data-sky="dusk" title="Dusk">🌆</button>
           <button class="sky-btn" data-sky="night" title="Night">🌙</button>
           <button class="follow-btn" id="followBtn" title="Follow an animal">🦌</button>
+          <button class="walk-btn" id="walkBtn" title="Walk through the city">🚶</button>
         </div>
       </div>
 
@@ -2175,6 +2180,7 @@
         }
         scene.add(posts); scene.add(lanterns); lanterns.visible = false;
         setupFollow();
+        setupWalk();
         window.__vc = { scene, camera, controls, envAnimals, get fireflies() { return fireflies; } };
 
         // Fireflies (jugnu)
@@ -2211,10 +2217,85 @@
         });
       }
 
+
+      const walk = { on: false, x: -2.8, z: 28.9, yaw: 0, pitch: 0, jx: 0, jy: 0, keys: {}, saved: null, t: 0 };
+      function setupWalk() {
+        const b = document.getElementById('walkBtn'), joy = document.getElementById('walkJoy'), knob = document.getElementById('walkKnob'), hint = document.getElementById('walkHint');
+        if (!b || !joy) return;
+        const dom = renderer.domElement;
+        b.addEventListener('click', () => {
+          walk.on = !walk.on;
+          b.classList.toggle('active', walk.on);
+          joy.style.display = walk.on ? 'block' : 'none';
+          if (walk.on) {
+            walk.saved = { p: camera.position.clone(), t: controls.target.clone() };
+            followIdx = -1; const fb = document.getElementById('followBtn'); if (fb) { fb.classList.remove('active'); fb.title = 'Follow an animal'; }
+            controls.enabled = false;
+            walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0;
+            walk.boxes = templeObjects.filter(o => o.userData.temple).map(o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o).expandByScalar(0.8); });
+            window.__vc.walkBoxes = walk.boxes;
+            camera.rotation.order = 'YXZ';
+            b.title = 'Walking (tap to return to city view)';
+            hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
+          } else {
+            controls.enabled = true;
+            camera.rotation.order = 'XYZ';
+            camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
+            walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
+            b.title = 'Walk through the city'; hint.style.display = 'none';
+          }
+        });
+        let jid = null;
+        function joyMove(e) {
+          const r = joy.getBoundingClientRect();
+          let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+          const m = Math.hypot(dx, dy), lim = 38;
+          if (m > lim) { dx = dx / m * lim; dy = dy / m * lim; }
+          walk.jx = dx / lim; walk.jy = dy / lim;
+          knob.style.left = (38 + dx) + 'px'; knob.style.top = (38 + dy) + 'px';
+        }
+        joy.addEventListener('pointerdown', e => { jid = e.pointerId; try { joy.setPointerCapture(jid); } catch (_) {} joyMove(e); e.preventDefault(); });
+        joy.addEventListener('pointermove', e => { if (e.pointerId === jid) joyMove(e); });
+        const joyEnd = e => { if (e.pointerId === jid) { jid = null; walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px'; } };
+        joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+        let lid = null, lx = 0, ly = 0;
+        dom.addEventListener('pointerdown', e => { if (walk.on) { lid = e.pointerId; lx = e.clientX; ly = e.clientY; } });
+        dom.addEventListener('pointermove', e => {
+          if (!walk.on || e.pointerId !== lid) return;
+          walk.yaw -= (e.clientX - lx) * 0.005; walk.pitch -= (e.clientY - ly) * 0.004;
+          walk.pitch = Math.max(-0.9, Math.min(0.9, walk.pitch)); lx = e.clientX; ly = e.clientY;
+        });
+        const lookEnd = e => { if (e.pointerId === lid) lid = null; };
+        dom.addEventListener('pointerup', lookEnd); dom.addEventListener('pointercancel', lookEnd);
+        window.addEventListener('keydown', e => { walk.keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { walk.keys[e.key.toLowerCase()] = false; });
+      }
+      function walkTick(dt) {
+        const k = walk.keys;
+        let f = -walk.jy + ((k['w'] || k['arrowup']) ? 1 : 0) - ((k['s'] || k['arrowdown']) ? 1 : 0);
+        let st = walk.jx + ((k['d'] || k['arrowright']) ? 1 : 0) - ((k['a'] || k['arrowleft']) ? 1 : 0);
+        if (k['q']) walk.yaw += dt * 1.5; if (k['e']) walk.yaw -= dt * 1.5;
+        const m = Math.hypot(f, st); if (m > 1) { f /= m; st /= m; }
+        const sp = 5 * dt, sy = Math.sin(walk.yaw), cy = Math.cos(walk.yaw);
+        let nx = walk.x + (-sy * f + cy * st) * sp, nz = walk.z + (-cy * f - sy * st) * sp;
+        const r = Math.hypot(nx, nz); if (r > 30.5) { nx *= 30.5 / r; nz *= 30.5 / r; }
+        (walk.boxes || []).forEach(bx => {
+          if (nx > bx.min.x && nx < bx.max.x && nz > bx.min.z && nz < bx.max.z) {
+            const dl = nx - bx.min.x, dr = bx.max.x - nx, dt2 = nz - bx.min.z, db = bx.max.z - nz, mn = Math.min(dl, dr, dt2, db);
+            if (mn === dl) nx = bx.min.x; else if (mn === dr) nx = bx.max.x; else if (mn === dt2) nz = bx.min.z; else nz = bx.max.z;
+          }
+        });
+        if (m > 0.05) walk.t += dt * 8;
+        walk.x = nx; walk.z = nz;
+        camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
+        camera.rotation.set(walk.pitch, walk.yaw, 0);
+      }
+
       let _envLast = performance.now();
       function envTick() {
         const now = performance.now(); const dt = Math.min(0.1, (now - _envLast) / 1000); _envLast = now;
         const t = now / 1000;
+        if (walk.on) walkTick(dt);
         if (followIdx >= 0 && envAnimals[followIdx]) {
           const p = envAnimals[followIdx].position;
           const dx = (p.x - controls.target.x) * 0.1, dz = (p.z - controls.target.z) * 0.1;
