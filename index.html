@@ -1225,18 +1225,16 @@
       <div class="bhajan-card">
         <h2>🎶 भजन और ध्वनि</h2>
         <div class="sub">Bhajan &amp; temple sound. Starts only when you tap play.</div>
-        <button class="bhajan-track" data-track="aarti">🪔 <span>Aarti Puja (Santoshi Maa)<small>Live recording, 2:32</small></span></button>
-        <button class="bhajan-track" data-track="omnava">🔱 <span>Om Navashivam<small>Traditional song, Kumaon, 1:55</small></span></button>
-        <button class="bhajan-track" data-track="sherawali">🦁 <span>Sherawali Maa<small>Traditional song, Kumaon, 0:51</small></span></button>
+        <button class="bhajan-track" data-track="omnava">🔱 <span>Om Navashivam<small>Traditional hindu song, Kumaon, 1:55</small></span></button>
+        <button class="bhajan-track" data-track="sherawali">🦁 <span>Sherawali Maa<small>Traditional hindu song, Kumaon, 0:51</small></span></button>
         <div class="bhajan-row"><span>🔔</span><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn">🔊</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="stopBtn">⏹ Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div>
-        <div class="bhajan-credits">Recordings are used under open licences, shortened to mono MP3 where noted:<br>
+        <div class="bhajan-credits">Recordings used under open licences:<br>
         Temple bell: "Indian Temple Bell" by ganiket, Freesound, <a href="https://freesound.org/people/ganiket/sounds/466652/" target="_blank" rel="noopener">CC0</a>.<br>
-        Aarti Puja, deity Santoshi: Shri hari om sharan ji, Wikimedia Commons, <a href="https://commons.wikimedia.org/wiki/File:Aarti_Puja,_deity_Santoshi.ogg" target="_blank" rel="noopener">CC0</a>.<br>
         Om Navashivam and Sherawali Maa: Yann, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
         (<a href="https://commons.wikimedia.org/wiki/File:Om_Navashivam,_traditional_hindu_song,_Kumaon,_Uttarakhand,_India.ogg" target="_blank" rel="noopener">source 1</a>,
-        <a href="https://commons.wikimedia.org/wiki/File:Sherawali_Maa,_traditional_hindu_song,_Kumaon,_Uttarakhand.oga" target="_blank" rel="noopener">source 2</a>). Converted to mono MP3.</div>
+        <a href="https://commons.wikimedia.org/wiki/File:Sherawali_Maa,_traditional_hindu_song,_Kumaon,_Uttarakhand.oga" target="_blank" rel="noopener">source 2</a>). Converted to mono 32 kbps MP3 (changes made); the converted audio is also under CC BY-SA 4.0. Titles follow the Commons file names; the Commons page for Sherawali Maa has a copied description, so its label is unconfirmed.</div>
       </div>
     </div>
 
@@ -2689,7 +2687,6 @@
 
       // ==================== BHAJAN PLAYER (open-licence recordings) ====================
       const TRACKS = {
-        aarti: () => import('./audio/aarti.js'),
         omnava: () => import('./audio/omnava.js'),
         sherawali: () => import('./audio/sherawali.js'),
         bell: () => import('./audio/bell.js')
