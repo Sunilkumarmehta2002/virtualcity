@@ -1230,7 +1230,7 @@
         <div class="bhajan-row"><span>🔔</span><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn">🔊</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="stopBtn">⏹ Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div>
-        <div class="bhajan-credits">Recordings used under open licences:<br>
+        <div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>
         Temple bell: "Indian Temple Bell" by ganiket, Freesound, <a href="https://freesound.org/people/ganiket/sounds/466652/" target="_blank" rel="noopener">CC0</a>.<br>
         Two Kumaon recordings by Yann, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
         (<a href="https://commons.wikimedia.org/wiki/File:Om_Navashivam,_traditional_hindu_song,_Kumaon,_Uttarakhand,_India.ogg" target="_blank" rel="noopener">source 1</a>,
@@ -2027,6 +2027,17 @@
         });
       }
 
+      function loadStone(mat, name, rep, tint) {
+        const base = 'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/' + name + '/' + name + '_diff_1k.jpg';
+        new THREE.TextureLoader().load(base, (t) => {
+          t.wrapS = t.wrapT = THREE.RepeatWrapping;
+          t.repeat.set(rep, rep);
+          t.colorSpace = THREE.SRGBColorSpace;
+          t.anisotropy = 4;
+          mat.map = t; mat.color.setHex(tint); mat.needsUpdate = true;
+        }, undefined, () => {});
+      }
+
       function createGround() {
         // Main ground
         const groundGeo = new THREE.CircleGeometry(40, 64);
@@ -2036,6 +2047,7 @@
           metalness: 0.1
         });
         const ground = new THREE.Mesh(groundGeo, groundMat);
+        loadStone(groundMat, 'monastery_stone_floor', 18, 0xb8a9b8);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
@@ -2170,6 +2182,7 @@
           roughness: 0.7
         });
         const hall = new THREE.Mesh(hallGeo, hallMat);
+        loadStone(hallMat, 'large_sandstone_blocks', 1.5, 0xffe9c8);
         hall.position.y = 1 + 1.5 * scale;
         hall.castShadow = true;
         group.add(hall);
