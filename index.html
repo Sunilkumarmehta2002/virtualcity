@@ -2391,7 +2391,7 @@
           const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 0.8, 16), stoneM); ped.position.set(0, 0.4, 1.35); al.add(ped);
           const lot = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.9, 0.2, 16), gold); lot.position.set(0, 0.9, 1.35); al.add(lot);
           const dya = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb54a })); dya.position.set(1.0, 0.3, 2.1); al.add(dya);
-          const lb = label(n.h, n.e, n.id === 'ganesh' ? '' : 'मूर्ति शीघ्र · statue pending'); lb.position.set(0, 3.7, 0.7); al.add(lb);
+          const lb = label(n.id === 'parvati' ? 'उमा-महेश्वर' : n.h, n.id === 'parvati' ? 'Shiva & Parvati · Uma-Maheshvara' : n.e, ['ganesh', 'parvati'].includes(n.id) ? '' : 'मूर्ति शीघ्र · statue pending'); lb.position.set(0, 3.7, 0.7); al.add(lb);
           slots.push({ id: n.id, grp: al, base: new THREE.Vector3(x, 1.0, side * (W / 2) + inward * 1.35) });
           GAL.circles.push([GAL.ox + x, side * (W / 2) + inward * 1.35, 1.2]);
         });
@@ -2400,8 +2400,9 @@
         // hanging lamps (decorative)
         for (let i = 0; i < 9; i++) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffc060 })); l.position.set(-24 + i * 6, 5.6, 0); g.add(l); }
         // the real Ganesha scan in the Ganesh niche
-        const slot = slots.find(s => s.id === 'ganesh');
-        fetch('models/ganesha.json').then(r => r.json()).then(d => {
+        function loadMuseumScan(id, file, height, color) {
+        const slot = slots.find(s => s.id === id);
+        return fetch(file).then(r => r.json()).then(d => {
           const bin = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0)).buffer;
           const P = new Uint16Array(bin(d.p)), I = new Uint16Array(bin(d.i));
           const pos = new Float32Array(P.length);
@@ -2409,10 +2410,13 @@
           const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setIndex(new THREE.BufferAttribute(I, 1));
           geo.rotateX(-Math.PI / 2); geo.computeVertexNormals(); geo.computeBoundingBox();
           const bb = geo.boundingBox; geo.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
-          const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xc8b496, roughness: 0.85, emissive: 0x3a2f24 }));
-          const sc = 1.9 / (bb.max.y - bb.min.y); mesh.scale.setScalar(sc); mesh.position.set(0, 1.0, 1.35); mesh.castShadow = true;
-          slot.grp.add(mesh); window.__vc.statue = mesh;
+          const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.85, emissive: 0x3a2f24 }));
+          const sc = height / (bb.max.y - bb.min.y); mesh.scale.setScalar(sc); mesh.position.set(0, 1.0, 1.35); mesh.castShadow = true;
+          slot.grp.add(mesh); window.__vc.statues = window.__vc.statues || {}; window.__vc.statues[id] = mesh; if (id === 'ganesh') window.__vc.statue = mesh;
         }).catch(() => {});
+        }
+        loadMuseumScan('ganesh', 'models/ganesha.json', 1.9, 0xc8b496);
+        loadMuseumScan('parvati', 'models/uma.json', 2.25, 0xbf9570);
       }
       function setupGalleryBtn() {
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
@@ -3255,4 +3259,4 @@
       init();
     </script>
   </body>
-                 </html>
+                           </html>
