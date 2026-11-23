@@ -2072,6 +2072,7 @@
 
       // ---------- Living environment: gardens, trees, animals, fireflies, IST sky ----------
       const envAnimals = [];
+      const outdoorSolids = [];
       let fireflies = null;
       let lanterns = null;
       let skyManual = false;
@@ -2188,6 +2189,7 @@
           const r = 33 + (i % 3) * 2.2;
           const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 3.2, 8), trunkM);
           tr.position.set(Math.cos(a) * r, 1.6, Math.sin(a) * r); tr.castShadow = true; scene.add(tr);
+          outdoorSolids.push([tr.position.x, tr.position.z, 1.05]);
           for (let k = 0; k < 3; k++) {
             const cn = new THREE.Mesh(new THREE.IcosahedronGeometry(1.8 - k * 0.2, 1), leafM);
             cn.position.set(tr.position.x + (k - 1) * 0.9, 4.0 + k * 0.5, tr.position.z + (k % 2 ? 0.8 : -0.8));
@@ -2213,13 +2215,14 @@
         for (let i = 0; i < 32; i++) {
           const a = (i / 32) * Math.PI * 2, r = 25.2;
           dummy.position.set(Math.cos(a) * r, 1.1, Math.sin(a) * r); dummy.scale.setScalar(1); dummy.updateMatrix(); posts.setMatrixAt(i, dummy.matrix);
+          outdoorSolids.push([dummy.position.x, dummy.position.z, 0.6]);
           dummy.position.y = 2.3; dummy.updateMatrix(); lanterns.setMatrixAt(i, dummy.matrix);
         }
         scene.add(posts); scene.add(lanterns); lanterns.visible = false;
         setupFollow();
         setupWalk();
         setupGalleryBtn();
-        window.__vc = { scene, camera, controls, envAnimals, walk, get fireflies() { return fireflies; } };
+        window.__vc = { scene, camera, controls, envAnimals, outdoorSolids, walk, get fireflies() { return fireflies; } };
 
         // Fireflies (jugnu)
         const N = 140; const pos = new Float32Array(N * 3); const ph = [];
@@ -2278,7 +2281,7 @@
             window.__vc.walkBoxes = walk.boxes;
             camera.rotation.order = 'YXZ';
             b.title = 'Walking (tap to return to city view)';
-            hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
+            hint.textContent = 'Drag to look · joystick or WASD to walk · gardens are open'; hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
             walk.hall = false; document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
             camera.rotation.order = 'XYZ';
@@ -2320,7 +2323,7 @@
         const m = Math.hypot(f, st); if (m > 1) { f /= m; st /= m; }
         const sp = 5 * dt, sy = Math.sin(walk.yaw), cy = Math.cos(walk.yaw);
         let nx = walk.x + (-sy * f + cy * st) * sp, nz = walk.z + (-cy * f - sy * st) * sp;
-        const r = Math.hypot(nx, nz); if (!walk.hall && r > 30.5) { nx *= 30.5 / r; nz *= 30.5 / r; }
+        const r = Math.hypot(nx, nz); if (!walk.hall && r > 38.5) { nx *= 38.5 / r; nz *= 38.5 / r; }
         if (walk.hall) {
           nx = Math.max(GAL.rect.minx, Math.min(GAL.rect.maxx, nx)); nz = Math.max(GAL.rect.minz, Math.min(GAL.rect.maxz, nz));
           GAL.circles.forEach(c => { const ex = nx - c[0], ez = nz - c[1], ed = Math.hypot(ex, ez); if (ed < c[2] && ed > 0.0001) { nx = c[0] + ex / ed * c[2]; nz = c[1] + ez / ed * c[2]; } });
@@ -2330,6 +2333,10 @@
             const dl = nx - bx.min.x, dr = bx.max.x - nx, dt2 = nz - bx.min.z, db = bx.max.z - nz, mn = Math.min(dl, dr, dt2, db);
             if (mn === dl) nx = bx.min.x; else if (mn === dr) nx = bx.max.x; else if (mn === dt2) nz = bx.min.z; else nz = bx.max.z;
           }
+        });
+        if (!walk.hall) outdoorSolids.forEach(c => {
+          const dx = nx - c[0], dz = nz - c[1], d = Math.hypot(dx, dz);
+          if (d < c[2]) { const a = d > 0.0001 ? Math.atan2(dz, dx) : walk.yaw; nx = c[0] + Math.cos(a) * c[2]; nz = c[1] + Math.sin(a) * c[2]; }
         });
         if (!walk.hall) envAnimals.forEach(pp => {
           const ex = nx - pp.position.x, ez = nz - pp.position.z, ed = Math.hypot(ex, ez);
@@ -2454,9 +2461,9 @@
         }
         const OB = window._pplObs;
         const blocked = (x, z) => {
-          if (Math.hypot(x, z) > 31) return true;
+          if (Math.hypot(x, z) > 38.5) return true;
           for (const bb of OB.boxes) if (x > bb.min.x && x < bb.max.x && z > bb.min.z && z < bb.max.z) return true;
-          for (const p of OB.posts) if (Math.hypot(x - p[0], z - p[1]) < 0.7) return true;
+          for (const p of outdoorSolids) if (Math.hypot(x - p[0], z - p[1]) < p[2] + 0.15) return true;
           return false;
         };
         const clearLine = (x0, z0, x1, z1) => { for (let q = 1; q <= 24; q++) { if (blocked(x0 + (x1 - x0) * q / 24, z0 + (z1 - z0) * q / 24)) return false; } return true; };
@@ -2465,7 +2472,7 @@
           if (u.wait > 0) { u.wait -= dt; return; }
           if (!u.target) {
             for (let n = 0; n < 25 && !u.target; n++) {
-              const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 26;
+              const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 34;
               const tx = Math.cos(a) * r, tz = Math.sin(a) * r;
               if (!blocked(tx, tz) && clearLine(an.position.x, an.position.z, tx, tz)) u.target = new THREE.Vector3(tx, 0, tz);
             }
@@ -3260,4 +3267,4 @@
       init();
     </script>
   </body>
-                           </html>
+        </html>
