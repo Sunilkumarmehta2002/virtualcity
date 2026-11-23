@@ -2202,8 +2202,8 @@
           b.title = 'Following ' + k + ' (tap for next)';
           const p = envAnimals[followIdx].position;
           controls.target.set(p.x, 1, p.z);
-          const far = camera.aspect < 1 ? 11 : 7;
-          camera.position.set(p.x + far, far * 0.7, p.z + far);
+          const far = camera.aspect < 1 ? 4 : 6;
+          camera.position.set(p.x + far, 22, p.z + far);
         });
       }
 
