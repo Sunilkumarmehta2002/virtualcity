@@ -1211,6 +1211,7 @@
           <button class="sky-btn" data-sky="night" title="Night">🌙</button>
           <button class="follow-btn" id="followBtn" title="Follow a devotee">🧍</button>
           <button class="walk-btn" id="walkBtn" title="Walk through the city">🚶</button>
+          <button class="walk-btn" id="galBtn" title="Darshan gallery (inside)">🪔</button>
         </div>
       </div>
 
@@ -2209,7 +2210,8 @@
         scene.add(posts); scene.add(lanterns); lanterns.visible = false;
         setupFollow();
         setupWalk();
-        window.__vc = { scene, camera, controls, envAnimals, get fireflies() { return fireflies; } };
+        setupGalleryBtn();
+        window.__vc = { scene, camera, controls, envAnimals, walk, get fireflies() { return fireflies; } };
 
         // Fireflies (jugnu)
         const N = 140; const pos = new Float32Array(N * 3); const ph = [];
@@ -2263,14 +2265,14 @@
             walk.saved = { p: camera.position.clone(), t: controls.target.clone() };
             followIdx = -1; const fb = document.getElementById('followBtn'); if (fb) { fb.classList.remove('active'); fb.title = 'Follow a devotee'; }
             controls.enabled = false;
-            walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0;
+            walk.hall = false; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0;
             walk.boxes = templeObjects.filter(o => o.userData.temple).map(o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o).expandByScalar(0.8); });
             window.__vc.walkBoxes = walk.boxes;
             camera.rotation.order = 'YXZ';
             b.title = 'Walking (tap to return to city view)';
             hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
-            controls.enabled = true;
+            walk.hall = false; controls.enabled = true;
             camera.rotation.order = 'XYZ';
             camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
             walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
@@ -2310,14 +2312,18 @@
         const m = Math.hypot(f, st); if (m > 1) { f /= m; st /= m; }
         const sp = 5 * dt, sy = Math.sin(walk.yaw), cy = Math.cos(walk.yaw);
         let nx = walk.x + (-sy * f + cy * st) * sp, nz = walk.z + (-cy * f - sy * st) * sp;
-        const r = Math.hypot(nx, nz); if (r > 30.5) { nx *= 30.5 / r; nz *= 30.5 / r; }
-        (walk.boxes || []).forEach(bx => {
+        const r = Math.hypot(nx, nz); if (!walk.hall && r > 30.5) { nx *= 30.5 / r; nz *= 30.5 / r; }
+        if (walk.hall) {
+          nx = Math.max(GAL.rect.minx, Math.min(GAL.rect.maxx, nx)); nz = Math.max(GAL.rect.minz, Math.min(GAL.rect.maxz, nz));
+          GAL.circles.forEach(c => { const ex = nx - c[0], ez = nz - c[1], ed = Math.hypot(ex, ez); if (ed < c[2] && ed > 0.0001) { nx = c[0] + ex / ed * c[2]; nz = c[1] + ez / ed * c[2]; } });
+        }
+        (walk.hall ? [] : (walk.boxes || [])).forEach(bx => {
           if (nx > bx.min.x && nx < bx.max.x && nz > bx.min.z && nz < bx.max.z) {
             const dl = nx - bx.min.x, dr = bx.max.x - nx, dt2 = nz - bx.min.z, db = bx.max.z - nz, mn = Math.min(dl, dr, dt2, db);
             if (mn === dl) nx = bx.min.x; else if (mn === dr) nx = bx.max.x; else if (mn === dt2) nz = bx.min.z; else nz = bx.max.z;
           }
         });
-        envAnimals.forEach(pp => {
+        if (!walk.hall) envAnimals.forEach(pp => {
           const ex = nx - pp.position.x, ez = nz - pp.position.z, ed = Math.hypot(ex, ez);
           if (ed < 0.6 && ed > 0.0001) { nx = pp.position.x + ex / ed * 0.6; nz = pp.position.z + ez / ed * 0.6; }
         });
@@ -2325,6 +2331,93 @@
         walk.x = nx; walk.z = nz;
         camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
+      }
+
+      // ---------- Darshan Gallery: a walkable hall with one niche per deity ----------
+      const GAL = { ox: 200, built: false, circles: [], rect: { minx: 171, maxx: 229, minz: -10.2, maxz: 10.2 } };
+      function buildGallery() {
+        if (GAL.built) return; GAL.built = true;
+        const g = new THREE.Group(); g.position.set(GAL.ox, 0, 0); scene.add(g);
+        const M = (c, r) => new THREE.MeshStandardMaterial({ color: c, roughness: r === undefined ? 0.9 : r });
+        const floorM = M(0xffffff), wallM = M(0xffffff), ceilM = M(0x5a3b22, 0.95);
+        const L = 60, W = 22, H = 7;
+        const tex = (mat, name, rx, ry) => {
+          const u = 'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/' + name + '/' + name + '_diff_1k.jpg';
+          new THREE.TextureLoader().load(u, (t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; mat.map = t; mat.emissiveMap = t; mat.emissive.setHex(0x7a6a5a); mat.needsUpdate = true; }, undefined, () => {});
+        };
+        tex(floorM, 'monastery_stone_floor', 20, 8); tex(wallM, 'large_sandstone_blocks', 16, 2);
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(L, W), floorM); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; g.add(floor);
+        const ceil = new THREE.Mesh(new THREE.PlaneGeometry(L, W), ceilM); ceil.rotation.x = Math.PI / 2; ceil.position.y = H; g.add(ceil);
+        [-1, 1].forEach(s => { const w = new THREE.Mesh(new THREE.PlaneGeometry(L, H), wallM); w.position.set(0, H / 2, s * W / 2); w.rotation.y = s > 0 ? Math.PI : 0; g.add(w); });
+        [-1, 1].forEach(s => { const w = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallM); w.position.set(s * L / 2, H / 2, 0); w.rotation.y = s > 0 ? -Math.PI / 2 : Math.PI / 2; g.add(w); });
+        // pillars down the middle line of the hall
+        const pilM = M(0xc98a3a, 0.7); pilM.emissive.setHex(0x3a2208);
+        for (let i = 0; i < 8; i++) [-1, 1].forEach(s => {
+          const x = -24.5 + i * 7, z = s * 4.2;
+          const p = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.42, H, 12), pilM); p.position.set(x, H / 2, z); g.add(p);
+          const cap = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1), pilM); cap.position.set(x, H - 0.15, z); g.add(cap);
+          GAL.circles.push([GAL.ox + x, z, 0.8]);
+        });
+        // niches: 7 per long wall
+        const gold = M(0xffc24a, 0.4); gold.emissive.setHex(0x5a3a08);
+        const stoneM = M(0xb09a80, 0.8); stoneM.emissive.setHex(0x4a3d30);
+        const names = TEMPLES.map(t => ({ h: t.god.hindi, e: t.god.english, id: t.id }));
+        const label = (h, e, sub) => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 160; const x = c.getContext('2d');
+          x.fillStyle = 'rgba(40,16,60,0.85)'; x.fillRect(0, 0, 512, 160); x.strokeStyle = '#f2d27a'; x.lineWidth = 6; x.strokeRect(3, 3, 506, 154);
+          x.fillStyle = '#fff1c4'; x.textAlign = 'center'; x.font = 'bold 54px sans-serif'; x.fillText(h, 256, 70); x.font = '34px sans-serif'; x.fillText(e, 256, 114);
+          if (sub) { x.font = '22px sans-serif'; x.fillStyle = '#e6c982'; x.fillText(sub, 256, 146); }
+          const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+          return new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.69), new THREE.MeshBasicMaterial({ map: t }));
+        };
+        const slots = [];
+        names.forEach((n, i) => {
+          const side = i < 7 ? -1 : 1, k = i < 7 ? i : i - 7;
+          const x = -21 + k * 7, wz = side * W / 2, inward = -side;
+          const al = new THREE.Group(); al.position.set(x, 0, wz); al.rotation.y = side < 0 ? 0 : Math.PI; g.add(al);
+          // alcove frame (local +z points into the hall)
+          [-1.7, 1.7].forEach(dx => { const pst = new THREE.Mesh(new THREE.BoxGeometry(0.45, 5, 0.6), stoneM); pst.position.set(dx, 2.5, 0.3); al.add(pst); });
+          const lint = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.5, 0.7), stoneM); lint.position.set(0, 5.1, 0.35); al.add(lint);
+          const arch = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.18, 0.18), gold); arch.position.set(0, 4.7, 0.62); al.add(arch);
+          const back = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 4.5), M(0x4a1d2a, 0.9)); back.position.set(0, 2.5, 0.02); al.add(back);
+          const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 0.8, 16), stoneM); ped.position.set(0, 0.4, 1.35); al.add(ped);
+          const lot = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.9, 0.2, 16), gold); lot.position.set(0, 0.9, 1.35); al.add(lot);
+          const dya = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb54a })); dya.position.set(1.0, 0.3, 2.1); al.add(dya);
+          const lb = label(n.h, n.e, n.id === 'ganesh' ? '' : 'मूर्ति शीघ्र · statue pending'); lb.position.set(0, 3.7, 0.7); al.add(lb);
+          slots.push({ id: n.id, grp: al, base: new THREE.Vector3(x, 1.0, side * (W / 2) + inward * 1.35) });
+          GAL.circles.push([GAL.ox + x, side * (W / 2) + inward * 1.35, 1.2]);
+        });
+        // warm lights
+        [-18, 0, 18].forEach(x => { const pl = new THREE.PointLight(0xffb060, 2.2, 28); pl.position.set(x, 5.5, 0); g.add(pl); });
+        // hanging lamps (decorative)
+        for (let i = 0; i < 9; i++) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffc060 })); l.position.set(-24 + i * 6, 5.6, 0); g.add(l); }
+        // the real Ganesha scan in the Ganesh niche
+        const slot = slots.find(s => s.id === 'ganesh');
+        fetch('models/ganesha.json').then(r => r.json()).then(d => {
+          const bin = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0)).buffer;
+          const P = new Uint16Array(bin(d.p)), I = new Uint16Array(bin(d.i));
+          const pos = new Float32Array(P.length);
+          for (let v = 0; v < P.length; v += 3) { pos[v] = d.min[0] + P[v] / 65535 * d.size[0]; pos[v + 1] = d.min[1] + P[v + 1] / 65535 * d.size[1]; pos[v + 2] = d.min[2] + P[v + 2] / 65535 * d.size[2]; }
+          const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setIndex(new THREE.BufferAttribute(I, 1));
+          geo.rotateX(-Math.PI / 2); geo.computeVertexNormals(); geo.computeBoundingBox();
+          const bb = geo.boundingBox; geo.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
+          const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xc8b496, roughness: 0.85, emissive: 0x3a2f24 }));
+          const sc = 1.9 / (bb.max.y - bb.min.y); mesh.scale.setScalar(sc); mesh.position.set(0, 1.0, 1.35); mesh.castShadow = true;
+          slot.grp.add(mesh); window.__vc.statue = mesh;
+        }).catch(() => {});
+      }
+      function setupGalleryBtn() {
+        const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
+        if (!gb || !wb) return;
+        gb.addEventListener('click', () => {
+          if (walk.on && walk.hall) { walk.hall = false; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); return; }
+          if (!walk.on) wb.click();
+          enterGallery(); gb.classList.add('active');
+        });
+      }
+      function enterGallery() {
+        buildGallery();
+        walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
       }
 
       let _envLast = performance.now();
