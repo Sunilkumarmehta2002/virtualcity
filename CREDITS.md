@@ -26,3 +26,9 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - CC0 download and licence: https://commons.wikimedia.org/wiki/File:Uma-Maheshvara%2C_10th_-_11th_C_CE_-_3D_model_by_Minneapolis_Institute_of_Art_-_Sketchfab.stl
 - Adaptation: welded vertices, 16-bit position quantization and indexed mesh, rotated/scaled for display with neutral sandstone material. simplified from 99,994 to 16,625 triangles using vertex clustering, 7,585 vertices, about 194 KB JSON. Original surface colour is not reproduced.
 - Experimental asset only. Not displayed: the simplified mesh failed visual QA. Any future display must identify the joint Shiva and Parvati depiction.
+
+## Animated visitors
+- Casual Walker and Hiker by tevy.dev. Source pages: https://tevy.dev/models/casual-walker and https://tevy.dev/models/hiker . Each source page and GLB asset metadata states CC0 1.0.
+- Pinned v1 LOD1 files loaded from those source pages, about 1.3MB combined. GLTFLoader, KTX2Loader and Meshopt decoder use the existing pinned Three.js0.160.0 dependency.
+- Independently cloned skinned models, idle/walk animation blending, movement speed matched to the source walk cycle (1.3m/s), and existing city collision/yielding wrappers retained.
+- These are stylized modern visitors, not photoreal people or a finished varied devotional crowd. If a download fails the prior procedural crowd remains as a fallback.
