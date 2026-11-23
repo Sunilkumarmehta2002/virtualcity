@@ -424,7 +424,8 @@
       #galleryGuide small { display:block; margin-top:5px; }
       @media(max-width:699px) {
         #galleryGuide { bottom:92px; width:calc(100vw - 24px); max-width:370px; }
-        #galleryGuide select { width:calc(100% - 86px); }
+        #galleryGuide select { width:100%; margin-bottom:4px; }
+        #galleryGuide button { padding:5px 9px; }
         body.in-gallery #walkJoy { bottom:200px; }
       }
       #walkHint { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:240px; z-index:30; background:rgba(20,10,40,0.7); color:#ffe9a8; padding:6px 12px; border-radius:12px; font-size:12px; pointer-events:none; white-space:normal; width:max-content; max-width:calc(100vw - 32px); box-sizing:border-box; text-align:center; }
@@ -1206,7 +1207,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="galleryGuide"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryExit">बाहर · Exit</button><small id="galleryStatus"></small></div>
+      <div id="galleryGuide"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button> <button id="galleryExit">बाहर · Exit</button><small id="galleryStatus"></small></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
         <div>
@@ -2365,7 +2366,7 @@
           const k=Math.round((walk.x-GAL.ox+21)/7), inBay=Math.abs(walk.z)>3.65 && k>=0 && k<7;
           const sel=document.getElementById('gallerySelect');
           if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
-          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';status.textContent='Connecting passage · 14 shrine bays · 1 statue, 13 pending'; }
+          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryAarti').hidden=true;stopGalleryAarti();status.textContent='Connecting passage · 14 shrine bays · 1 statue, 13 pending'; }
         }
         camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
@@ -2476,7 +2477,45 @@
         loadMuseumScan('ganesh', 'models/ganesha.json', 1.9, 0xc8b496);
         // Uma-Maheshvara retained as an experimental asset, not displayed until mesh QA passes.
       }
+      // Opt-in 3D aarti study. Original procedural geometry and effects, no recording.
+      const galleryRitual={group:null,active:false,start:0};
+      function stopGalleryAarti(){
+        galleryRitual.active=false;if(galleryRitual.group)galleryRitual.group.visible=false;
+        const b=document.getElementById('galleryAarti');if(b)b.textContent='🪔 आरती · Aarti';
+      }
+      function startGalleryAarti(){
+        if(galleryRitual.active){stopGalleryAarti();return;}
+        if(!walk.hall||document.getElementById('gallerySelect').value!=='ganesh'||GAL.scanStatus!=='ready')return;
+        if(!galleryRitual.group){
+          const g=new THREE.Group();scene.add(g);galleryRitual.group=g;
+          const brass=new THREE.MeshStandardMaterial({color:0xb98934,metalness:.78,roughness:.28});
+          const profile=[[0,0],[.07,0],[.09,.035],[.08,.065],[.045,.08],[.035,.19],[.1,.21],[.16,.245],[.19,.3],[.2,.34],[.18,.345],[.145,.28],[0,.26]].map(p=>new THREE.Vector2(...p));
+          const lamp=new THREE.Mesh(new THREE.LatheGeometry(profile,40),brass);g.add(lamp);
+          const handle=new THREE.Mesh(new THREE.TorusGeometry(.12,.018,8,24),brass);handle.position.set(.22,.19,0);g.add(handle);
+          const oil=new THREE.Mesh(new THREE.CylinderGeometry(.145,.145,.008,32),new THREE.MeshStandardMaterial({color:0x38200b,roughness:.18}));oil.position.y=.285;g.add(oil);
+          const wick=new THREE.Mesh(new THREE.CylinderGeometry(.014,.018,.085,8),new THREE.MeshStandardMaterial({color:0x35200c}));wick.position.set(0,.32,0);g.add(wick);
+          const flameMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,uniforms:{time:{value:0}},vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 v;uniform float time;void main(){float y=v.y;float sway=sin(time*8.+y*9.)*.035*y;float w=.3*pow(max(0.,1.-y),.65);float r=abs(v.x-.5-sway)/max(.001,w);float a=(1.-smoothstep(.45,1.,r))*smoothstep(0.,.1,y)*(1.-smoothstep(.75,1.,y));vec3 c=mix(vec3(1.,.36,.025),vec3(1.,.9,.45),pow(max(0.,1.-r),3.)*(1.-y));gl_FragColor=vec4(c,a*.9);}' });
+          const flame=new THREE.Mesh(new THREE.PlaneGeometry(.18,.25),flameMat);flame.position.y=.465;g.add(flame);galleryRitual.flame=flame;
+          const glow=new THREE.PointLight(0xff9a35,2,4,2);glow.position.y=.48;g.add(glow);galleryRitual.glow=glow;
+          const c=document.createElement('canvas');c.width=c.height=64;const cx=c.getContext('2d'),gr=cx.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(180,170,160,.2)');gr.addColorStop(1,'rgba(180,170,160,0)');cx.fillStyle=gr;cx.fillRect(0,0,64,64);const sm=new THREE.CanvasTexture(c);
+          galleryRitual.smoke=[];for(let i=0;i<9;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sm,transparent:true,depthWrite:false,opacity:.18}));g.add(sp);galleryRitual.smoke.push(sp);}
+          window.__vc.ritual=galleryRitual;
+        }
+        galleryRitual.start=performance.now()/1000;galleryRitual.active=true;galleryRitual.group.visible=true;
+        document.getElementById('galleryAarti').textContent='■ रोकें · Stop';
+      }
+      function tickGalleryAarti(t){
+        const r=galleryRitual;if(!r.active)return;
+        if(!walk.hall||document.getElementById('gallerySelect').value!=='ganesh'||t-r.start>24){stopGalleryAarti();return;}
+        const e=t-r.start,a=e*1.5,fade=Math.min(1,e*2,(24-e)*2);
+        r.group.position.set(GAL.ox-21+Math.sin(a)*.52,1.4+Math.cos(a)*.28,-8.0);
+        r.group.rotation.z=Math.sin(a)*-.08;r.flame.rotation.y=walk.yaw;
+        r.flame.material.uniforms.time.value=t;r.flame.scale.set(1+Math.sin(t*17)*.07,1+Math.sin(t*23)*.08,1);
+        r.glow.intensity=(1.7+Math.sin(t*19)*.2)*fade;
+        r.smoke.forEach((sp,i)=>{const p=(e*.28+i/9)%1;sp.position.set(Math.sin(p*5+t*.4)*p*.14,.58+p*.85,0);sp.scale.setScalar(.12+p*.4);sp.material.opacity=(1-p)*.24*fade;});
+      }
       function setupGalleryBtn() {
+        document.getElementById('galleryAarti').addEventListener('click',startGalleryAarti);
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
@@ -2494,6 +2533,8 @@
         updateGalleryStatus(id);
       }
       function updateGalleryStatus(id) {
+        const aartiBtn=document.getElementById('galleryAarti');aartiBtn.hidden=id!=='ganesh'||GAL.scanStatus!=='ready';
+        if(id!=='ganesh') stopGalleryAarti();
         document.getElementById('galleryStatus').dataset.zone=id;
         document.getElementById('galleryStatus').textContent = id !== 'ganesh' ? 'Prototype niche · statue not yet added' : GAL.scanStatus === 'ready' ? 'CC0 museum scan · Ganesha · Java, 10th–11th century' : GAL.scanStatus === 'error' ? 'Statue could not load · check connection and reload' : 'Loading Ganesha museum scan…';
       }
@@ -2505,6 +2546,7 @@
           sel.addEventListener('change', () => visitGalleryNiche(sel.value));
           document.getElementById('galleryExit').addEventListener('click', () => document.getElementById('galBtn').click());
         }
+        document.getElementById('galleryAarti').hidden=true;
         document.getElementById('galleryGuide').style.display = 'block'; document.body.classList.add('in-gallery');
         document.getElementById('galleryStatus').textContent = 'Prototype hall · 1 statue, 13 pending · choose a niche';
         sel.selectedIndex = -1;
@@ -2519,6 +2561,7 @@
         const now = performance.now(); const dt = Math.min(0.1, (now - _envLast) / 1000); _envLast = now;
         const t = now / 1000;
         if (walk.on) walkTick(dt);
+        tickGalleryAarti(now / 1000);
         if (followIdx >= 0 && envAnimals[followIdx]) {
           const p = envAnimals[followIdx].position;
           const dx = (p.x - controls.target.x) * 0.1, dz = (p.z - controls.target.z) * 0.1;
@@ -3344,4 +3387,4 @@
       init();
     </script>
   </body>
-                     </html>
+                              </html>
