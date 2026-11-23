@@ -2193,6 +2193,10 @@
         }
         const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
         fireflies = new THREE.Points(fg, new THREE.PointsMaterial({ color: 0xd8ff6a, size: 0.28, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+        fireflies.material.onBeforeCompile = (sh) => {
+          sh.vertexShader = sh.vertexShader.replace('#include <logdepthbuf_vertex>', 'gl_PointSize = min(gl_PointSize, 14.0);\n#include <logdepthbuf_vertex>');
+          sh.fragmentShader = sh.fragmentShader.replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n vec2 _c = gl_PointCoord - 0.5; if (dot(_c, _c) > 0.25) discard;');
+        };
         fireflies.userData.ph = ph; fireflies.visible = false;
         scene.add(fireflies);
       }
