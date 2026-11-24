@@ -1206,6 +1206,7 @@
       /* ========== UTILITY CLASSES ========== */
       .hidden { display: none !important; }
       .visible { display: flex !important; }
+    #themePanel{position:fixed;right:14px;top:82px;z-index:1002;width:248px;box-sizing:border-box;padding:14px;border:1px solid #c8a768;border-radius:14px;background:#160f28f5;color:#fff0cd;font:13px Lora,serif;box-shadow:0 10px 35px #0006}#themePanel[hidden]{display:none}#themePanel p{font-size:11px;line-height:1.5;margin:8px 0}#themePanel button{min-height:44px;border:1px solid #a98b55;border-radius:8px;background:#382646;color:#fff0cd;padding:8px}#themePanel label{display:flex;align-items:center;gap:8px;margin:10px 0}#themePanel input{width:145px;accent-color:#e7bc68}#themePanel .theme-row{display:flex;justify-content:space-between;gap:10px}
     body.portal-crossing::after{content:'';position:fixed;inset:0;z-index:280;pointer-events:none;background:radial-gradient(ellipse,#fff0bb,#ba91dc88 45%,transparent 80%);animation:portalFade .65s ease-out both;}@keyframes portalFade{0%{opacity:.85}100%{opacity:0}}@media(prefers-reduced-motion:reduce){body.portal-crossing::after{animation:none;display:none}}
     #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide,body.on-sky .city-legend{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
 </style>
@@ -1213,6 +1214,7 @@
   <body>
     <!-- Sound Toggle -->
     <button class="sound-toggle" id="soundToggle" title="Enable ambient theme" aria-label="Enable ambient theme" aria-pressed="false">🔇</button>
+    <section id="themePanel" hidden aria-label="Ambient theme controls"><strong id="themeStatus">Ambient theme off</strong><p>Original soft tone bed. Optional sound for a quiet visit.</p><label>Volume <input id="themeVolume" type="range" min="0" max="60" value="28" aria-label="Ambient theme volume"></label><div class="theme-row"><button id="themePower">Play theme</button><button id="themeClose" aria-label="Close theme controls">Close</button></div><p>Playing a bhajan pauses this theme.</p></section>
 
     <!-- ========== OM GATE ENTRY ========== -->
     <div id="om-gate">
@@ -1729,7 +1731,7 @@
       // ==================== STATE ====================
       let audioContext = null;
       let isSoundOn = false;
-      let ambientTheme=null;
+      let ambientTheme=null,ambientVolume=.28;
       function syncAmbientTheme(){
         if(!audioContext)return;
         if(!ambientTheme){
@@ -1737,11 +1739,12 @@
           const voices=[130.81,196,261.63,329.63].map((f,i)=>{const o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=f;g.gain.value=[.10,.055,.035,.022][i];o.connect(g);g.connect(master);o.start();return o;});
           ambientTheme={master,voices};
         }
-        if(isSoundOn)audioContext.resume();
-        ambientTheme.master.gain.cancelScheduledValues(audioContext.currentTime);ambientTheme.master.gain.setTargetAtTime(isSoundOn?.28:0,audioContext.currentTime,.18);
+        if(isSoundOn){audioContext.resume();if(typeof stopAllAudio==='function')stopAllAudio(false);}
+        document.getElementById('themeStatus').textContent=isSoundOn?'Ambient theme on':'Ambient theme off';document.getElementById('themePower').textContent=isSoundOn?'Mute theme':'Play theme';
+        ambientTheme.master.gain.cancelScheduledValues(audioContext.currentTime);ambientTheme.master.gain.setTargetAtTime(isSoundOn?ambientVolume:0,audioContext.currentTime,.18);
         const b=document.getElementById('soundToggle');b.textContent=isSoundOn?'🔊':'🔇';b.title=isSoundOn?'Mute ambient theme':'Enable ambient theme';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',String(isSoundOn));
         if(!isSoundOn)audioContext.suspend();
-        window.__ambientTheme={enabled:isSoundOn,voices:4,state:audioContext.state};
+        window.__ambientTheme={enabled:isSoundOn,voices:4,state:audioContext.state,volume:ambientVolume};
       }
 
       let currentTemple = null;
@@ -2537,7 +2540,7 @@
         }
         const fin=new THREE.Mesh(new THREE.SphereGeometry(.45,12,8),gold);fin.position.set(0,31.9,end-3.7);g.add(fin);
         box(6.8,6.1,.5,0,21,end-8,dark);const halo=new THREE.Mesh(new THREE.TorusGeometry(2.4,.09,8,64),glow);halo.position.set(0,21.4,end-7.7);g.add(halo);
-        const portalCanvas=document.createElement('canvas');portalCanvas.width=portalCanvas.height=256;const pc=portalCanvas.getContext('2d'),pr=pc.createRadialGradient(128,128,8,128,128,125);pr.addColorStop(0,'#fff8dc');pr.addColorStop(.35,'#d9b9ff');pr.addColorStop(.75,'#7858ad');pr.addColorStop(1,'#21152f');pc.fillStyle=pr;pc.fillRect(0,0,256,256);const portalTexture=new THREE.CanvasTexture(portalCanvas);portalTexture.colorSpace=THREE.SRGBColorSpace;const portal=new THREE.Mesh(new THREE.CircleGeometry(2.25,64),new THREE.MeshBasicMaterial({map:portalTexture}));portal.position.set(0,21.4,end-7.6);g.add(portal);
+        const portalCanvas=document.createElement('canvas');portalCanvas.width=portalCanvas.height=256;const pc=portalCanvas.getContext('2d'),pr=pc.createRadialGradient(128,128,8,128,128,125);pr.addColorStop(0,'#fff8dc');pr.addColorStop(.35,'#d9b9ff');pr.addColorStop(.75,'#7858ad');pr.addColorStop(1,'#21152f');pc.fillStyle=pr;pc.fillRect(0,0,256,256);for(let k=0;k<7;k++){pc.strokeStyle='rgba(255,236,190,'+(.10+k*.012)+')';pc.lineWidth=1.5;pc.beginPath();pc.ellipse(128,128,36+k*12,38+k*12,k*.19,0,Math.PI*2);pc.stroke();}for(let k=0;k<65;k++){const a=k*2.399,r=35+(k*29)%86;pc.fillStyle='rgba(255,244,204,.65)';pc.fillRect(128+Math.cos(a)*r,128+Math.sin(a)*r,1.5,1.5);}const portalTexture=new THREE.CanvasTexture(portalCanvas);portalTexture.colorSpace=THREE.SRGBColorSpace;const portal=new THREE.Mesh(new THREE.CircleGeometry(2.25,64),new THREE.MeshBasicMaterial({map:portalTexture}));portal.position.set(0,21.4,end-7.6);g.add(portal);
         const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#fff0c6';ctx.textAlign='center';ctx.font='bold 72px sans-serif';ctx.fillText('दर्शन मंदिर',512,105);ctx.font='38px sans-serif';ctx.fillText('DARSHAN MANDIR',512,175);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;const plaque=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:tx,transparent:true}));plaque.position.set(0,24,end+1.4);g.add(plaque);box(6.5,1.7,.12,0,24,end+1.3,dark);
         // Soft radial sprites give cloud banks without large transparent mesh layers.
         const cv=document.createElement('canvas');cv.width=cv.height=128;const q=cv.getContext('2d'),rad=q.createRadialGradient(64,64,4,64,64,63);rad.addColorStop(0,'rgba(255,241,223,.9)');rad.addColorStop(.55,'rgba(248,231,232,.65)');rad.addColorStop(1,'rgba(240,224,255,0)');q.fillStyle=rad;q.fillRect(0,0,128,128);const cloudTex=new THREE.CanvasTexture(cv);
@@ -3018,7 +3021,7 @@
         const state=GAL.scans[id];document.getElementById('galleryStatus').textContent=!state?'Prototype niche · statue not yet added':state==='ready'?descriptions[id]:state==='error'?'Statue could not load · check connection, then Retry statue':id==='shiv'?'Loading Shiva Nataraja scan…':id==='surya'?'Loading Surya museum scan…':id==='vishnu'?'Loading Vishnu museum scan…':id==='lakshmi'?'Loading Lakshmi sculpture…':id==='hanuman'?'Loading Hanuman scan…':id==='krishna'?'Loading Krishna scan…':id==='durga'?'Loading Durga sculpture…':id==='ram'?'Loading Shri Ram sculpture…':id==='saraswati'?'Loading Saraswati sculpture…':id==='kali'?'Loading Kali - Hindu goddess sculpture…':id==='parvati'?'Loading Parvati scan…':'Loading Ganesha museum scan…';
       }
       function enterGallery() {
-        leaveSkyApproach();buildGallery();
+        document.getElementById('themePanel').hidden=true;leaveSkyApproach();buildGallery();
         const sel = document.getElementById('gallerySelect');
         if (!sel.options.length) {
           TEMPLES.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = t.god.hindi + ' · ' + t.god.english; sel.add(o); });
@@ -3658,9 +3661,12 @@
       // ==================== EVENT LISTENERS ====================
       function initEventListeners() {
         // Sound toggle
+        document.getElementById('themeClose').addEventListener('click',()=>document.getElementById('themePanel').hidden=true);
+        document.getElementById('themePower').addEventListener('click',()=>{initAudio();isSoundOn=!isSoundOn;syncAmbientTheme();});
+        document.getElementById('themeVolume').addEventListener('input',e=>{ambientVolume=Number(e.target.value)/100;if(ambientTheme){ambientTheme.master.gain.setTargetAtTime(isSoundOn?ambientVolume:0,audioContext.currentTime,.1);window.__ambientTheme.volume=ambientVolume;}});
         document.getElementById('soundToggle').addEventListener('click', () => {
           initAudio();
-          isSoundOn = !isSoundOn;
+          isSoundOn = !isSoundOn;document.getElementById('themePanel').hidden=false;
           document.getElementById('soundToggle').textContent = isSoundOn ? '🔊' : '🔇';
           syncAmbientTheme();
         });
@@ -3827,6 +3833,7 @@
       async function playTrack(key) {
         const btns = document.querySelectorAll('.bhajan-track');
         if (bh.current === key && bh.music && !bh.music.paused) { bh.music.pause(); bh.current = null; btns.forEach(b => b.classList.remove('playing')); return; }
+        if(isSoundOn){isSoundOn=false;syncAmbientTheme();}
         const mod = await TRACKS[key]();
         if (bh.music) bh.music.pause();
         bh.music = new Audio(mod.default);
@@ -3839,11 +3846,14 @@
       async function toggleAmbience() {
         const btn = document.getElementById('ambienceBtn');
         if (bh.ambienceOn) { bh.ambience.pause(); bh.ambienceOn = false; btn.textContent = 'Off'; return; }
+        if(isSoundOn){isSoundOn=false;syncAmbientTheme();}
         if (!bh.ambience) { bh.ambience = new Audio((await TRACKS.bell()).default); bh.ambience.loop = true; }
         applyVolume();
         try { await bh.ambience.play(); bh.ambienceOn = true; btn.textContent = 'On'; } catch (e) { /* needs a tap */ }
       }
-      function stopAllAudio() {
+      function stopAllAudio(includeTheme=true) {
+        if(includeTheme&&isSoundOn){isSoundOn=false;syncAmbientTheme();}
+        if(bh.ambience)bh.ambience.pause();bh.ambienceOn=false;document.getElementById('ambienceBtn').textContent='Off';
         if (bh.music) bh.music.pause();
         bh.current = null;
         document.querySelectorAll('.bhajan-track').forEach(b => b.classList.remove('playing'));
@@ -3852,7 +3862,7 @@
       function initBhajanEvents() {
         document.querySelectorAll('.bhajan-track').forEach(b => b.addEventListener('click', () => playTrack(b.dataset.track)));
         document.getElementById('ambienceBtn').addEventListener('click', toggleAmbience);
-        document.getElementById('stopBtn').addEventListener('click', stopAllAudio);
+        document.getElementById('stopBtn').addEventListener('click', ()=>stopAllAudio());
         document.getElementById('closeBhajan').addEventListener('click', () => document.getElementById('bhajanModal').classList.remove('visible'));
         document.getElementById('muteBtn').addEventListener('click', () => { bh.muted = !bh.muted; applyVolume(); });
         document.getElementById('volumeSlider').addEventListener('input', e => { bh.volume = e.target.value / 100; bh.muted = false; applyVolume(); });
