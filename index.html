@@ -1185,7 +1185,7 @@
         #om-gate .audio-prompt { display:none; }
       }
       @media(max-width:359px) { .sky-toggle { position:fixed; top:60px; left:12px; right:auto; } }
-      #galleryControls { display:none; }
+      .gallery-stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.gallery-stepper span{font-size:11px}#galleryControls { display:none; }
       #galleryGuide.compact #galleryDetails { display:none; }
       @media(max-width:1023px) {
         body.in-gallery .bottom-nav { display:none; }
@@ -1250,7 +1250,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
+      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
       <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
@@ -2987,6 +2987,7 @@
           document.documentElement.style.setProperty('--gallery-nav-height',nav.getBoundingClientRect().height+'px');
         }).observe(nav);
         document.getElementById('galleryAarti').addEventListener('click',startGalleryAarti);
+        document.getElementById('galleryPrevious').addEventListener('click',()=>stepGallery(-1));document.getElementById('galleryNext').addEventListener('click',()=>stepGallery(1));
         document.getElementById('galleryRetry').addEventListener('click',()=>{
           const id=document.getElementById('gallerySelect').value;
           if(GAL.scans[id]!=='error')return;
@@ -3000,6 +3001,8 @@
           startSkyApproach(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
       }
+      const installedDeities=['ganesh','shiv','surya','vishnu','lakshmi','hanuman','krishna','parvati','saraswati','kali','ram','durga'];
+      function stepGallery(direction){const current=document.getElementById('gallerySelect').value,i=installedDeities.indexOf(current);const next=i<0?(direction>0?0:installedDeities.length-1):(i+direction+installedDeities.length)%installedDeities.length;visitGalleryNiche(installedDeities[next]);}
       function visitGalleryNiche(id) {
         const i = TEMPLES.findIndex(t => t.id === id); if (i < 0) return;
         const side = i < 7 ? -1 : 1, k = i % 7;
@@ -3009,6 +3012,7 @@
         updateGalleryStatus(id);
       }
       function updateGalleryStatus(id) {
+        const position=installedDeities.indexOf(id);document.getElementById('galleryPosition').textContent=position<0?'Statue pending':(position+1)+' / '+installedDeities.length+' statues';
         if(id==='durga'&&GAL.scans.durga==='pending')GAL.loadDurga();if(id==='ram'&&GAL.scans.ram==='pending')GAL.loadRama();if(id==='ganesh'&&GAL.scans.ganesh==='pending')GAL.loadGanesha();
         document.getElementById('galleryRetry').hidden=GAL.scans[id]!=='error';
         if(id==='shiv'&&GAL.scans.shiv==='pending')GAL.loadShiva();if(id==='surya'&&GAL.scans.surya==='pending')GAL.loadSurya();if(id==='vishnu'&&GAL.scans.vishnu==='pending')GAL.loadVishnu();if(id==='lakshmi'&&GAL.scans.lakshmi==='pending')GAL.loadLakshmi();if(id==='hanuman'&&GAL.scans.hanuman==='pending')GAL.loadHanuman();if(id==='krishna'&&GAL.scans.krishna==='pending')GAL.loadKrishna();if(id==='parvati'&&GAL.scans.parvati==='pending')GAL.loadParvati();if(id==='kali'&&GAL.scans.kali==='pending')GAL.loadKali();if(id==='saraswati'&&GAL.scans.saraswati==='pending')GAL.loadSaraswati();
@@ -3031,7 +3035,7 @@
         document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;
         document.getElementById('galleryGuide').style.display = 'block'; document.body.classList.add('in-gallery');
         document.getElementById('galleryStatus').textContent = 'Sky Mandir · 12 statues available · 2 statues pending · choose a niche';
-        sel.selectedIndex = -1;
+        sel.selectedIndex = -1;document.getElementById('galleryPosition').textContent='12 statues';
         GAL.group.visible=true;SKY.group.visible=false;document.body.classList.remove('portal-crossing');void document.body.offsetWidth;document.body.classList.add('portal-crossing');setTimeout(()=>document.body.classList.remove('portal-crossing'),650);walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
         const hint = document.getElementById('walkHint');
         hint.textContent = 'Sky Mandir · 14 connected shrine bays · choose a deity or walk through the doorways';
