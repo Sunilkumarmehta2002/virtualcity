@@ -861,6 +861,16 @@
         justify-content: center;
       }
 
+      #panchangPage{padding-bottom:calc(112px + env(safe-area-inset-bottom));scroll-padding-bottom:112px}
+      #panchangPage .bottom-nav{position:fixed}
+      @media(min-width:1024px){#panchangPage{padding-left:118px}}
+      .calendar-note{font:15px/1.8 'Noto Sans Devanagari',sans-serif;color:#e8d6b5;max-width:650px;margin:16px auto 0}
+      .calendar-source{border:1px solid #9b7c23;border-radius:14px;padding:20px;background:#160d24;margin-top:0}
+      .calendar-source h4{font-size:20px;color:#ffe9a8;margin-bottom:12px}
+      .calendar-source p{margin-bottom:14px}
+      .calendar-source a{display:inline-block;color:#ffe9a8;padding:12px 0;text-underline-offset:4px}
+      .calendar-source small{display:block;font-size:12px;color:#d6c6ad}
+      .panchang-item-value.calendar-pending{font-size:20px}
       /* ========== PANCHANG PAGE ========== */
       .panchang-page {
         position: fixed;
@@ -1280,7 +1290,7 @@
             🚪 मंदिर नगरी में प्रवेश करें | Enter Sacred City
           </button>
           <button class="btn-divine btn-secondary" id="showPanchang">
-            📿 आज का पंचांग | Today's Panchang
+            पंचांग · Calendar information
           </button>
         </div>
       </div>
@@ -1447,14 +1457,10 @@
     <!-- ========== PANCHANG PAGE ========== -->
     <div class="panchang-page" id="panchangPage">
       <div class="panchang-header">
-        <h1 class="panchang-title">📅 आज का पंचांग</h1>
+        <h1 class="panchang-title">पंचांग · Calendar</h1>
         <p class="panchang-date" id="panchangDate"></p>
         
-        <div class="moon-display">
-          <div class="moon" id="moonPhase">
-            <div class="moon-phase"></div>
-          </div>
-        </div>
+        <p class="calendar-note">भारत का नागरिक दिनांक · Indian civil date (IST)<br>Not a calculated Panchang or ritual timetable.</p>
       </div>
 
       <div class="panchang-grid" id="panchangGrid">
@@ -1462,7 +1468,7 @@
       </div>
 
       <div class="festival-section">
-        <h3 class="festival-title">🎉 आने वाले त्योहार</h3>
+        <h3 class="festival-title">पंचांग जानकारी · Calendar information</h3>
         <div id="festivalList">
           <!-- Filled by JS -->
         </div>
@@ -1719,8 +1725,6 @@
       ];
 
       // ==================== PANCHANG DATA ====================
-      const TITHIS = ['प्रतिपदा', 'द्वितीया', 'तृतीया', 'चतुर्थी', 'पंचमी', 'षष्ठी', 'सप्तमी', 'अष्टमी', 'नवमी', 'दशमी', 'एकादशी', 'द्वादशी', 'त्रयोदशी', 'चतुर्दशी', 'पूर्णिमा', 'अमावस्या'];
-      const NAKSHATRAS = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशिरा', 'आर्द्रा', 'पुनर्वसु', 'पुष्य', 'आश्लेषा', 'मघा', 'पूर्वा फाल्गुनी', 'उत्तरा फाल्गुनी', 'हस्त', 'चित्रा', 'स्वाती', 'विशाखा', 'अनुराधा', 'ज्येष्ठा', 'मूल', 'पूर्वाषाढ़ा', 'उत्तराषाढ़ा', 'श्रवण', 'धनिष्ठा', 'शतभिषा', 'पूर्वा भाद्रपद', 'उत्तरा भाद्रपद', 'रेवती'];
       const VARAS = [
         { hindi: 'रविवार', english: 'Sunday', deity: 'सूर्य देव' },
         { hindi: 'सोमवार', english: 'Monday', deity: 'भगवान शिव' },
@@ -1730,33 +1734,6 @@
         { hindi: 'शुक्रवार', english: 'Friday', deity: 'माँ लक्ष्मी' },
         { hindi: 'शनिवार', english: 'Saturday', deity: 'शनि देव' }
       ];
-      const MONTHS = ['चैत्र', 'वैशाख', 'ज्येष्ठ', 'आषाढ़', 'श्रावण', 'भाद्रपद', 'आश्विन', 'कार्तिक', 'मार्गशीर्ष', 'पौष', 'माघ', 'फाल्गुन'];
-      
-      const FESTIVALS = [
-        { name: 'राम नवमी', english: 'Ram Navami', icon: '🏹', month: 3, day: 17 },
-        { name: 'हनुमान जयंती', english: 'Hanuman Jayanti', icon: '💪', month: 3, day: 23 },
-        { name: 'अक्षय तृतीया', english: 'Akshaya Tritiya', icon: '🪙', month: 4, day: 10 },
-        { name: 'गंगा दशहरा', english: 'Ganga Dussehra', icon: '🌊', month: 5, day: 16 },
-        { name: 'रथ यात्रा', english: 'Rath Yatra', icon: '🛕', month: 6, day: 7 },
-        { name: 'गुरु पूर्णिमा', english: 'Guru Purnima', icon: '🙏', month: 6, day: 21 },
-        { name: 'नाग पंचमी', english: 'Nag Panchami', icon: '🐍', month: 7, day: 9 },
-        { name: 'रक्षा बंधन', english: 'Raksha Bandhan', icon: '🎀', month: 7, day: 19 },
-        { name: 'जन्माष्टमी', english: 'Janmashtami', icon: '🦚', month: 7, day: 26 },
-        { name: 'गणेश चतुर्थी', english: 'Ganesh Chaturthi', icon: '🙏', month: 8, day: 7 },
-        { name: 'नवरात्रि', english: 'Navratri', icon: '🔱', month: 9, day: 3 },
-        { name: 'दशहरा', english: 'Dussehra', icon: '🏹', month: 9, day: 12 },
-        { name: 'करवा चौथ', english: 'Karva Chauth', icon: '🌙', month: 9, day: 20 },
-        { name: 'दीपावली', english: 'Diwali', icon: '🪔', month: 10, day: 1 },
-        { name: 'गोवर्धन पूजा', english: 'Govardhan Puja', icon: '⛰️', month: 10, day: 2 },
-        { name: 'भाई दूज', english: 'Bhai Dooj', icon: '👫', month: 10, day: 3 },
-        { name: 'छठ पूजा', english: 'Chhath Puja', icon: '☀️', month: 10, day: 7 },
-        { name: 'देव उठनी एकादशी', english: 'Dev Uthani Ekadashi', icon: '🙏', month: 10, day: 12 },
-        { name: 'मकर संक्रांति', english: 'Makar Sankranti', icon: '🪁', month: 0, day: 14 },
-        { name: 'बसंत पंचमी', english: 'Basant Panchami', icon: '📚', month: 1, day: 2 },
-        { name: 'महा शिवरात्रि', english: 'Maha Shivratri', icon: '🔱', month: 1, day: 26 },
-        { name: 'होली', english: 'Holi', icon: '🎨', month: 2, day: 14 }
-      ];
-
       // ==================== STATE ====================
       let audioContext = null;
       let isSoundOn = false;
@@ -2091,7 +2068,7 @@
       }
 
       function addTempleLabels() {
-        const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+        const today = indiaCivilDate().weekday;
         TEMPLES.forEach(t => {
           const label = makeLabelSprite(t.god.hindi, t.god.english);
           label.position.set(t.position[0], 4 + t.scale * 3.6, t.position[2]);
@@ -3564,96 +3541,24 @@
       }
 
       // ==================== PANCHANG ====================
-      function getPanchang() {
-        const now = new Date();
-        const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-        
-        // Simplified calculations (real panchang needs astronomical data)
-        const tithiIndex = (dayOfYear + 5) % 16;
-        const nakshatraIndex = (dayOfYear + 3) % 27;
-        const monthIndex = (now.getMonth() + 10) % 12;
-        const vara = VARAS[now.getDay()];
-        
-        const paksha = tithiIndex < 15 ? 'शुक्ल पक्ष' : 'कृष्ण पक्ष';
-        
-        return {
-          tithi: { hindi: TITHIS[tithiIndex], english: `Day ${tithiIndex + 1}` },
-          nakshatra: { hindi: NAKSHATRAS[nakshatraIndex], english: NAKSHATRAS[nakshatraIndex] },
-          vara: vara,
-          masa: { hindi: MONTHS[monthIndex], english: MONTHS[monthIndex] },
-          paksha: paksha,
-          moonPhase: tithiIndex / 15, // 0-1 for display
-          samvat: { vikram: now.getFullYear() + 57, shaka: now.getFullYear() - 78 }
-        };
+      function indiaCivilDate(now=new Date()){
+        const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',weekday:'long'}).formatToParts(now);
+        const get=key=>parts.find(p=>p.type===key).value;
+        return {key:`${get('year')}-${get('month')}-${get('day')}`,weekday:get('weekday'),label:new Intl.DateTimeFormat('hi-IN',{timeZone:'Asia/Kolkata',weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(now)};
       }
-
+      let lastCalendarDate='';
       function updatePanchangDisplay() {
-        const panchang = getPanchang();
-        const now = new Date();
-        
-        // Mini display
-        document.getElementById('panchangMini').textContent = 
-          `${panchang.tithi.hindi} | ${panchang.vara.hindi} | ${panchang.nakshatra.hindi}`;
-        
-        // Full display
-        document.getElementById('panchangDate').textContent = 
-          `${now.toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
-        
-        // Grid
-        const grid = document.getElementById('panchangGrid');
-        grid.innerHTML = `
-          <div class="panchang-item">
-            <div class="panchang-item-label">तिथि</div>
-            <div class="panchang-item-value">${panchang.tithi.hindi}</div>
-            <div class="panchang-item-english">${panchang.paksha}</div>
-          </div>
-          <div class="panchang-item">
-            <div class="panchang-item-label">वार</div>
-            <div class="panchang-item-value">${panchang.vara.hindi}</div>
-            <div class="panchang-item-english">${panchang.vara.english}</div>
-          </div>
-          <div class="panchang-item">
-            <div class="panchang-item-label">नक्षत्र</div>
-            <div class="panchang-item-value">${panchang.nakshatra.hindi}</div>
-          </div>
-          <div class="panchang-item">
-            <div class="panchang-item-label">मास</div>
-            <div class="panchang-item-value">${panchang.masa.hindi}</div>
-          </div>
-          <div class="panchang-item">
-            <div class="panchang-item-label">आज के देवता</div>
-            <div class="panchang-item-value">${panchang.vara.deity}</div>
-          </div>
-          <div class="panchang-item">
-            <div class="panchang-item-label">विक्रम संवत</div>
-            <div class="panchang-item-value">${panchang.samvat.vikram}</div>
-          </div>
-        `;
-        
-        // Festivals
-        const festivalList = document.getElementById('festivalList');
-        const currentMonth = now.getMonth();
-        const upcomingFestivals = FESTIVALS
-          .filter(f => f.month >= currentMonth || (f.month < currentMonth && f.month < 3))
-          .slice(0, 5);
-        
-        festivalList.innerHTML = upcomingFestivals.map(f => {
-          const festDate = new Date(now.getFullYear(), f.month, f.day);
-          if (festDate < now) festDate.setFullYear(now.getFullYear() + 1);
-          const daysAway = Math.ceil((festDate - now) / (1000 * 60 * 60 * 24));
-          
-          return `
-            <div class="festival-card">
-              <span class="festival-icon">${f.icon}</span>
-              <div class="festival-info">
-                <h4>${f.name}</h4>
-                <p>${f.english}</p>
-              </div>
-              <span class="festival-days">${daysAway} दिन</span>
-            </div>
-          `;
-        }).join('');
+        const civil=indiaCivilDate();lastCalendarDate=civil.key;
+        document.getElementById('panchangMini').textContent=`${civil.label} · IST`;
+        document.getElementById('panchangDate').textContent=civil.label;
+        document.getElementById('panchangGrid').innerHTML=`
+          <div class="panchang-item"><div class="panchang-item-label">नागरिक वार · Civil weekday</div><div class="panchang-item-value">${civil.weekday}</div><div class="panchang-item-english">Indian Standard Time · UTC+05:30</div></div>
+          <div class="panchang-item"><div class="panchang-item-label">तिथि, नक्षत्र, पक्ष व मास</div><div class="panchang-item-value calendar-pending">अभी सत्यापित नहीं</div><div class="panchang-item-english">Verified astronomical data is not connected.</div></div>`;
+        document.getElementById('festivalList').innerHTML=`
+          <div class="calendar-note calendar-source"><h4>पूजा व व्रत से पहले पुष्टि करें</h4><p>स्थानीय पंचांग या मंदिर से तिथि, व्रत, त्योहार और पूजा का समय जाँचें। यहाँ त्योहारों की तारीखें या उलटी गिनती नहीं दिखाई जा रही हैं।</p><p>Confirm observances with your local Panchang or temple. Devnagari does not currently provide verified festival dates, sunrise times or ritual timings.</p><a href="https://mausam.imd.gov.in/responsive/rashtriyPanchang.php" target="_blank" rel="noopener noreferrer">IMD Rashtriya Panchang reference ↗</a><small>External reference, not a live data connection or a location-specific timetable.</small></div>`;
       }
+      setInterval(()=>{if(indiaCivilDate().key!==lastCalendarDate)updatePanchangDisplay();},60000);
+      document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePanchangDisplay();});
 
       // ==================== PRASAD ====================
       let prasadTemple=null,prasadReturnFocus=null,prasadRender=0;
@@ -3867,7 +3772,7 @@
               openBhajan();
             } else if (page === 'darshan') {
               // Open today's recommended temple
-              const today = new Date().getDay();
+              const today = VARAS.findIndex(v=>v.english===indiaCivilDate().weekday);
               const templeOfDay = TEMPLES.find(t => t.day === VARAS[today].english) || TEMPLES[0];
               openDarshan(templeOfDay);
             }
