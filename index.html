@@ -426,7 +426,7 @@
       @media(max-width:699px) { #viewZoom { bottom:250px; right:10px; } }
       #walkJoy { display:none; position:fixed; left:24px; bottom:110px; width:116px; height:116px; border-radius:50%; background:rgba(20,10,40,0.45); border:2px solid rgba(255,215,0,0.5); z-index:30; touch-action:none; }
       @media (min-width:700px) { #walkJoy { left:auto; right:36px; bottom:40px; } }
-      #walkKnob { position:absolute; left:38px; top:38px; width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
+      #walkKnob { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
       #galleryGuide { display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:32; background:rgba(20,10,40,.92); border:1px solid #9b7c23; border-radius:12px; padding:8px; color:#ffe9a8; max-width:calc(100vw - 32px); box-sizing:border-box; font-size:12px; text-align:center; }
       #galleryGuide select, #galleryGuide button { background:#30203c; color:#fff1c4; border:1px solid #9b7c23; border-radius:6px; padding:7px; max-width:100%; min-height:44px; touch-action:manipulation; }
       #galleryGuide select:focus-visible, #galleryGuide button:focus-visible { outline:2px solid #ffe173; outline-offset:2px; }
@@ -2412,7 +2412,7 @@
             leaveSkyApproach();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
             camera.rotation.order = 'XYZ';
             camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
-            walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
+            walk.jx = walk.jy = 0; knob.style.left = '50%'; knob.style.top = '50%';
             b.title = 'Walk through the city'; hint.style.display = 'none';
           }
         });
@@ -2420,15 +2420,15 @@
         function joyMove(e) {
           const r = joy.getBoundingClientRect();
           let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-          const m = Math.hypot(dx, dy), lim = 38;
+          const m = Math.hypot(dx, dy), lim = Math.max(1, Math.min(38, (joy.clientWidth - knob.offsetWidth) / 2));
           if (m > lim) { dx = dx / m * lim; dy = dy / m * lim; }
           walk.jx = dx / lim; walk.jy = dy / lim;
-          knob.style.left = (38 + dx) + 'px'; knob.style.top = (38 + dy) + 'px';
+          knob.style.left = `calc(50% + ${dx}px)`; knob.style.top = `calc(50% + ${dy}px)`;
         }
-        joy.addEventListener('pointerdown', e => { jid = e.pointerId; try { joy.setPointerCapture(jid); } catch (_) {} joyMove(e); e.preventDefault(); });
+        joy.addEventListener('pointerdown', e => { if (jid !== null) return; jid = e.pointerId; try { joy.setPointerCapture(jid); } catch (_) {} joyMove(e); e.preventDefault(); });
         joy.addEventListener('pointermove', e => { if (e.pointerId === jid) joyMove(e); });
-        const joyEnd = e => { if (e.pointerId === jid) { jid = null; walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px'; } };
-        joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+        const joyEnd = e => { if (e.pointerId === jid) { jid = null; walk.jx = walk.jy = 0; knob.style.left = '50%'; knob.style.top = '50%'; } };
+        joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd); joy.addEventListener('lostpointercapture', joyEnd);
         let lid = null, lx = 0, ly = 0;
         dom.addEventListener('pointerdown', e => { if (walk.on) { lid = e.pointerId; lx = e.clientX; ly = e.clientY; } });
         dom.addEventListener('pointermove', e => {
@@ -2441,7 +2441,7 @@
         // Controls keep their native keys; focus loss must never leave walking held.
         const resetWalkInput = () => {
           walk.keys = {}; walk.jx = walk.jy = 0; jid = lid = null;
-          knob.style.left = '38px'; knob.style.top = '38px';
+          knob.style.left = '50%'; knob.style.top = '50%';
         };
         const isFormControl = el => el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(el.tagName));
         window.addEventListener('keydown', e => {
@@ -2453,6 +2453,7 @@
         });
         window.addEventListener('keyup', e => { walk.keys[e.key.toLowerCase()] = false; });
         window.addEventListener('blur', resetWalkInput);
+        window.addEventListener('resize', resetWalkInput);
         window.addEventListener('focusin', e => { if (isFormControl(e.target)) resetWalkInput(); });
         document.addEventListener('visibilitychange', () => { if (document.hidden) resetWalkInput(); });
       }
@@ -3912,4 +3913,4 @@
       init();
     </script>
   </body>
-  </html>
+                 </html>
