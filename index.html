@@ -2679,15 +2679,15 @@
         };
         // Uma-Maheshvara retained as an experimental asset, not displayed until mesh QA passes.
       }
-      // Opt-in 3D aarti study. Original procedural geometry and effects, no recording.
-      const galleryRitual={group:null,active:false,start:0};
+      // Opt-in 3D aarti study at each verified statue. Original procedural geometry and effects, no recording.
+      const galleryRitual={group:null,active:false,start:0,deity:null};
       function stopGalleryAarti(){
-        galleryRitual.active=false;if(galleryRitual.group)galleryRitual.group.visible=false;
-        const b=document.getElementById('galleryAarti');if(b)b.textContent='🪔 आरती · Aarti';
+        galleryRitual.active=false;galleryRitual.deity=null;if(galleryRitual.group)galleryRitual.group.visible=false;
+        const b=document.getElementById('galleryAarti');if(b){b.textContent='🪔 आरती · Aarti';b.setAttribute('aria-pressed','false');}
       }
       function startGalleryAarti(){
         if(galleryRitual.active){stopGalleryAarti();return;}
-        if(!walk.hall||document.getElementById('gallerySelect').value!=='ganesh'||GAL.scans.ganesh!=='ready')return;
+        const id=document.getElementById('gallerySelect').value;if(!walk.hall||GAL.scans[id]!=='ready')return;
         if(!galleryRitual.group){
           const g=new THREE.Group();scene.add(g);galleryRitual.group=g;
           const brass=new THREE.MeshStandardMaterial({color:0xb98934,metalness:.78,roughness:.28});
@@ -2703,16 +2703,16 @@
           galleryRitual.smoke=[];for(let i=0;i<9;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:sm,transparent:true,depthWrite:false,opacity:.18}));g.add(sp);galleryRitual.smoke.push(sp);}
           window.__vc.ritual=galleryRitual;
         }
-        galleryRitual.start=performance.now()/1000;galleryRitual.active=true;galleryRitual.group.visible=true;
-        document.getElementById('galleryAarti').textContent='■ रोकें · Stop';
+        galleryRitual.deity=id;galleryRitual.start=performance.now()/1000;galleryRitual.active=true;galleryRitual.group.visible=true;
+        document.getElementById('galleryAarti').textContent='■ रोकें · Stop';document.getElementById('galleryAarti').setAttribute('aria-pressed','true');tickGalleryAarti(performance.now()/1000);
       }
       function tickGalleryAarti(t){
         const r=galleryRitual;if(!r.active)return;
-        if(!walk.hall||document.getElementById('gallerySelect').value!=='ganesh'||t-r.start>24){stopGalleryAarti();return;}
+        if(!walk.hall||document.getElementById('gallerySelect').value!==r.deity||GAL.scans[r.deity]!=='ready'||t-r.start>24){stopGalleryAarti();return;}
         const e=t-r.start,a=e*1.5,fade=Math.min(1,e*2,(24-e)*2);
         const small=innerWidth<700;r.group.scale.setScalar(small?.72:1);
-        r.group.position.set(GAL.ox-21+Math.sin(a)*(small?.28:.52),1.4+Math.cos(a)*.28,-8.0);
-        r.group.rotation.z=Math.sin(a)*-.08;r.flame.rotation.y=walk.yaw;
+        const i=TEMPLES.findIndex(n=>n.id===r.deity),side=i<7?-1:1;r.group.rotation.y=side<0?0:Math.PI;r.group.position.set(GAL.ox-21+(i%7)*7+Math.sin(a)*(small?.28:.52),1.4+Math.cos(a)*.28,side*8.0);
+        r.group.rotation.z=Math.sin(a)*-.08;r.flame.rotation.y=walk.yaw-r.group.rotation.y;
         r.flame.material.uniforms.time.value=t;r.flame.scale.set(1+Math.sin(t*17)*.07,1+Math.sin(t*23)*.08,1);
         r.glow.intensity=(1.7+Math.sin(t*19)*.2)*fade;
         r.smoke.forEach((sp,i)=>{const p=(e*.28+i/9)%1;sp.position.set(Math.sin(p*5+t*.4)*p*.14,.58+p*.85,0);sp.scale.setScalar(.12+p*.4);sp.material.opacity=(1-p)*.24*fade;});
@@ -2722,7 +2722,7 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && walk.hall) { walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
+          if (walk.on && walk.hall) { stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
           if (!walk.on) wb.click();
           enterGallery(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
@@ -2738,8 +2738,8 @@
       function updateGalleryStatus(id) {
         if(id==='shiv'&&GAL.scans.shiv==='pending')GAL.loadShiva();if(id==='surya'&&GAL.scans.surya==='pending')GAL.loadSurya();if(id==='vishnu'&&GAL.scans.vishnu==='pending')GAL.loadVishnu();if(id==='lakshmi'&&GAL.scans.lakshmi==='pending')GAL.loadLakshmi();if(id==='hanuman'&&GAL.scans.hanuman==='pending')GAL.loadHanuman();if(id==='krishna'&&GAL.scans.krishna==='pending')GAL.loadKrishna();if(id==='parvati'&&GAL.scans.parvati==='pending')GAL.loadParvati();
         const cr=document.getElementById('galleryCredit');cr.hidden=!['lakshmi','hanuman','krishna','parvati'].includes(id);if(id==='parvati')cr.innerHTML='Parvati by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/hindu-goddess-parvati-statue-b23e43fc97374278b94687921f904fd1" target="_blank" rel="noopener">Tyler Jackson</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Simplified/compressed geometry; new material/scale.';else if(id==='krishna')cr.innerHTML='Krishna, MUEC by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/krishna-muec-002635095eb14f929d74333806ab47d2" target="_blank" rel="noopener">Giravolt</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Simplified geometry; new bronze material/scale.';else if(id==='hanuman')cr.innerHTML='Hanuman/Anjaneya by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/hanumananjaneya-idol-1d75f15d1cba49738c1a13e9e2846cb0" target="_blank" rel="noopener">Addere Creations</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new material/scale.';else if(id==='lakshmi')cr.innerHTML='Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.';
-        const aartiBtn=document.getElementById('galleryAarti');aartiBtn.hidden=id!=='ganesh'||GAL.scans.ganesh!=='ready';
-        if(id!=='ganesh') stopGalleryAarti();
+        const aartiBtn=document.getElementById('galleryAarti');aartiBtn.hidden=GAL.scans[id]!=='ready';aartiBtn.title='24-second procedural lamp offering · visual study, no recording';
+        if(galleryRitual.active&&galleryRitual.deity!==id) stopGalleryAarti();
         document.getElementById('galleryStatus').dataset.zone=id;
         const descriptions={parvati:'Parvati plaster statue · Tyler Jackson · CC BY4.0 · material study',krishna:'Krishna · Tamil Nadu, 13th–14th C · Giravolt, MUEC · CC BY4.0',hanuman:'Hanuman/Anjaneya · Addere Creations · CC BY4.0 · brown material study',lakshmi:'Lakshmi · Baardus · CC BY4.0 · artistic stone/metal materials',vishnu:'Vishnu on Garuda · Cambodia, 12th–13th C · CC0 · bronze-style material',surya:'Surya · Kashmir, early700s · CC0 · brass-style material',ganesh:'CC0 museum scan · Ganesha · Java, 10th–11th century',shiv:'Shiva Nataraja · Tamil Nadu, 1000s · CC0 · bronze-style material'};
         const state=GAL.scans[id];document.getElementById('galleryStatus').textContent=!state?'Prototype niche · statue not yet added':state==='ready'?descriptions[id]:state==='error'?'Statue could not load · check connection and reload':id==='shiv'?'Loading Shiva Nataraja scan…':id==='surya'?'Loading Surya museum scan…':id==='vishnu'?'Loading Vishnu museum scan…':id==='lakshmi'?'Loading Lakshmi sculpture…':id==='hanuman'?'Loading Hanuman scan…':id==='krishna'?'Loading Krishna scan…':id==='parvati'?'Loading Parvati scan…':'Loading Ganesha museum scan…';
