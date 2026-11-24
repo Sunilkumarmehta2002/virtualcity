@@ -2486,6 +2486,8 @@
         });
         window.__vc.gallery = GAL;
         const slots = [];
+        const shrineLights=[];GAL.shrineLights=shrineLights;
+        const registerShrineLight=(light,slot)=>{slot.grp.add(light);shrineLights.push({light,x:GAL.ox+slot.grp.position.x,z:slot.grp.position.z});light.visible=false;};
         names.forEach((n, i) => {
           const side = i < 7 ? -1 : 1, k = i < 7 ? i : i - 7;
           const x = -21 + k * 7, wz = side * W / 2, inward = -side;
@@ -2523,8 +2525,8 @@
           slot.grp.add(mesh);
           GAL.scanStatus = 'ready'; GAL.scans[id]='ready'; if (document.getElementById('gallerySelect').value === id) updateGalleryStatus(id);
           // Local warm-neutral key and soft fill make the scanned relief readable at night.
-          const key = new THREE.PointLight(0xffe0b3, 8, 9, 2); key.position.set(-1.5, 3.8, 3.8); slot.grp.add(key);
-          const fill = new THREE.PointLight(0xc9ddff, 2, 7, 2); fill.position.set(1.8, 2.0, 3.0); slot.grp.add(fill);
+          const key = new THREE.PointLight(0xffe0b3, 8, 9, 2); key.position.set(-1.5, 3.8, 3.8); registerShrineLight(key,slot);
+          const fill = new THREE.PointLight(0xc9ddff, 2, 7, 2); fill.position.set(1.8, 2.0, 3.0); registerShrineLight(fill,slot);
           window.__vc.statues = window.__vc.statues || {}; window.__vc.statues[id] = mesh; if (id === 'ganesh') window.__vc.statue = mesh;
         }).catch(() => { GAL.scanStatus = 'error'; GAL.scans[id]='error'; if (document.getElementById('gallerySelect').value === id) updateGalleryStatus(id); });
         }
@@ -2544,8 +2546,8 @@
             const holder=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x8c703c,metalness:.55,roughness:.48,side:THREE.DoubleSide}));
             holder.scale.setScalar(2/(bb.max.y-bb.min.y));holder.position.set(0,1,1.35);holder.castShadow=true;
             const slot=slots.find(s=>s.id==='shiv');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.shiv=holder;GAL.scans.shiv='ready';if(document.getElementById('gallerySelect').value==='shiv')updateGalleryStatus('shiv');
           }).catch(()=>{GAL.scans.shiv='error';if(document.getElementById('gallerySelect').value==='shiv')updateGalleryStatus('shiv');});
         };
@@ -2564,8 +2566,8 @@
             const holder=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0xb49442,metalness:.55,roughness:.48,side:THREE.DoubleSide}));
             holder.scale.setScalar(2/(bb.max.y-bb.min.y));holder.position.set(0,1,1.35);holder.castShadow=true;
             const slot=slots.find(s=>s.id==='surya');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.surya=holder;GAL.scans.surya='ready';if(document.getElementById('gallerySelect').value==='surya')updateGalleryStatus('surya');
           }).catch(()=>{GAL.scans.surya='error';if(document.getElementById('gallerySelect').value==='surya')updateGalleryStatus('surya');});
         };
@@ -2584,8 +2586,8 @@
             const holder=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x827348,metalness:.55,roughness:.48,side:THREE.DoubleSide}));
             holder.scale.setScalar(2/(bb.max.y-bb.min.y));holder.position.set(0,1,1.35);holder.castShadow=true;
             const slot=slots.find(s=>s.id==='vishnu');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.vishnu=holder;GAL.scans.vishnu='ready';if(document.getElementById('gallerySelect').value==='vishnu')updateGalleryStatus('vishnu');
           }).catch(()=>{GAL.scans.vishnu='error';if(document.getElementById('gallerySelect').value==='vishnu')updateGalleryStatus('vishnu');});
         };
@@ -2606,8 +2608,8 @@
             const bb=new THREE.Box3().setFromObject(holder),sz=bb.getSize(new THREE.Vector3()),ct=bb.getCenter(new THREE.Vector3());
             holder.children.forEach(m=>m.position.set(-ct.x,-bb.min.y,-ct.z));holder.scale.setScalar(2/sz.y);holder.position.set(0,1,1.35);
             const slot=slots.find(s=>s.id==='lakshmi');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.lakshmi=holder;GAL.scans.lakshmi='ready';if(document.getElementById('gallerySelect').value==='lakshmi')updateGalleryStatus('lakshmi');
           }).catch(()=>{GAL.scans.lakshmi='error';if(document.getElementById('gallerySelect').value==='lakshmi')updateGalleryStatus('lakshmi');});
         };
@@ -2628,8 +2630,8 @@
             const bb=new THREE.Box3().setFromObject(holder),sz=bb.getSize(new THREE.Vector3()),ct=bb.getCenter(new THREE.Vector3());
             holder.children.forEach(m=>m.position.set(-ct.x,-bb.min.y,-ct.z));holder.scale.setScalar(2/sz.y);holder.position.set(0,1,1.35);
             const slot=slots.find(s=>s.id==='hanuman');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.hanuman=holder;GAL.scans.hanuman='ready';if(document.getElementById('gallerySelect').value==='hanuman')updateGalleryStatus('hanuman');
           }).catch(()=>{GAL.scans.hanuman='error';if(document.getElementById('gallerySelect').value==='hanuman')updateGalleryStatus('hanuman');});
         };
@@ -2650,8 +2652,8 @@
             const bb=new THREE.Box3().setFromObject(holder),sz=bb.getSize(new THREE.Vector3()),ct=bb.getCenter(new THREE.Vector3());
             holder.children.forEach(m=>m.position.set(-ct.x,-bb.min.y,-ct.z));holder.scale.setScalar(2/sz.y);holder.position.set(0,1,1.35);holder.rotation.y=Math.PI/2;
             const slot=slots.find(s=>s.id==='krishna');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.krishna=holder;GAL.scans.krishna='ready';if(document.getElementById('gallerySelect').value==='krishna')updateGalleryStatus('krishna');
           }).catch(()=>{GAL.scans.krishna='error';if(document.getElementById('gallerySelect').value==='krishna')updateGalleryStatus('krishna');});
         };
@@ -2672,8 +2674,8 @@
             const bb=new THREE.Box3().setFromObject(holder),sz=bb.getSize(new THREE.Vector3()),ct=bb.getCenter(new THREE.Vector3());
             holder.children.forEach(m=>m.position.set(-ct.x,-bb.min.y,-ct.z));holder.scale.setScalar(2/sz.y);holder.position.set(0,1,1.35);holder.rotation.y=0;
             const slot=slots.find(s=>s.id==='parvati');slot.grp.add(holder);
-            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);slot.grp.add(key);
-            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);slot.grp.add(fill);
+            const key=new THREE.PointLight(0xffe0b3,7,9,2);key.position.set(-1.5,3.8,3.8);registerShrineLight(key,slot);
+            const fill=new THREE.PointLight(0xc9ddff,2,7,2);fill.position.set(1.8,2,3);registerShrineLight(fill,slot);
             window.__vc.statues.parvati=holder;GAL.scans.parvati='ready';if(document.getElementById('gallerySelect').value==='parvati')updateGalleryStatus('parvati');
           }).catch(()=>{GAL.scans.parvati='error';if(document.getElementById('gallerySelect').value==='parvati')updateGalleryStatus('parvati');});
         };
@@ -2768,6 +2770,8 @@
         const t = now / 1000;
         if (walk.on) walkTick(dt);
         tickGalleryAarti(now / 1000);
+        // Loaded statues keep their geometry, but only nearby shrine lights affect rendering.
+        if(GAL.shrineLights){for(const s of GAL.shrineLights)s.light.visible=!!walk.hall&&Math.hypot(walk.x-s.x,walk.z-s.z)<11;}
         if (followIdx >= 0 && envAnimals[followIdx]) {
           const p = envAnimals[followIdx].position;
           const dx = (p.x - controls.target.x) * 0.1, dz = (p.z - controls.target.z) * 0.1;
@@ -3594,4 +3598,4 @@
       init();
     </script>
   </body>
-            </html>
+          </html>
