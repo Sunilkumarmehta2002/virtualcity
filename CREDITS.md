@@ -81,3 +81,8 @@ Removed: an "Aarti Puja, deity Santoshi" recording (Commons CC0, source an Inter
 - Changes: applied source transforms, merged mesh parts and welded seams, simplified from200000 to70000 triangles,16bit quantized positions, gzip/base64 storage, scaled for display. New stone-style material replaces original scan texture. No claim of original historical colour.
 - Four models/parvati66-*.txt chunks,749840 encoded bytes, fetched on demand.
 - This is NOT the rejected Uma-Maheshvara scan. Both older CC0 and improved2023 BY-SA Uma candidates remain excluded pending geometry/completeness review.
+
+
+## November 24 additions
+- Saraswati by Thunk3D scanner: https://sketchfab.com/3d-models/saraswati-d25c0acc4b9740589728b79495c2a97f , author https://sketchfab.com/Diana123456 , CC BY4.0 https://creativecommons.org/licenses/by/4.0/ . Geometry simplified to 85,000 faces, quantized/compressed; new ivory artistic material and scale. Not original historic surface.
+- Kali - Hindu goddess by Brian Trepanier: https://sketchfab.com/3d-models/kali-hindu-goddess-884e66620d094d5897bd916cb04013cc , author https://sketchfab.com/CMBC , CC BY4.0 https://creativecommons.org/licenses/by/4.0/ . UV-preserving simplification, quantization/compression, source painted texture re-encoded, new scale/lighting. No Shiva figure is present in this downloaded mesh.
