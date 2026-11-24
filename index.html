@@ -305,6 +305,12 @@
         backdrop-filter: blur(10px);
       }
 
+      .sound-toggle { color:#ffe9a8;background:#140a28; }
+      .sound-toggle .vc-icon { width:26px;height:26px;stroke-width:2; }
+      .sound-toggle .sound-playing { display:none; }
+      .sound-toggle[aria-pressed="true"] .sound-muted { display:none; }
+      .sound-toggle[aria-pressed="true"] .sound-playing { display:block; }
+      .sound-toggle:focus-visible { outline:3px solid #fff4ca;outline-offset:4px; }
       .sound-toggle:hover {
         transform: scale(1.1);
         box-shadow: 0 0 20px var(--gold-glow);
@@ -1221,7 +1227,7 @@
   </head>
   <body>
     <!-- Sound Toggle -->
-    <button class="sound-toggle" id="soundToggle" title="Enable ambient theme" aria-label="Enable ambient theme" aria-pressed="false">🔇</button>
+    <button class="sound-toggle" id="soundToggle" title="Enable ambient theme" aria-label="Enable ambient theme" aria-pressed="false"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 4 6 8H3v8h3l5 4Z"/><path class="sound-muted" d="m16 9 5 6m0-6-5 6"/><path class="sound-playing" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button>
     <section id="themePanel" hidden aria-label="Ambient theme controls"><strong id="themeStatus">Ambient theme off</strong><p>Original soft tone bed. Optional sound for a quiet visit.</p><label>Volume <input id="themeVolume" type="range" min="0" max="60" value="28" aria-label="Ambient theme volume"></label><div class="theme-row"><button id="themePower">Play theme</button><button id="themeClose" aria-label="Close theme controls">Close</button></div><p>Playing a bhajan pauses this theme.</p></section>
 
     <!-- ========== OM GATE ENTRY ========== -->
@@ -1750,7 +1756,7 @@
         if(isSoundOn){audioContext.resume();if(typeof stopAllAudio==='function')stopAllAudio(false);}
         document.getElementById('themeStatus').textContent=isSoundOn?'Ambient theme on':'Ambient theme off';document.getElementById('themePower').textContent=isSoundOn?'Mute theme':'Play theme';
         ambientTheme.master.gain.cancelScheduledValues(audioContext.currentTime);ambientTheme.master.gain.setTargetAtTime(isSoundOn?ambientVolume:0,audioContext.currentTime,.18);
-        const b=document.getElementById('soundToggle');b.textContent=isSoundOn?'🔊':'🔇';b.title=isSoundOn?'Mute ambient theme':'Enable ambient theme';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',String(isSoundOn));
+        const b=document.getElementById('soundToggle');b.title=isSoundOn?'Mute ambient theme':'Enable ambient theme';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',String(isSoundOn));
         if(!isSoundOn)audioContext.suspend();
         window.__ambientTheme={enabled:isSoundOn,voices:4,state:audioContext.state,volume:ambientVolume};
       }
@@ -3696,7 +3702,7 @@
         document.getElementById('soundToggle').addEventListener('click', () => {
           initAudio();
           isSoundOn = !isSoundOn;document.getElementById('themePanel').hidden=false;
-          document.getElementById('soundToggle').textContent = isSoundOn ? '🔊' : '🔇';
+
           syncAmbientTheme();
         });
         
@@ -3704,7 +3710,7 @@
         document.getElementById('audioPrompt').addEventListener('click', () => {
           initAudio();
           isSoundOn = true;
-          document.getElementById('soundToggle').textContent = '🔊';
+
           document.getElementById('audioPrompt').classList.add('hidden');
           syncAmbientTheme();
         });
@@ -3913,4 +3919,4 @@
       init();
     </script>
   </body>
-                 </html>
+  </html>
