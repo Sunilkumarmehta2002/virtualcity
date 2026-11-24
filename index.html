@@ -1206,7 +1206,7 @@
       /* ========== UTILITY CLASSES ========== */
       .hidden { display: none !important; }
       .visible { display: flex !important; }
-    #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
+    #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide,body.on-sky .city-legend{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
 </style>
   </head>
   <body>
@@ -1479,6 +1479,7 @@
     <!-- ========== JAVASCRIPT ========== -->
     <script type="module">
       import * as THREE from 'three';
+      import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
       import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
       import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -2437,7 +2438,7 @@
         const sp = 5 * dt, sy = Math.sin(walk.yaw), cy = Math.cos(walk.yaw);
         let nx = walk.x + (-sy * f + cy * st) * sp, nz = walk.z + (-cy * f - sy * st) * sp;
         if(walk.approach){
-          if(walk.skyScenic){camera.position.set(...(innerWidth<700?[125,50,55]:[78,34,53]));camera.lookAt(...(innerWidth<700?[59,16,-7]:[45,12,8]));return;}
+          if(walk.skyScenic){camera.position.set(...(innerWidth<700?[95,42,72]:[78,34,53]));camera.lookAt(...(innerWidth<700?[61,16,-4]:[45,12,8]));return;}
           const p=skyProject(nx,nz),clamped=Math.max(-2.15,Math.min(2.15,p.side)),t=Math.max(0,Math.min(1,p.t));
           walk.x=SKY.ax+SKY.dx*t+SKY.px*clamped;walk.z=SKY.az+SKY.dz*t+SKY.pz*clamped;
           if(m>.05)walk.t+=dt*8;
@@ -2513,8 +2514,12 @@
         // Open colonnade and stepped sanctuary crown at the destination.
         for(const x of [-7,-3.5,3.5,7])for(const z of [end-8,end+1]){const col=new THREE.Mesh(new THREE.CylinderGeometry(.3,.44,7,12),marble);col.position.set(x,21.5,z);g.add(col);box(1,.3,1,x,18.2,z,gold);box(1,.35,1,x,24.85,z,gold);}
         box(17,.55,11,0,25.2,end-3.7,marble);box(17.5,.2,11.5,0,25.6,end-3.7,gold);
-        for(let k=0;k<6;k++){const roof=new THREE.Mesh(new THREE.CylinderGeometry(3.5-k*.48,4-k*.48,1.05,8),marble);roof.position.set(0,26.1+k*.9,end-3.7);roof.rotation.y=Math.PI/8;g.add(roof);const edge=new THREE.Mesh(new THREE.CylinderGeometry(3.55-k*.48,3.7-k*.48,.11,8),gold);edge.position.set(0,25.65+k*.9,end-3.7);edge.rotation.y=Math.PI/8;g.add(edge);}
-        const fin=new THREE.Mesh(new THREE.SphereGeometry(.45,12,8),gold);fin.position.set(0,31.8,end-3.7);g.add(fin);
+        for(let k=0;k<7;k++){
+          const span=8.6-k*.96,level=25.9+k*.82;
+          box(span,.62,span,0,level,end-3.7,marble);box(span+.3,.12,span+.3,0,level-.33,end-3.7,gold);
+          for(const side of [-1,1])for(let n=-1;n<=1;n++){const inset=box(.3,.28,.12,n*(span*.25),level, end-3.7+side*(span/2+.025),gold);}
+        }
+        const fin=new THREE.Mesh(new THREE.SphereGeometry(.45,12,8),gold);fin.position.set(0,31.9,end-3.7);g.add(fin);
         box(6.8,6.1,.5,0,21,end-8,dark);const halo=new THREE.Mesh(new THREE.TorusGeometry(2.4,.09,8,64),glow);halo.position.set(0,21.4,end-7.7);g.add(halo);
         const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#fff0c6';ctx.textAlign='center';ctx.font='bold 72px sans-serif';ctx.fillText('दर्शन मंदिर',512,105);ctx.font='38px sans-serif';ctx.fillText('DARSHAN MANDIR',512,175);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;const plaque=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:tx,transparent:true}));plaque.position.set(0,24,end+1.4);g.add(plaque);
         // Soft radial sprites give cloud banks without large transparent mesh layers.
@@ -2529,10 +2534,31 @@
         for(const x of [-3.1,3.1]){box(.6,6,.8,x,21,end-7.5,marble);for(let n=0;n<9;n++){const jewel=new THREE.Mesh(new THREE.SphereGeometry(.22,8,6),gold);jewel.scale.y=.5;jewel.position.set(x,18.6+n*.6,end-7.0);g.add(jewel);}}
         for(let k=0;k<3;k++){const arch=new THREE.Mesh(new THREE.TorusGeometry(2.7+k*.22,.10,8,64,Math.PI),k%2?gold:marble);arch.position.set(0,21.2,end-7.05-k*.02);g.add(arch);}
         box(6.8,.34,1.1,0,24.1,end-7.3,gold);
+        // Chiselled collars and perforated side screens leave the central portal clear.
+        for(const x of [-7,-3.5,3.5,7])for(const z of [end-8,end+1])for(const y of [18.7,23.9])box(.68,.18,.68,x,y,z,gold);
+        for(const side of [-1,1]){
+          for(let n=0;n<12;n++){const z=end-7.8+n*.68;box(.14,2.8,.10,side*7,20,z,gold);}
+          for(let n=0;n<6;n++)box(.14,.10,8.0,side*7,18.8+n*.5,end-4,gold);
+          for(let n=0;n<5;n++){const petal=new THREE.Mesh(new THREE.TorusGeometry(.5,.055,6,20,Math.PI),gold);petal.rotation.y=side*Math.PI/2;petal.position.set(side*7,21.3,end-7+n*1.4);g.add(petal);}
+          const arch=new THREE.Mesh(new THREE.TorusGeometry(1.42,.08,6,40,Math.PI),gold);arch.position.set(side*5.25,23.2,end+1.12);g.add(arch);
+        }
+        // A narrow carpet guides the eye through the portal, without covering the stairs.
+        box(2.1,.025,7.4,0,18.02,end-3.4,dark);
+        for(const side of [-1,1])box(.07,.035,7.4,side*1.08,18.04,end-3.4,gold);
+        // Quiet particles remain off the walking surface.
+        const motePos=new Float32Array(90*3);for(let n=0;n<90;n++){const t=n/90;motePos[n*3]=Math.sin(n*2.399)*(3.7+n%4);motePos[n*3+1]=skyHeight(t)+2.1+(n%7)*.65;motePos[n*3+2]=-length*t;}
+        const moteGeo=new THREE.BufferGeometry();moteGeo.setAttribute('position',new THREE.BufferAttribute(motePos,3));const motes=new THREE.Points(moteGeo,new THREE.PointsMaterial({color:0xffe6a8,size:.075,transparent:true,opacity:.8,depthWrite:false}));g.add(motes);SKY.motes=motes;
         // Floating cloud shelf under the sanctuary and bridge landing.
         for(let i=0;i<18;i++){const cl=new THREE.Sprite(new THREE.SpriteMaterial({map:cloudTex,transparent:true,opacity:.78,depthWrite:false}));cl.position.set(Math.sin(i*2.4)*10,14.7+(i%3)*.45,end-4+Math.cos(i*2.4)*7);cl.scale.set(13,7,1);g.add(cl);}
         // Light mist above the bridge edges, never across its walking surface.
         for(const side of [-1,1])for(let i=0;i<7;i++){const cl=new THREE.Sprite(new THREE.SpriteMaterial({map:cloudTex,transparent:true,opacity:.35,depthWrite:false}));cl.position.set(side*(5+i%2*2),7.2,-length*(.31+i*.055));cl.scale.set(10,4.5,1);g.add(cl);}
+        // Static pieces share a handful of draw calls. Clouds, text and motes stay separate.
+        const batches=new Map(),staticMeshes=g.children.filter(o=>o.isMesh&&o.material&&!Array.isArray(o.material));
+        for(const mesh of staticMeshes){mesh.updateMatrix();const geo=mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone();geo.applyMatrix4(mesh.matrix);const key=mesh.material.uuid;if(!batches.has(key))batches.set(key,{material:mesh.material,parts:[]});batches.get(key).parts.push(geo);}
+        for(const mesh of staticMeshes)g.remove(mesh);
+        for(const batch of batches.values()){const merged=mergeGeometries(batch.parts,false);if(merged){const mesh=new THREE.Mesh(merged,batch.material);mesh.receiveShadow=true;g.add(mesh);}for(const geo of batch.parts)geo.dispose();}
+        SKY.staticBatches=batches.size;SKY.originalPieces=staticMeshes.length;
+        SKY.clouds=g.children.filter(o=>o.isSprite).map((sprite,i)=>({sprite,x:sprite.position.x,y:sprite.position.y,phase:i*1.73}));
         const sunlight=new THREE.DirectionalLight(0xffe3af,2);sunlight.position.set(35,45,5);scene.add(sunlight);
         document.getElementById('skyWalk').onclick=()=>{document.querySelector('#skyGuide small').textContent='Drag to look · joystick / WASD to climb';walk.skyScenic=false;walk.yaw=-Math.PI/4;walk.pitch=.18;};document.getElementById('skyDirect').onclick=()=>{leaveSkyApproach();enterGallery();};document.getElementById('skyReturn').onclick=()=>document.getElementById('galBtn').click();
       }
@@ -2994,7 +3020,9 @@
         const now = performance.now(); const dt = Math.min(0.1, (now - _envLast) / 1000); _envLast = now;
         const t = now / 1000;
         if (walk.on) walkTick(dt);
-        if(walk.approach)renderer.toneMappingExposure=1.5;
+        if(walk.approach){renderer.toneMappingExposure=1.5;
+          if(SKY.clouds&&!matchMedia('(prefers-reduced-motion: reduce)').matches){for(const c of SKY.clouds){c.sprite.position.x=c.x+Math.sin(t*.075+c.phase)*.45;c.sprite.position.y=c.y+Math.sin(t*.10+c.phase)*.16;}if(SKY.motes)SKY.motes.material.opacity=.58+Math.sin(t*.7)*.17;}
+        }
         tickGalleryAarti(now / 1000);
         // Loaded statues keep their geometry, but only nearby shrine lights affect rendering.
         if(GAL.shrineLights){for(const s of GAL.shrineLights)s.light.visible=!!walk.hall&&Math.hypot(walk.x-s.x,walk.z-s.z)<11;}
