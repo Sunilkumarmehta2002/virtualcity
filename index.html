@@ -2678,8 +2678,21 @@
         for(const [key,parts] of Object.entries(surroundTrim)){const geos=parts.map(({mesh,parent})=>{parent.updateMatrix();mesh.updateMatrix();const geo=mesh.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(parent.matrix,mesh.matrix));return geo;});const merged=mergeGeometries(geos,false);if(merged)g.add(new THREE.Mesh(merged,key==='stone'?stoneM:gold));geos.forEach(geo=>geo.dispose());}
         // warm lights
         [-18, 0, 18].forEach(x => { const pl = new THREE.PointLight(0xffb060, 2.2, 28); pl.position.set(x, 5.5, 0); g.add(pl); });
-        // hanging lamps (decorative)
-        for (let i = 0; i < 9; i++) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffc060 })); l.position.set(-24 + i * 6, 5.6, 0); g.add(l); }
+        // Original suspended lamp housings and crossbeams. Static detail uses three batches.
+        const overhead=[];const lampGlow=new THREE.MeshBasicMaterial({color:0xffd58b});
+        const overheadPart=(geometry,material,x,y,z)=>{const mesh=new THREE.Mesh(geometry,material);mesh.position.set(x,y,z);overhead.push(mesh);return mesh;};
+        for(let i=0;i<9;i++){
+          const x=-24+i*6;
+          overheadPart(new THREE.BoxGeometry(.22,.22,8.9),pilM,x,6.55,0);
+          overheadPart(new THREE.CylinderGeometry(.025,.025,.72,6),gold,x,6.18,0);
+          overheadPart(new THREE.CylinderGeometry(.3,.11,.14,12),gold,x,5.78,0);
+          overheadPart(new THREE.CylinderGeometry(.24,.24,.38,12),lampGlow,x,5.52,0);
+          overheadPart(new THREE.CylinderGeometry(.34,.28,.09,12),gold,x,5.28,0);
+          for(let r=0;r<6;r++){const angle=r*Math.PI/3;overheadPart(new THREE.CylinderGeometry(.017,.017,.42,5),gold,x+Math.sin(angle)*.25,5.51,Math.cos(angle)*.25);}
+        }
+        const overheadBatches=new Map();for(const mesh of overhead){mesh.updateMatrix();const geo=mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone();geo.applyMatrix4(mesh.matrix);const key=mesh.material.uuid;if(!overheadBatches.has(key))overheadBatches.set(key,{material:mesh.material,parts:[]});overheadBatches.get(key).parts.push(geo);mesh.geometry.dispose();}
+        for(const batch of overheadBatches.values()){const merged=mergeGeometries(batch.parts,false);if(merged)g.add(new THREE.Mesh(merged,batch.material));batch.parts.forEach(geo=>geo.dispose());}
+        GAL.overheadBatches=overheadBatches.size;
         // the real Ganesha scan in the Ganesh niche
         function loadMuseumScan(id, file, height, color) {
         if(GAL.scans[id]==='loading'||GAL.scans[id]==='ready')return;
@@ -3897,4 +3910,4 @@
       init();
     </script>
   </body>
-        </html>
+                                                     </html>
