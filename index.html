@@ -1214,6 +1214,25 @@
       }
       /* City navigation stays outside the immersive gallery; sound and Exit remain. */
       body.in-gallery .top-bar, body.in-gallery #cityLegend { display:none; }
+      /* Offerings stay inside the live Sky Mandir visit, never replace its statue. */
+      body.in-gallery #darshanModal { inset:auto 14px 14px auto;width:340px;max-width:calc(100vw - 28px);max-height:64dvh;border:1px solid #c9a860;border-radius:14px;background:rgba(22,13,36,.98);z-index:1000; }
+      body.in-gallery #darshanModal .darshan-header { padding:14px 48px 8px 12px; }
+      body.in-gallery #darshanModal .darshan-deity-name { font-size:23px; }
+      body.in-gallery #darshanModal .darshan-deity-english { font-size:14px; }
+      body.in-gallery #darshanModal .darshan-mantra { font-size:15px;margin-top:6px;animation:none; }
+      body.in-gallery #darshanModal .darshan-stage { min-height:64px;max-height:64px;padding:4px;overflow:hidden;flex:none; }
+      body.in-gallery #darshanModal .deity-symbol-large, body.in-gallery #darshanModal .smoke { display:none; }
+      body.in-gallery #darshanModal .darshan-stage::before { content:'Symbolic offerings · statue remains in the temple';font-size:11px;color:#ffe9a8; }
+      body.in-gallery #darshanModal .mala-counter { padding:8px; }
+      body.in-gallery #darshanModal .mala-count { font-size:24px; }
+      body.in-gallery #darshanModal .mala-progress { margin:6px auto; }
+      body.in-gallery #darshanModal .darshan-actions { padding:8px;gap:6px;display:grid;grid-template-columns:repeat(3,1fr); }
+      body.in-gallery #darshanModal .darshan-action { padding:6px 2px;font-size:11px;min-height:54px; }
+      body.in-gallery #darshanModal .darshan-action-icon { display:none; }
+      body.in-gallery #darshanModal .darshan-action-label { font-size:10px; }
+      body.in-gallery #darshanModal .darshan-close { position:sticky;top:8px;right:auto;align-self:flex-end;flex-shrink:0;margin:8px 8px -44px 0; }
+      @media(max-width:699px) { body.in-gallery #darshanModal { max-height:44dvh; } body.in-gallery #darshanModal .darshan-header { padding-top:8px;padding-bottom:4px; } body.in-gallery #darshanModal .darshan-stage { min-height:30px;max-height:30px; } body.in-gallery #darshanModal .mala-counter { padding:4px; } body.in-gallery #darshanModal .mala-label { font-size:11px; } }
+      @media(max-height:500px) and (orientation:landscape) { body.in-gallery #darshanModal { max-height:calc(100dvh - 88px);width:300px; } }
       .vc-icon { width:24px; height:24px; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
       .sky-toggle .vc-icon { width:20px; height:20px; color:#ffe9a8; }
 
@@ -1264,7 +1283,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
+      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryOfferings">पूजा · Offerings</button> <button id="galleryAarti" hidden>आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
       <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
@@ -1350,8 +1369,8 @@
     </div>
 
     <!-- ========== DARSHAN MODAL ========== -->
-    <div class="darshan-modal" id="darshanModal">
-      <button class="darshan-close" id="closeDarshan">×</button>
+    <div class="darshan-modal" id="darshanModal" role="region" aria-label="Sky Mandir offerings">
+      <button class="darshan-close" id="closeDarshan" aria-label="Close offerings">×</button>
       
       <div class="darshan-header">
         <h1 class="darshan-deity-name" id="darshanDeityHindi">श्री गणेश</h1>
@@ -2970,7 +2989,7 @@
       const galleryRitual={group:null,active:false,start:0,deity:null};
       function stopGalleryAarti(){
         galleryRitual.active=false;galleryRitual.deity=null;if(galleryRitual.group)galleryRitual.group.visible=false;
-        const b=document.getElementById('galleryAarti');if(b){b.textContent='🪔 आरती · Aarti';b.setAttribute('aria-pressed','false');}
+        const b=document.getElementById('galleryAarti');if(b){b.textContent='आरती · Aarti';b.setAttribute('aria-pressed','false');}
       }
       function startGalleryAarti(){
         if(galleryRitual.active){stopGalleryAarti();return;}
@@ -3017,6 +3036,7 @@
         if(window.ResizeObserver&&nav)new ResizeObserver(()=>{
           document.documentElement.style.setProperty('--gallery-nav-height',nav.getBoundingClientRect().height+'px');
         }).observe(nav);
+        document.getElementById('galleryOfferings').addEventListener('click',()=>{const t=TEMPLES.find(t=>t.id===document.getElementById('gallerySelect').value);if(!walk.hall||!t){document.getElementById('galleryStatus').textContent='Choose a deity before opening offerings';return;}syncDarshanDetails(t);document.getElementById('darshanModal').classList.add('visible');document.getElementById('closeDarshan').focus();});
         document.getElementById('galleryAarti').addEventListener('click',startGalleryAarti);
         document.getElementById('galleryPrevious').addEventListener('click',()=>stepGallery(-1));document.getElementById('galleryNext').addEventListener('click',()=>stepGallery(1));
         document.getElementById('galleryRetry').addEventListener('click',()=>{
@@ -3027,7 +3047,7 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && (walk.hall||walk.approach)) { leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title); return; }
+          if (walk.on && (walk.hall||walk.approach)) { document.getElementById('darshanModal').classList.remove('visible');leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title); return; }
           if (!walk.on) wb.click();
           startSkyApproach(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
@@ -3035,11 +3055,13 @@
       const installedDeities=['ganesh','shiv','surya','vishnu','lakshmi','hanuman','krishna','parvati','saraswati','kali','ram','durga'];
       function stepGallery(direction){const current=document.getElementById('gallerySelect').value,i=installedDeities.indexOf(current);const next=i<0?(direction>0?0:installedDeities.length-1):(i+direction+installedDeities.length)%installedDeities.length;visitGalleryNiche(installedDeities[next]);}
       function visitGalleryNiche(id) {
+        document.getElementById('darshanModal').classList.remove('visible');
         const i = TEMPLES.findIndex(t => t.id === id); if (i < 0) return;
         const side = i < 7 ? -1 : 1, k = i % 7;
         walk.x = GAL.ox - 21 + k * 7; walk.z = side * 5.5;
         walk.yaw = side < 0 ? 0 : Math.PI; walk.pitch = 0;
         document.getElementById('gallerySelect').value = id;
+        syncDarshanDetails(TEMPLES[i]);malaCount=0;updateMalaCount();
         updateGalleryStatus(id);
       }
       function updateGalleryStatus(id) {
@@ -3482,21 +3504,20 @@
       }
 
       // ==================== DARSHAN ====================
+      function syncDarshanDetails(temple){
+        currentTemple=temple;
+        document.getElementById('darshanDeityHindi').textContent=temple.god.hindi;
+        document.getElementById('darshanDeityEnglish').textContent=temple.god.english;
+        document.getElementById('darshanMantra').textContent=temple.mantra;
+      }
       function openDarshan(temple) {
-        currentTemple = temple;
-        
-        document.getElementById('darshanDeityHindi').textContent = temple.god.hindi;
-        document.getElementById('darshanDeityEnglish').textContent = temple.god.english;
-        document.getElementById('darshanMantra').textContent = temple.mantra;
-        document.getElementById('darshanSymbol').textContent = temple.symbol;
-        
-        document.getElementById('darshanModal').classList.add('visible');
-        
-        malaCount = 0;
-        updateMalaCount();
-        
-        startPetals();
-        playConchSound();
+        document.getElementById('templePanel').classList.remove('visible');
+        document.getElementById('darshanModal').classList.remove('visible');
+        if(!walk.on)document.getElementById('walkBtn').click();
+        if(!walk.hall)enterGallery();
+        document.getElementById('galBtn').classList.add('active');
+        visitGalleryNiche(temple.id);syncDarshanDetails(temple);
+        malaCount=0;updateMalaCount();
       }
 
       function updateMalaCount() {
@@ -3532,30 +3553,10 @@
       }
 
       function performAarti() {
-        const container = document.getElementById('aartiContainer');
-        const ring = document.getElementById('diyaRing');
-        
-        ring.innerHTML = '';
-        
-        // Create 8 diyas in a circle
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
-          const diya = document.createElement('span');
-          diya.className = 'diya';
-          diya.textContent = '🪔';
-          diya.style.left = `${50 + Math.cos(angle) * 40}%`;
-          diya.style.top = `${50 + Math.sin(angle) * 40}%`;
-          diya.style.transform = 'translate(-50%, -50%)';
-          diya.style.animationDelay = `${i * 0.1}s`;
-          ring.appendChild(diya);
-        }
-        
-        container.style.display = 'flex';
-        playBellSound();
-        
-        setTimeout(() => {
-          container.style.display = 'none';
-        }, 8000);
+        document.getElementById('darshanModal').classList.remove('visible');
+        const id=document.getElementById('gallerySelect').value;
+        if(walk.hall&&GAL.scans[id]==='ready')startGalleryAarti();
+        else document.getElementById('galleryStatus').textContent='Aarti becomes available when the selected statue has loaded';
       }
 
       // ==================== PANCHANG ====================
@@ -3752,7 +3753,7 @@
         document.getElementById('btnAarti').addEventListener('click', () => {
           if (currentTemple) {
             openDarshan(currentTemple);
-            setTimeout(performAarti, 1000);
+            performAarti();
           }
         });
         
@@ -3762,7 +3763,7 @@
         
         // Close darshan
         document.getElementById('closeDarshan').addEventListener('click', () => {
-          document.getElementById('darshanModal').classList.remove('visible');
+          document.getElementById('darshanModal').classList.remove('visible');document.getElementById('galleryOfferings').focus();
         });
         
         // Darshan actions
