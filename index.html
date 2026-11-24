@@ -428,14 +428,16 @@
       @media (min-width:700px) { #walkJoy { left:auto; right:36px; bottom:40px; } }
       #walkKnob { position:absolute; left:38px; top:38px; width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
       #galleryGuide { display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:32; background:rgba(20,10,40,.92); border:1px solid #9b7c23; border-radius:12px; padding:8px; color:#ffe9a8; max-width:calc(100vw - 32px); box-sizing:border-box; font-size:12px; text-align:center; }
-      #galleryGuide select, #galleryGuide button { background:#30203c; color:#fff1c4; border:1px solid #9b7c23; border-radius:6px; padding:7px; max-width:100%; }
+      #galleryGuide select, #galleryGuide button { background:#30203c; color:#fff1c4; border:1px solid #9b7c23; border-radius:6px; padding:7px; max-width:100%; min-height:44px; touch-action:manipulation; }
+      #galleryGuide select:focus-visible, #galleryGuide button:focus-visible { outline:2px solid #ffe173; outline-offset:2px; }
+      @media (max-width:1023px) { #galleryGuide { bottom:calc(var(--gallery-nav-height, 84px) + 8px); } }
       #galleryCredit[hidden] { display:none; }
       #galleryGuide small { display:block; margin-top:5px; }
       @media(max-width:699px) {
-        #galleryGuide { bottom:92px; width:calc(100vw - 24px); max-width:370px; }
+        #galleryGuide { bottom:calc(var(--gallery-nav-height, 84px) + 8px); width:calc(100vw - 24px); max-width:370px; }
         #galleryGuide select { width:100%; margin-bottom:4px; }
         #galleryGuide button { padding:5px 9px; }
-        body.in-gallery #walkJoy { bottom:200px; }
+        body.in-gallery #walkJoy, body.in-gallery #viewZoom { bottom:calc(var(--gallery-panel-height, 160px) + var(--gallery-nav-height, 84px) + 20px); }
       }
       #walkHint { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:240px; z-index:30; background:rgba(20,10,40,0.7); color:#ffe9a8; padding:6px 12px; border-radius:12px; font-size:12px; pointer-events:none; white-space:normal; width:max-content; max-width:calc(100vw - 32px); box-sizing:border-box; text-align:center; }
       .top-bar { padding-right: 80px; }
@@ -1231,7 +1233,7 @@
           <button class="sky-btn" data-sky="night" title="Night">🌙</button>
           <button class="follow-btn" id="followBtn" title="Follow a devotee">🧍</button>
           <button class="walk-btn" id="walkBtn" title="Walk through the city">🚶</button>
-          <button class="walk-btn" id="galBtn" title="Darshan gallery (inside)">🪔</button>
+          <button class="walk-btn" id="galBtn" aria-label="Enter darshan gallery" title="Darshan gallery (inside)">🪔</button>
         </div>
       </div>
 
@@ -2739,6 +2741,14 @@
         r.smoke.forEach((sp,i)=>{const p=(e*.28+i/9)%1;sp.position.set(Math.sin(p*5+t*.4)*p*.14,.58+p*.85,0);sp.scale.setScalar(.12+p*.4);sp.material.opacity=(1-p)*.24*fade;});
       }
       function setupGalleryBtn() {
+        const panel=document.getElementById('galleryGuide');
+        if(window.ResizeObserver)new ResizeObserver(()=>{
+          document.documentElement.style.setProperty('--gallery-panel-height',panel.getBoundingClientRect().height+'px');
+        }).observe(panel);
+        const nav=document.querySelector('.bottom-nav');
+        if(window.ResizeObserver&&nav)new ResizeObserver(()=>{
+          document.documentElement.style.setProperty('--gallery-nav-height',nav.getBoundingClientRect().height+'px');
+        }).observe(nav);
         document.getElementById('galleryAarti').addEventListener('click',startGalleryAarti);
         document.getElementById('galleryRetry').addEventListener('click',()=>{
           const id=document.getElementById('gallerySelect').value;
@@ -3625,4 +3635,4 @@
       init();
     </script>
   </body>
-                                                                                                      </html>
+                                                  </html>
