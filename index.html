@@ -2377,8 +2377,23 @@
         });
         const lookEnd = e => { if (e.pointerId === lid) lid = null; };
         dom.addEventListener('pointerup', lookEnd); dom.addEventListener('pointercancel', lookEnd);
-        window.addEventListener('keydown', e => { walk.keys[e.key.toLowerCase()] = true; });
+        // Controls keep their native keys; focus loss must never leave walking held.
+        const resetWalkInput = () => {
+          walk.keys = {}; walk.jx = walk.jy = 0; jid = lid = null;
+          knob.style.left = '38px'; knob.style.top = '38px';
+        };
+        const isFormControl = el => el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(el.tagName));
+        window.addEventListener('keydown', e => {
+          if (isFormControl(e.target) || e.altKey || e.ctrlKey || e.metaKey) return;
+          const key = e.key.toLowerCase();
+          if (walk.on && /^(w|a|s|d|q|e|arrowup|arrowdown|arrowleft|arrowright)$/.test(key)) {
+            e.preventDefault(); walk.keys[key] = true;
+          }
+        });
         window.addEventListener('keyup', e => { walk.keys[e.key.toLowerCase()] = false; });
+        window.addEventListener('blur', resetWalkInput);
+        window.addEventListener('focusin', e => { if (isFormControl(e.target)) resetWalkInput(); });
+        document.addEventListener('visibilitychange', () => { if (document.hidden) resetWalkInput(); });
       }
       function walkTick(dt) {
         const k = walk.keys;
@@ -3598,4 +3613,4 @@
       init();
     </script>
   </body>
-          </html>
+  </html>
