@@ -1206,6 +1206,8 @@
         body.in-gallery .gallery-stepper button { white-space:nowrap;font-size:11px;padding:5px; }
         body.in-gallery #galleryGuide { left:auto;right:12px;transform:none;width:clamp(220px,calc(100vw - 400px),300px);max-height:calc(100dvh - 88px);overflow-y:auto;overscroll-behavior:contain; }
       }
+      /* City navigation stays outside the immersive gallery; sound and Exit remain. */
+      body.in-gallery .top-bar, body.in-gallery #cityLegend { display:none; }
       .vc-icon { width:24px; height:24px; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
       .sky-toggle .vc-icon { width:20px; height:20px; color:#ffe9a8; }
 
@@ -3910,4 +3912,4 @@
       init();
     </script>
   </body>
-                                                     </html>
+  </html>
