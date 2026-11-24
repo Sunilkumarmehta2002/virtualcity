@@ -2614,7 +2614,8 @@
         });
         // niches: 7 per long wall
         const gold = M(0xffc24a, 0.4); gold.emissive.setHex(0x5a3a08);
-        const stoneM = M(0xb09a80, 0.8); stoneM.emissive.setHex(0x4a3d30);
+        const stoneM = M(0xe4c99c, 0.88); stoneM.emissive.setHex(0x4a3d30);
+        tex(stoneM,'large_sandstone_blocks',1,2.5);
         const names = TEMPLES.map(t => ({ h: t.god.hindi, e: t.god.english, id: t.id }));
         const label = (h, e, sub) => {
           const c = document.createElement('canvas'); c.width = 512; c.height = 160; const x = c.getContext('2d');
@@ -2646,7 +2647,7 @@
           }
         });
         window.__vc.gallery = GAL;
-        const slots = [];
+        const slots = []; const surroundTrim={stone:[],gold:[]};
         const shrineLights=[];GAL.shrineLights=shrineLights;
         const registerShrineLight=(light,slot)=>{slot.grp.add(light);shrineLights.push({light,x:GAL.ox+slot.grp.position.x,z:slot.grp.position.z});light.visible=false;};
         names.forEach((n, i) => {
@@ -2656,6 +2657,7 @@
           // alcove frame (local +z points into the hall)
           [-1.7, 1.7].forEach(dx => { const pst = new THREE.Mesh(new THREE.BoxGeometry(0.45, 5, 0.6), stoneM); pst.position.set(dx, 2.5, 0.3); al.add(pst); });
           const lint = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.5, 0.7), stoneM); lint.position.set(0, 5.1, 0.35); al.add(lint);
+          [-1.7,1.7].forEach(dx=>{for(const y of [.17,4.88]){const molding=new THREE.Mesh(new THREE.BoxGeometry(.62,.18,.78),stoneM);molding.position.set(dx,y,.3);surroundTrim.stone.push({mesh:molding,parent:al});const rim=new THREE.Mesh(new THREE.BoxGeometry(.64,.035,.8),gold);rim.position.set(dx,y+.1,.3);surroundTrim.gold.push({mesh:rim,parent:al});}});
           const arch = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.18, 0.18), gold); arch.position.set(0, 4.7, 0.62); al.add(arch);
           const back = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 4.5), M(0x4a1d2a, 0.9)); back.position.set(0, 2.5, 0.02); al.add(back);
           const ped = new THREE.Mesh(new THREE.CylinderGeometry(n.id==='ram'?1.15:0.9, n.id==='ram'?1.25:1.1, 0.8, 16), stoneM); ped.position.set(0, 0.4, 1.35); al.add(ped);
@@ -2667,6 +2669,7 @@
           slots.push({ id: n.id, grp: al, base: new THREE.Vector3(x, 1.0, side * (W / 2) + inward * 1.35) });
           GAL.circles.push([GAL.ox + x, side * (W / 2) + inward * 1.35, 1.2]);
         });
+        for(const [key,parts] of Object.entries(surroundTrim)){const geos=parts.map(({mesh,parent})=>{parent.updateMatrix();mesh.updateMatrix();const geo=mesh.geometry.clone();geo.applyMatrix4(new THREE.Matrix4().multiplyMatrices(parent.matrix,mesh.matrix));return geo;});const merged=mergeGeometries(geos,false);if(merged)g.add(new THREE.Mesh(merged,key==='stone'?stoneM:gold));geos.forEach(geo=>geo.dispose());}
         // warm lights
         [-18, 0, 18].forEach(x => { const pl = new THREE.PointLight(0xffb060, 2.2, 28); pl.position.set(x, 5.5, 0); g.add(pl); });
         // hanging lamps (decorative)
@@ -3888,4 +3891,4 @@
       init();
     </script>
   </body>
-  </html>
+                                                    </html>
