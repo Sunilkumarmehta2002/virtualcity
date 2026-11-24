@@ -2986,8 +2986,10 @@
         // Uma-Maheshvara retained as an experimental asset, not displayed until mesh QA passes.
       }
       // Opt-in 3D aarti study at each verified statue. Original procedural geometry and effects, no recording.
+      let requestedGalleryAarti=null;
       const galleryRitual={group:null,active:false,start:0,deity:null};
       function stopGalleryAarti(){
+        requestedGalleryAarti=null;
         galleryRitual.active=false;galleryRitual.deity=null;if(galleryRitual.group)galleryRitual.group.visible=false;
         const b=document.getElementById('galleryAarti');if(b){b.textContent='आरती · Aarti';b.setAttribute('aria-pressed','false');}
       }
@@ -3055,6 +3057,7 @@
       const installedDeities=['ganesh','shiv','surya','vishnu','lakshmi','hanuman','krishna','parvati','saraswati','kali','ram','durga'];
       function stepGallery(direction){const current=document.getElementById('gallerySelect').value,i=installedDeities.indexOf(current);const next=i<0?(direction>0?0:installedDeities.length-1):(i+direction+installedDeities.length)%installedDeities.length;visitGalleryNiche(installedDeities[next]);}
       function visitGalleryNiche(id) {
+        requestedGalleryAarti=null;
         document.getElementById('darshanModal').classList.remove('visible');
         const i = TEMPLES.findIndex(t => t.id === id); if (i < 0) return;
         const side = i < 7 ? -1 : 1, k = i % 7;
@@ -3075,7 +3078,9 @@
         if(galleryRitual.active&&galleryRitual.deity!==id) stopGalleryAarti();
         document.getElementById('galleryStatus').dataset.zone=id;
         const descriptions={durga:'Durga on a lion sculpture · gametest9069 · CC BY4.0 · source painted texture',ram:'Shri Ram archer sculpture · Deepu5510 · CC BY4.0 · source painted texture',kali:'Kali - Hindu goddess · Brian Trepanier · CC BY4.0 · source painted texture',saraswati:'Saraswati · Thunk3D scanner · CC BY4.0 · new ivory material',parvati:'Parvati plaster statue · Tyler Jackson · CC BY4.0 · material study',krishna:'Krishna · Tamil Nadu, 13th–14th C · Giravolt, MUEC · CC BY4.0',hanuman:'Hanuman/Anjaneya · Addere Creations · CC BY4.0 · brown material study',lakshmi:'Lakshmi · Baardus · CC BY4.0 · artistic stone/metal materials',vishnu:'Vishnu on Garuda · Cambodia, 12th–13th C · CC0 · bronze-style material',surya:'Surya · Kashmir, early700s · CC0 · brass-style material',ganesh:'CC0 museum scan · Ganesha · Java, 10th–11th century',shiv:'Shiva Nataraja · Tamil Nadu, 1000s · CC0 · bronze-style material'};
-        const state=GAL.scans[id];document.getElementById('galleryStatus').textContent=!state?'Prototype niche · statue not yet added':state==='ready'?descriptions[id]:state==='error'?'Statue could not load · check connection, then Retry statue':id==='shiv'?'Loading Shiva Nataraja scan…':id==='surya'?'Loading Surya museum scan…':id==='vishnu'?'Loading Vishnu museum scan…':id==='lakshmi'?'Loading Lakshmi sculpture…':id==='hanuman'?'Loading Hanuman scan…':id==='krishna'?'Loading Krishna scan…':id==='durga'?'Loading Durga sculpture…':id==='ram'?'Loading Shri Ram sculpture…':id==='saraswati'?'Loading Saraswati sculpture…':id==='kali'?'Loading Kali - Hindu goddess sculpture…':id==='parvati'?'Loading Parvati scan…':'Loading Ganesha museum scan…';
+        const state=GAL.scans[id];
+        if(requestedGalleryAarti===id&&walk.hall&&document.getElementById('gallerySelect').value===id){if(state==='ready'){requestedGalleryAarti=null;startGalleryAarti();}else if(state==='error'||!state){requestedGalleryAarti=null;}}
+        document.getElementById('galleryStatus').textContent=!state?'Prototype niche · statue not yet added':state==='ready'?descriptions[id]:state==='error'?'Statue could not load · check connection, then Retry statue':id==='shiv'?'Loading Shiva Nataraja scan…':id==='surya'?'Loading Surya museum scan…':id==='vishnu'?'Loading Vishnu museum scan…':id==='lakshmi'?'Loading Lakshmi sculpture…':id==='hanuman'?'Loading Hanuman scan…':id==='krishna'?'Loading Krishna scan…':id==='durga'?'Loading Durga sculpture…':id==='ram'?'Loading Shri Ram sculpture…':id==='saraswati'?'Loading Saraswati sculpture…':id==='kali'?'Loading Kali - Hindu goddess sculpture…':id==='parvati'?'Loading Parvati scan…':'Loading Ganesha museum scan…';
       }
       function enterGallery() {
         document.getElementById('themePanel').hidden=true;leaveSkyApproach();buildGallery();
@@ -3556,7 +3561,10 @@
         document.getElementById('darshanModal').classList.remove('visible');
         const id=document.getElementById('gallerySelect').value;
         if(walk.hall&&GAL.scans[id]==='ready')startGalleryAarti();
-        else document.getElementById('galleryStatus').textContent='Aarti becomes available when the selected statue has loaded';
+        else if(walk.hall&&['pending','loading'].includes(GAL.scans[id])){
+          requestedGalleryAarti=id;
+          document.getElementById('galleryStatus').textContent='Loading statue for your Aarti request · changing deity or Exit cancels it';
+        }else document.getElementById('galleryStatus').textContent='Aarti is unavailable until this statue can load';
       }
 
       // ==================== PANCHANG ====================
@@ -3920,4 +3928,4 @@
       init();
     </script>
   </body>
-  </html>
+                                                                        </html>
