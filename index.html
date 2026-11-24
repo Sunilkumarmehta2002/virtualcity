@@ -1206,7 +1206,8 @@
       /* ========== UTILITY CLASSES ========== */
       .hidden { display: none !important; }
       .visible { display: flex !important; }
-    </style>
+    #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
+</style>
   </head>
   <body>
     <!-- Sound Toggle -->
@@ -1246,7 +1247,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
+      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryAarti" hidden>🪔 आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
       <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
@@ -1261,7 +1262,7 @@
           <button class="sky-btn" data-sky="night" title="Night"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z"/></svg></button>
           <button class="follow-btn" aria-label="Follow a devotee" id="followBtn" title="Follow a devotee"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="5" r="3"/><path d="M8 21v-6l-3-2 3-5h8l3 5-3 2v6M9 14h6m-3 0v7"/></svg></button>
           <button class="walk-btn" aria-label="Walk through the city" id="walkBtn" title="Walk through the city"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="14" cy="4" r="2"/><path d="m7 11 4-4 4 2 3 4m-7-6-1 7-4 7m4-7 6 2 2 5"/></svg></button>
-          <button class="walk-btn" id="galBtn" aria-label="Enter darshan gallery" title="Darshan gallery (inside)"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 15h18a9 9 0 0 1-18 0Zm9-2c-5-4 2-5 0-10 6 6 3 8 0 10Z"/></svg></button>
+          <button class="walk-btn" id="galBtn" aria-label="Climb to the Sky Mandir" title="Celestial staircase to Darshan Mandir"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 15h18a9 9 0 0 1-18 0Zm9-2c-5-4 2-5 0-10 6 6 3 8 0 10Z"/></svg></button>
         </div>
       </div>
 
@@ -2266,6 +2267,7 @@
         for (let i = 0; i < 16; i++) {
           const a = (i / 16) * Math.PI * 2 + 0.2;
           const r = 33 + (i % 3) * 2.2;
+          const pathP=skyProject(Math.cos(a)*r,Math.sin(a)*r);if(pathP.t>-.08&&pathP.t<.2&&Math.abs(pathP.side)<5)continue;
           const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 3.2, 8), trunkM);
           tr.position.set(Math.cos(a) * r, 1.6, Math.sin(a) * r); tr.castShadow = true; scene.add(tr);
           outdoorSolids.push([tr.position.x, tr.position.z, 1.05]);
@@ -2304,6 +2306,7 @@
         setupViewZoom();
         window.__vc = { scene, camera, controls, envAnimals, outdoorSolids, walk, get fireflies() { return fireflies; } };
 
+        createSkyMandir();
         upgradeVisitors();
         // Fireflies (jugnu)
         const N = 140; const pos = new Float32Array(N * 3); const ph = [];
@@ -2378,7 +2381,7 @@
             b.title = 'Walking (tap to return to city view)';
             hint.textContent = 'Drag to look · joystick or WASD to walk · gardens are open'; hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
-            walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
+            leaveSkyApproach();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
             camera.rotation.order = 'XYZ';
             camera.position.copy(walk.saved.p); controls.target.copy(walk.saved.t);
             walk.jx = walk.jy = 0; knob.style.left = '38px'; knob.style.top = '38px';
@@ -2433,6 +2436,16 @@
         const m = Math.hypot(f, st); if (m > 1) { f /= m; st /= m; }
         const sp = 5 * dt, sy = Math.sin(walk.yaw), cy = Math.cos(walk.yaw);
         let nx = walk.x + (-sy * f + cy * st) * sp, nz = walk.z + (-cy * f - sy * st) * sp;
+        if(walk.approach){
+          if(walk.skyScenic){camera.position.set(...(innerWidth<700?[125,50,55]:[78,34,53]));camera.lookAt(...(innerWidth<700?[59,16,-7]:[45,12,8]));return;}
+          const p=skyProject(nx,nz),clamped=Math.max(-2.15,Math.min(2.15,p.side)),t=Math.max(0,Math.min(1,p.t));
+          walk.x=SKY.ax+SKY.dx*t+SKY.px*clamped;walk.z=SKY.az+SKY.dz*t+SKY.pz*clamped;
+          if(m>.05)walk.t+=dt*8;
+          camera.position.set(walk.x,skyHeight(t)+1.7+Math.sin(walk.t)*.025*Math.min(1,m),walk.z);camera.rotation.set(walk.pitch,walk.yaw,0);
+          if(t>.985){walk.skyScenic=false;walk.approach=false;document.body.classList.remove('on-sky');document.getElementById('skyGuide').hidden=true;enterGallery();}
+          return;
+        }
+        if(!walk.hall){const p=skyProject(nx,nz);if(p.t>=0&&p.t<.04&&Math.abs(p.side)<2.15&&m>.05){startSkyApproach();return;}}
         const r = Math.hypot(nx, nz); if (!walk.hall && r > 38.5) { nx *= 38.5 / r; nz *= 38.5 / r; }
         if (walk.hall) {
           nx = Math.max(GAL.rect.minx, Math.min(GAL.rect.maxx, nx)); nz = Math.max(GAL.rect.minz, Math.min(GAL.rect.maxz, nz));
@@ -2465,10 +2478,63 @@
           const k=Math.round((walk.x-GAL.ox+21)/7), inBay=Math.abs(walk.z)>3.65 && k>=0 && k<7;
           const sel=document.getElementById('gallerySelect');
           if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
-          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;stopGalleryAarti();status.textContent='Connecting passage · 14 shrine bays · 11 statues available · 3 statues pending'; }
+          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;stopGalleryAarti();status.textContent='Connecting passage · 14 shrine bays · 12 statues available · 2 statues pending'; }
         }
-        camera.position.set(walk.x, 1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
+        camera.position.set(walk.x, (walk.hall?18:0)+1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
+      }
+
+
+      // Original procedural architecture. The shrine interior is a separate scene zone behind the upper doorway.
+      const SKY={ax:25,az:25,dx:42,dz:-42,px:Math.SQRT1_2,pz:Math.SQRT1_2};
+      function skyProject(x,z){const rx=x-SKY.ax,rz=z-SKY.az;return {t:(rx*SKY.dx+rz*SKY.dz)/(SKY.dx**2+SKY.dz**2),side:rx*SKY.px+rz*SKY.pz};}
+      function skyHeight(t){if(t<.30)return t/.30*8;if(t<.68)return 8;return 8+(t-.68)/.32*10;}
+      function leaveSkyApproach(){if(renderer)renderer.toneMappingExposure=(skyMode==='night'?2.1:skyMode==='dawn'?1.6:1.35);walk.skyScenic=false;walk.approach=false;document.body.classList.remove('on-sky');const p=document.getElementById('skyGuide');if(p)p.hidden=true;}
+      function startSkyApproach(){
+        walk.hall=false;walk.approach=true;walk.skyScenic=true;walk.x=SKY.ax;walk.z=SKY.az;walk.yaw=-Math.PI/4;walk.pitch=.20;camera.position.set(walk.x,1.7,walk.z);camera.rotation.set(walk.pitch,walk.yaw,0);
+        document.getElementById('galleryGuide').style.display='none';document.body.classList.remove('in-gallery');document.body.classList.add('on-sky');document.getElementById('skyGuide').hidden=false;document.querySelector('#skyGuide small').textContent='Cloud bridge to the elevated Darshan Mandir';
+        document.getElementById('walkHint').style.display='none';
+      }
+      function createSkyMandir(){
+        const g=new THREE.Group();g.position.set(SKY.ax,0,SKY.az);g.rotation.y=-Math.PI/4;scene.add(g);SKY.group=g;window.__vc.sky=SKY;
+        const mat=(c,m=0,r=.6)=>new THREE.MeshStandardMaterial({color:c,metalness:m,roughness:r});
+        const marble=mat(0xf3e2c8,.06,.55),gold=mat(0xdcc08b,.35,.35),dark=mat(0x443054,.1,.6),glow=new THREE.MeshBasicMaterial({color:0xffdc9a});
+        const box=(w,h,d,x,y,z,m)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);g.add(o);o.receiveShadow=true;return o;};
+        const length=Math.hypot(SKY.dx,SKY.dz);
+        const stoneCanvas=document.createElement('canvas');stoneCanvas.width=stoneCanvas.height=256;const st=stoneCanvas.getContext('2d');st.fillStyle='#ede2d0';st.fillRect(0,0,256,256);st.strokeStyle='rgba(151,135,123,.18)';st.lineWidth=2;for(let n=0;n<10;n++){st.beginPath();st.moveTo(n*37-50,0);st.bezierCurveTo(n*22,80,n*40-70,140,n*30+15,256);st.stroke();}const stoneTex=new THREE.CanvasTexture(stoneCanvas);stoneTex.colorSpace=THREE.SRGBColorSpace;stoneTex.wrapS=stoneTex.wrapT=THREE.RepeatWrapping;marble.map=stoneTex;marble.color.setHex(0xffffff);marble.emissive.setHex(0x625b50);marble.needsUpdate=true;
+        // Broad, shallow steps with a level cloud bridge halfway up.
+        const count=112;for(let i=0;i<count;i++){const t=(i+.5)/count,y=skyHeight(t);box(5.6,.28,length/count+.025,0,y-.14,-length*t,marble);if(t<.30||t>.68){box(5.5,.05,.09,0,y+.025,-length*t-length/count*.45,gold);box(5.5,.14,.04,0,y-.1,-length*t+length/count*.48,dark);}else{box(.16,.035,length/count+.03,-2.35,y+.025,-length*t,gold);box(.16,.035,length/count+.03,2.35,y+.025,-length*t,gold);}}
+        box(8,.5,6,0,-.3,2,marble);
+        for(const sign of [-1,1]){
+          for(let i=0;i<=28;i++){const t=i/28,y=skyHeight(t),z=-length*t;box(.14,1.2,.14,sign*2.62,y+.6,z,gold);const bead=new THREE.Mesh(new THREE.SphereGeometry(.14,8,6),glow);bead.position.set(sign*2.62,y+1.27,z);g.add(bead);}
+          for(let i=0;i<112;i++){const t0=i/112,t1=(i+1)/112,ya=skyHeight(t0)+1.1,yb=skyHeight(t1)+1.1,za=-length*t0,zb=-length*t1;const bar=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,Math.hypot(yb-ya,zb-za),6),gold);bar.position.set(sign*2.62,(ya+yb)/2,(za+zb)/2);bar.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(0,yb-ya,zb-za).normalize());g.add(bar);}
+        }
+        const end=-length;box(18,1,13,0,17.4,end-4,marble);box(19,.2,14,0,17,end-4,gold);
+        // Open colonnade and stepped sanctuary crown at the destination.
+        for(const x of [-7,-3.5,3.5,7])for(const z of [end-8,end+1]){const col=new THREE.Mesh(new THREE.CylinderGeometry(.3,.44,7,12),marble);col.position.set(x,21.5,z);g.add(col);box(1,.3,1,x,18.2,z,gold);box(1,.35,1,x,24.85,z,gold);}
+        box(17,.55,11,0,25.2,end-3.7,marble);box(17.5,.2,11.5,0,25.6,end-3.7,gold);
+        for(let k=0;k<6;k++){const roof=new THREE.Mesh(new THREE.CylinderGeometry(3.5-k*.48,4-k*.48,1.05,8),marble);roof.position.set(0,26.1+k*.9,end-3.7);roof.rotation.y=Math.PI/8;g.add(roof);const edge=new THREE.Mesh(new THREE.CylinderGeometry(3.55-k*.48,3.7-k*.48,.11,8),gold);edge.position.set(0,25.65+k*.9,end-3.7);edge.rotation.y=Math.PI/8;g.add(edge);}
+        const fin=new THREE.Mesh(new THREE.SphereGeometry(.45,12,8),gold);fin.position.set(0,31.8,end-3.7);g.add(fin);
+        box(6.8,6.1,.5,0,21,end-8,dark);const halo=new THREE.Mesh(new THREE.TorusGeometry(2.4,.09,8,64),glow);halo.position.set(0,21.4,end-7.7);g.add(halo);
+        const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle='#fff0c6';ctx.textAlign='center';ctx.font='bold 72px sans-serif';ctx.fillText('दर्शन मंदिर',512,105);ctx.font='38px sans-serif';ctx.fillText('DARSHAN MANDIR',512,175);const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;const plaque=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:tx,transparent:true}));plaque.position.set(0,24,end+1.4);g.add(plaque);
+        // Soft radial sprites give cloud banks without large transparent mesh layers.
+        const cv=document.createElement('canvas');cv.width=cv.height=128;const q=cv.getContext('2d'),rad=q.createRadialGradient(64,64,4,64,64,63);rad.addColorStop(0,'rgba(255,241,223,.9)');rad.addColorStop(.55,'rgba(248,231,232,.65)');rad.addColorStop(1,'rgba(240,224,255,0)');q.fillStyle=rad;q.fillRect(0,0,128,128);const cloudTex=new THREE.CanvasTexture(cv);
+        for(let i=0;i<42;i++){const t=(i%14)/13,side=i%2?1:-1,cl=new THREE.Sprite(new THREE.SpriteMaterial({map:cloudTex,transparent:true,opacity:.65,depthWrite:false}));cl.position.set(side*(6+(i%4)*2),skyHeight(t)-3.7+(i%3)*.7,-length*t);cl.scale.set(14+(i%4)*3,7+(i%3)*2,1);g.add(cl);}
+        // Layered carved portal, lotus crown and small corner shikharas.
+        for(const x of [-7,7])for(const z of [end-8,end+1]){
+          for(let k=0;k<4;k++){const cap=new THREE.Mesh(new THREE.CylinderGeometry(.7-k*.12,.9-k*.12,.6,8),marble);cap.position.set(x,25.9+k*.47,z);g.add(cap);}
+          const sp=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),gold);sp.position.set(x,27.8,z);g.add(sp);
+        }
+        for(let n=0;n<17;n++){box(.19,.48,.42,-7.6+n*.95,25.9,end+1.65,gold);}
+        for(const x of [-3.1,3.1]){box(.6,6,.8,x,21,end-7.5,marble);for(let n=0;n<9;n++){const jewel=new THREE.Mesh(new THREE.SphereGeometry(.22,8,6),gold);jewel.scale.y=.5;jewel.position.set(x,18.6+n*.6,end-7.0);g.add(jewel);}}
+        for(let k=0;k<3;k++){const arch=new THREE.Mesh(new THREE.TorusGeometry(2.7+k*.22,.10,8,64,Math.PI),k%2?gold:marble);arch.position.set(0,21.2,end-7.05-k*.02);g.add(arch);}
+        box(6.8,.34,1.1,0,24.1,end-7.3,gold);
+        // Floating cloud shelf under the sanctuary and bridge landing.
+        for(let i=0;i<18;i++){const cl=new THREE.Sprite(new THREE.SpriteMaterial({map:cloudTex,transparent:true,opacity:.78,depthWrite:false}));cl.position.set(Math.sin(i*2.4)*10,14.7+(i%3)*.45,end-4+Math.cos(i*2.4)*7);cl.scale.set(13,7,1);g.add(cl);}
+        // Light mist above the bridge edges, never across its walking surface.
+        for(const side of [-1,1])for(let i=0;i<7;i++){const cl=new THREE.Sprite(new THREE.SpriteMaterial({map:cloudTex,transparent:true,opacity:.35,depthWrite:false}));cl.position.set(side*(5+i%2*2),7.2,-length*(.31+i*.055));cl.scale.set(10,4.5,1);g.add(cl);}
+        const sunlight=new THREE.DirectionalLight(0xffe3af,2);sunlight.position.set(35,45,5);scene.add(sunlight);
+        document.getElementById('skyWalk').onclick=()=>{document.querySelector('#skyGuide small').textContent='Drag to look · joystick / WASD to climb';walk.skyScenic=false;walk.yaw=-Math.PI/4;walk.pitch=.18;};document.getElementById('skyDirect').onclick=()=>{leaveSkyApproach();enterGallery();};document.getElementById('skyReturn').onclick=()=>document.getElementById('galBtn').click();
       }
 
       // ---------- Darshan Gallery: a walkable hall with one niche per deity ----------
@@ -2476,7 +2542,7 @@
       function buildGallery() {
         if (GAL.built) return; GAL.built = true;
         window.__vc.statues = window.__vc.statues || {};
-        const g = new THREE.Group(); g.position.set(GAL.ox, 0, 0); scene.add(g);
+        const g = new THREE.Group(); g.position.set(GAL.ox, 18, 0); scene.add(g);GAL.group=g;
         const M = (c, r) => new THREE.MeshStandardMaterial({ color: c, roughness: r === undefined ? 0.9 : r });
         const floorM = M(0xffffff), wallM = M(0xffffff), ceilM = M(0x5a3b22, 0.95);
         const L = 60, W = 22, H = 7;
@@ -2545,6 +2611,8 @@
           const back = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 4.5), M(0x4a1d2a, 0.9)); back.position.set(0, 2.5, 0.02); al.add(back);
           const ped = new THREE.Mesh(new THREE.CylinderGeometry(n.id==='ram'?1.15:0.9, n.id==='ram'?1.25:1.1, 0.8, 16), stoneM); ped.position.set(0, 0.4, 1.35); al.add(ped);
           const lot = new THREE.Mesh(new THREE.CylinderGeometry(n.id==='ram'?1.05:0.75, n.id==='ram'?1.15:0.9, 0.2, 16), gold); lot.position.set(0, 0.9, 1.35); al.add(lot);
+          
+          const petalGeo=new THREE.SphereGeometry(.15,8,5);for(let p=0;p<12;p++){const a=p*Math.PI/6,petal=new THREE.Mesh(petalGeo,gold);petal.scale.set(.8,.30,1.5);petal.position.set(Math.sin(a)*.83,.86,1.35+Math.cos(a)*.83);petal.rotation.y=a;al.add(petal);}
           const dya = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb54a })); dya.position.set(1.0, 0.3, 2.1); al.add(dya);
           const lb = label(n.h, n.e, ['ganesh','shiv','surya','vishnu','lakshmi','hanuman','krishna','parvati','saraswati','kali','ram','durga'].includes(n.id) ? '' : 'मूर्ति शीघ्र · statue pending'); lb.position.set(0, 3.7, 0.7); al.add(lb);
           slots.push({ id: n.id, grp: al, base: new THREE.Vector3(x, 1.0, side * (W / 2) + inward * 1.35) });
@@ -2850,7 +2918,7 @@
         if(!walk.hall||document.getElementById('gallerySelect').value!==r.deity||GAL.scans[r.deity]!=='ready'||t-r.start>24){stopGalleryAarti();return;}
         const e=t-r.start,a=e*1.5,fade=Math.min(1,e*2,(24-e)*2);
         const small=innerWidth<700;r.group.scale.setScalar(small?.72:1);
-        const i=TEMPLES.findIndex(n=>n.id===r.deity),side=i<7?-1:1;r.group.rotation.y=side<0?0:Math.PI;r.group.position.set(GAL.ox-21+(i%7)*7+Math.sin(a)*(small?.28:.52),1.4+Math.cos(a)*.28,side*8.0);
+        const i=TEMPLES.findIndex(n=>n.id===r.deity),side=i<7?-1:1;r.group.rotation.y=side<0?0:Math.PI;r.group.position.set(GAL.ox-21+(i%7)*7+Math.sin(a)*(small?.28:.52),19.4+Math.cos(a)*.28,side*8.0);
         r.group.rotation.z=Math.sin(a)*-.08;r.flame.rotation.y=walk.yaw-r.group.rotation.y;
         r.flame.material.uniforms.time.value=t;r.flame.scale.set(1+Math.sin(t*17)*.07,1+Math.sin(t*23)*.08,1);
         r.glow.intensity=(1.7+Math.sin(t*19)*.2)*fade;
@@ -2878,9 +2946,9 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && walk.hall) { stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Enter darshan gallery'; gb.setAttribute('aria-label', gb.title); return; }
+          if (walk.on && (walk.hall||walk.approach)) { leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title); return; }
           if (!walk.on) wb.click();
-          enterGallery(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
+          startSkyApproach(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
       }
       function visitGalleryNiche(id) {
@@ -2904,7 +2972,7 @@
         const state=GAL.scans[id];document.getElementById('galleryStatus').textContent=!state?'Prototype niche · statue not yet added':state==='ready'?descriptions[id]:state==='error'?'Statue could not load · check connection, then Retry statue':id==='shiv'?'Loading Shiva Nataraja scan…':id==='surya'?'Loading Surya museum scan…':id==='vishnu'?'Loading Vishnu museum scan…':id==='lakshmi'?'Loading Lakshmi sculpture…':id==='hanuman'?'Loading Hanuman scan…':id==='krishna'?'Loading Krishna scan…':id==='durga'?'Loading Durga sculpture…':id==='ram'?'Loading Shri Ram sculpture…':id==='saraswati'?'Loading Saraswati sculpture…':id==='kali'?'Loading Kali - Hindu goddess sculpture…':id==='parvati'?'Loading Parvati scan…':'Loading Ganesha museum scan…';
       }
       function enterGallery() {
-        buildGallery();
+        leaveSkyApproach();buildGallery();
         const sel = document.getElementById('gallerySelect');
         if (!sel.options.length) {
           TEMPLES.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = t.god.hindi + ' · ' + t.god.english; sel.add(o); });
@@ -2913,11 +2981,11 @@
         }
         document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;
         document.getElementById('galleryGuide').style.display = 'block'; document.body.classList.add('in-gallery');
-        document.getElementById('galleryStatus').textContent = 'Prototype hall · 11 statues available · 3 statues pending · choose a niche';
+        document.getElementById('galleryStatus').textContent = 'Sky Mandir · 12 statues available · 2 statues pending · choose a niche';
         sel.selectedIndex = -1;
         walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
         const hint = document.getElementById('walkHint');
-        hint.textContent = 'Prototype shrine bays · central passage connects all 14 · choose a deity or walk through doorways · drag to look, joystick / WASD to walk';
+        hint.textContent = 'Sky Mandir · 14 connected shrine bays · choose a deity or walk through the doorways';
         hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 10000);
       }
 
@@ -2926,6 +2994,7 @@
         const now = performance.now(); const dt = Math.min(0.1, (now - _envLast) / 1000); _envLast = now;
         const t = now / 1000;
         if (walk.on) walkTick(dt);
+        if(walk.approach)renderer.toneMappingExposure=1.5;
         tickGalleryAarti(now / 1000);
         // Loaded statues keep their geometry, but only nearby shrine lights affect rendering.
         if(GAL.shrineLights){for(const s of GAL.shrineLights)s.light.visible=!!walk.hall&&Math.hypot(walk.x-s.x,walk.z-s.z)<11;}
@@ -3258,6 +3327,7 @@
           const x = Math.cos(angle) * radius;
           const z = Math.sin(angle) * radius;
           
+          const pathP=skyProject(x,z);if(pathP.t>-.08&&pathP.t<.2&&Math.abs(pathP.side)<5)continue;
           // Trunk
           const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 2);
           const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3728 });
@@ -3581,7 +3651,7 @@
         document.getElementById('btnGallery').addEventListener('click', () => {
           if (!currentTemple) return;
           document.getElementById('templePanel').classList.remove('visible');
-          if (!walk.hall) document.getElementById('galBtn').click();
+          if (!walk.hall){if(!walk.on)document.getElementById('walkBtn').click();enterGallery();document.getElementById('galBtn').classList.add('active');}
           visitGalleryNiche(currentTemple.id);
         });
         // Temple panel actions
@@ -3755,4 +3825,4 @@
       init();
     </script>
   </body>
-                                                                                     </html>
+  </html>
