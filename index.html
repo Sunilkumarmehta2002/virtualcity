@@ -1011,6 +1011,16 @@
         font-weight: 600;
       }
 
+      #prasadCanvas{display:block;width:100%;height:auto}
+      #prasadCard{width:min(360px,calc(80dvh * 9 / 11));max-width:100%;padding:0;border:0;background:none;flex-shrink:0}
+      @media(max-height:500px){#prasadCard{width:min(300px,100%)}}
+      #prasadCard::before{display:none}
+      #prasadModal{overflow-y:auto;justify-content:safe center;gap:12px;background:rgba(13,7,22,.995);padding:60px 20px 24px}
+      #prasadModal .prasad-close{position:fixed;top:14px;right:14px;width:44px;height:44px;border:1px solid #d6b65c;border-radius:50%;background:#160d24}
+      #prasadModal .share-buttons{flex-wrap:wrap;margin-top:0;flex-shrink:0}
+      #prasadStatus{color:#ffe9a8;font-size:13px;text-align:center;max-width:360px;min-height:20px}
+      #prasadCopyFallback{width:min(100%,360px);min-height:110px;padding:12px;color:#fff;background:#20152c;border:1px solid #d4af37}
+      #prasadModal button:disabled{opacity:.5;cursor:wait}
       /* ========== PRASAD CARD ========== */
       .prasad-modal {
         position: fixed;
@@ -1483,33 +1493,19 @@
     </div>
 
     <!-- ========== PRASAD MODAL ========== -->
-    <div class="prasad-modal" id="prasadModal">
-      <button class="prasad-close" id="closePrasad">×</button>
+    <div class="prasad-modal" id="prasadModal" role="dialog" aria-modal="true" aria-label="Digital Prasad card">
+      <button class="prasad-close" id="closePrasad" aria-label="Close Prasad card">×</button>
       
       <div class="prasad-card" id="prasadCard">
-        <p class="prasad-header">🕉️ DEVNAGARI देवनगरी 🕉️</p>
-        <div class="prasad-deity" id="prasadDeity">🙏</div>
-        <h2 class="prasad-god-name" id="prasadGodName">देवता</h2>
-        <p class="prasad-temple" id="prasadTemple">मंदिर</p>
-        <p class="prasad-message">आपके लिए प्रसाद 🙏</p>
-        <p class="prasad-blessing" id="prasadBlessing">
-          भगवान आपको सदा स्वस्थ और सुखी रखें।
-        </p>
-        <p class="prasad-diyas">🪔🪔🪔🪔🪔</p>
-        <p class="prasad-footer">devnagari.app</p>
+        <canvas id="prasadCanvas" width="900" height="1100" role="img" aria-label="Digital Prasad blessing card"></canvas>
       </div>
-
       <div class="share-buttons">
-        <button class="share-btn" id="shareWhatsApp">
-          💚 WhatsApp
-        </button>
-        <button class="share-btn" id="shareDownload">
-          📥 Save Image
-        </button>
-        <button class="share-btn" id="shareCopy">
-          🔗 Copy Link
-        </button>
+        <button class="share-btn" id="shareWhatsApp">Share blessing</button>
+        <button class="share-btn" id="shareDownload" disabled>Save PNG</button>
+        <button class="share-btn" id="shareCopy">Copy text + link</button>
       </div>
+      <p id="prasadStatus" role="status" aria-live="polite"></p>
+      <textarea id="prasadCopyFallback" readonly aria-label="Blessing text to copy" hidden></textarea>
     </div>
 
     <!-- ========== JAVASCRIPT ========== -->
@@ -3660,32 +3656,47 @@
       }
 
       // ==================== PRASAD ====================
-      function openPrasad(temple) {
-        document.getElementById('prasadDeity').textContent = temple.symbol;
-        document.getElementById('prasadGodName').textContent = temple.god.hindi;
-        document.getElementById('prasadTemple').textContent = temple.nameHindi;
-        document.getElementById('prasadBlessing').textContent = temple.blessing;
-        
-        document.getElementById('prasadModal').classList.add('visible');
+      let prasadTemple=null,prasadReturnFocus=null,prasadRender=0;
+      const prasadSite='https://sunilkumarmehta2002.github.io/virtualcity/';
+      function prasadMessage(){return `${prasadTemple.god.hindi} · ${prasadTemple.nameHindi}\n${prasadTemple.blessing}\nDigital Prasad blessing card · Devnagari\n${prasadSite}`;}
+      function prasadStatus(text){document.getElementById('prasadStatus').textContent=text;}
+      async function openPrasad(temple) {
+        prasadTemple=temple;prasadReturnFocus=document.activeElement;
+        document.getElementById('prasadCanvas').getContext('2d').clearRect(0,0,900,1100);
+        document.getElementById('prasadCanvas').setAttribute('aria-label',`${temple.god.hindi}. ${temple.nameHindi}. ${temple.blessing}. Digital blessing card.`);
+        const ticket=++prasadRender,save=document.getElementById('shareDownload');save.disabled=true;
+        document.getElementById('prasadCopyFallback').hidden=true;prasadStatus('Preparing your digital blessing card…');
+        document.getElementById('prasadModal').classList.add('visible');document.getElementById('closePrasad').focus();
+        try{
+          await Promise.all([document.fonts.load('600 44px "Noto Sans Devanagari"'),document.fonts.load('400 32px "Noto Sans Devanagari"')]);
+          if(ticket!==prasadRender)return;
+          const c=document.getElementById('prasadCanvas'),x=c.getContext('2d');
+          const g=x.createLinearGradient(0,0,0,1100);g.addColorStop(0,'#251333');g.addColorStop(1,'#09050f');x.fillStyle=g;x.fillRect(0,0,900,1100);
+          x.strokeStyle='#d6b65c';x.lineWidth=4;x.strokeRect(28,28,844,1044);x.lineWidth=1;x.strokeRect(45,45,810,1010);
+          x.textAlign='center';x.fillStyle='#e8cc80';
+          const text=(value,y,size=36,color='#fff0cb')=>{x.fillStyle=color;x.font=`600 ${size}px "Noto Sans Devanagari", sans-serif`;const words=value.split(/\s+/);let line='',lines=[];for(const word of words){if(x.measureText(line+' '+word).width>720&&line){lines.push(line);line=word;}else line+=(line?' ':'')+word;}if(line)lines.push(line);for(const v of lines){x.fillText(v,450,y);y+=size*1.65;}return y;};
+          text('देवनगरी · DEVNAGARI',125,32,'#e8cc80');
+          // A simple drawn lamp avoids platform-specific emoji in saved cards.
+          x.strokeStyle='#e8cc80';x.lineWidth=5;x.beginPath();x.ellipse(450,275,70,20,0,0,Math.PI);x.lineTo(380,275);x.stroke();x.beginPath();x.moveTo(450,260);x.bezierCurveTo(405,230,452,208,450,178);x.bezierCurveTo(495,223,473,244,450,260);x.stroke();
+          let y=text(temple.god.hindi,390,52,'#ffe29a');y=text(temple.nameHindi,y+16,30,'#dbc7a4');
+          y=text('आपके लिए प्रसाद',y+48,38);text(temple.blessing,y+34,32,'#e6dbc5');
+          text('Digital blessing card',925,25,'#dbc7a4');text('sunilkumarmehta2002.github.io/virtualcity',990,22,'#d6b65c');
+          save.disabled=false;prasadStatus('A digital blessing to keep or share. No physical Prasad is sent.');
+        }catch(_){prasadStatus('Image could not be prepared. You can still copy the blessing text.');}
       }
-
-      function sharePrasad(platform) {
-        const temple = currentTemple || TEMPLES[0];
-        const message = `🙏 ${temple.god.hindi} जी का प्रसाद 🪔\nमैंने ${temple.nameHindi} में दर्शन किए। आपके लिए भी प्रसाद है!\n${temple.blessing}\n\n🕉️ देवनगरी - devnagari.app`;
-        
-        switch(platform) {
-          case 'whatsapp':
-            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-            break;
-          case 'copy':
-            navigator.clipboard.writeText(message);
-            alert('लिंक कॉपी हो गया! | Link copied!');
-            break;
-          case 'download':
-            // Would generate canvas image in full implementation
-            alert('प्रसाद कार्ड डाउनलोड हो रहा है...');
-            break;
+      async function sharePrasad(platform) {
+        if(!prasadTemple)return;
+        const message=prasadMessage();
+        if(platform==='download'){
+          const button=document.getElementById('shareDownload');if(button.disabled)return;button.disabled=true;
+          document.getElementById('prasadCanvas').toBlob(blob=>{
+            button.disabled=false;if(!blob){prasadStatus('Image could not be saved. Please try again.');return;}
+            const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`devnagari-prasad-${prasadTemple.id}.png`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);prasadStatus('PNG prepared. Check your downloads, or use your browser’s save option.');
+          },'image/png');return;
         }
+        if(platform==='whatsapp'&&navigator.share){try{await navigator.share({title:'Devnagari digital Prasad',text:message});prasadStatus('Share sheet closed.');}catch(e){if(e.name!=='AbortError')prasadStatus('Sharing is unavailable. Use Copy text + link instead.');}return;}
+        try{await navigator.clipboard.writeText(message);prasadStatus('Blessing text and site link copied.');}
+        catch(_){const fallback=document.getElementById('prasadCopyFallback');fallback.value=message;fallback.hidden=false;fallback.focus();fallback.select();prasadStatus('Copy is blocked by this browser. Select and copy the text below.');}
       }
 
       // ==================== GREETING ====================
@@ -3813,8 +3824,16 @@
         // Close prasad
         document.getElementById('closePrasad').addEventListener('click', () => {
           document.getElementById('prasadModal').classList.remove('visible');
+          (walk.hall?document.getElementById('galleryOfferings'):prasadReturnFocus)?.focus();
         });
         
+        document.getElementById('prasadModal').addEventListener('keydown',e=>{
+          if(e.key==='Escape'){e.preventDefault();document.getElementById('closePrasad').click();}
+          if(e.key==='Tab'){
+            const items=[...document.querySelectorAll('#prasadModal button:not(:disabled),#prasadModal textarea:not([hidden])')],first=items[0],last=items[items.length-1];
+            if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+          }
+        });
         // Share buttons
         document.getElementById('shareWhatsApp').addEventListener('click', () => sharePrasad('whatsapp'));
         document.getElementById('shareDownload').addEventListener('click', () => sharePrasad('download'));
@@ -3928,4 +3947,4 @@
       init();
     </script>
   </body>
-                                                                        </html>
+  </html>
