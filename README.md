@@ -6,7 +6,7 @@ Open `index.html` through any static server (for example `python3 -m http.server
 
 ## Current gallery status
 
-Ten statues installed: Ganesha, Shiva Nataraja, Surya, Vishnu on Garuda, Lakshmi, Hanuman, Krishna, Parvati, Saraswati and Kali. Four niches pending: Rama, Durga, Kartikeya and Ganga. All fourteen named temples below exist, but that does not mean all statues are complete. Gallery remains a shared prototype hall, not separate connected temple interiors. Desktop and emulated mobile interaction tests passed; physical-phone FPS is untested.
+Eleven statues installed: Ganesha, Shiva Nataraja, Surya, Vishnu on Garuda, Lakshmi, Hanuman, Krishna, Parvati, Saraswati, Kali and Rama. Three niches pending: Durga, Kartikeya and Ganga. All fourteen named temples below exist, but that does not mean all statues are complete. Gallery remains a shared prototype hall, not separate connected temple interiors. Desktop and emulated mobile interaction tests passed; physical-phone FPS is untested.
 
 ## Named temples
 Ganesh, Ram, Krishna, Shiv, Durga, Lakshmi, Hanuman, Saraswati, Vishnu, Surya, Parvati, Kartikeya, Kali, Ganga.
