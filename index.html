@@ -1263,7 +1263,22 @@
       body.in-gallery #darshanModal .darshan-action-label { font-size:10px; }
       body.in-gallery #darshanModal .darshan-close { position:sticky;top:8px;right:auto;align-self:flex-end;flex-shrink:0;margin:8px 8px -44px 0; }
       @media(max-width:699px) { body.in-gallery #darshanModal { max-height:44dvh; } body.in-gallery #darshanModal .darshan-header { padding-top:8px;padding-bottom:4px; } body.in-gallery #darshanModal .darshan-stage { min-height:30px;max-height:30px; } body.in-gallery #darshanModal .mala-counter { padding:4px; } body.in-gallery #darshanModal .mala-label { font-size:11px; } }
-      @media(max-height:500px) and (orientation:landscape) { body.in-gallery #darshanModal { max-height:calc(100dvh - 88px);width:300px; } }
+      body.in-gallery #darshanModal > * { flex-shrink:0; }
+      body.in-gallery #darshanModal { overscroll-behavior:contain; }
+      body.in-gallery #darshanModal button:focus-visible { outline:3px solid #fff0ad;outline-offset:-4px; }
+      @media(max-height:500px) and (orientation:landscape) {
+        body.in-gallery #darshanModal { max-height:calc(100dvh - 28px);width:300px; }
+        body.in-gallery #darshanModal .darshan-header { padding:10px 44px 4px 10px; }
+        body.in-gallery #darshanModal .darshan-deity-name { font-size:19px; }
+        body.in-gallery #darshanModal .darshan-deity-english { font-size:12px;margin-top:1px; }
+        body.in-gallery #darshanModal .darshan-mantra { font-size:13px;margin-top:3px; }
+        body.in-gallery #darshanModal .darshan-stage { min-height:24px;max-height:24px; }
+        body.in-gallery #darshanModal .mala-counter { padding:4px; }
+        body.in-gallery #darshanModal .mala-count { font-size:21px; }
+        body.in-gallery #darshanModal .mala-label { font-size:11px;margin-top:1px; }
+        body.in-gallery #darshanModal .mala-progress { margin:3px auto; }
+        body.in-gallery #darshanModal .darshan-actions { padding:6px; }
+      }
       .vc-icon { width:24px; height:24px; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
       .sky-toggle .vc-icon { width:20px; height:20px; color:#ffe9a8; }
 
