@@ -39,7 +39,7 @@
       .city-legend.faded { opacity: 0; }
       @media (max-width: 600px) { .city-legend small { display: none; } .city-legend { top: 60px; font-size: 12px; padding: 6px 10px; } }
 
-      .bhajan-modal { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center;
+      .bhajan-modal { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center;
         background: rgba(4,1,10,0.82); backdrop-filter: blur(8px); }
       .bhajan-modal.visible { display: flex; }
       .bhajan-card { width: min(94vw, 460px); max-height: 88vh; overflow-y: auto; background: #0d0420; border: 2px solid var(--divine-gold);
@@ -1940,6 +1940,7 @@
 
       // ==================== 3D CITY ====================
       function initCity() {
+        if (scene) return; // Every entry route shares one city, controls and animation loop.
         const container = document.getElementById('city-canvas');
         
         // Scene
@@ -3805,6 +3806,15 @@
           item.addEventListener('click', () => {
             const page = item.dataset.page;
             
+            // Audio is an overlay: preserve Calendar beneath it, including cold entry.
+            if(page==='bhajan'){
+              document.getElementById('app-container').classList.add('visible');
+              openBhajan();return;
+            }
+            if(page==='city'||page==='darshan'){
+              document.getElementById('app-container').classList.add('visible');
+              initCity();updatePanchangDisplay();updateGreeting();
+            }
             // Hide all pages
             document.getElementById('panchangPage').classList.remove('visible');
             document.getElementById('darshanModal').classList.remove('visible');
@@ -3814,8 +3824,6 @@
             } else if (page === 'panchang') {
               document.getElementById('panchangPage').classList.add('visible');
               updatePanchangDisplay();
-            } else if (page === 'bhajan') {
-              openBhajan();
             } else if (page === 'darshan') {
               // Open today's recommended temple
               const today = VARAS.findIndex(v=>v.english===indiaCivilDate().weekday);
@@ -3885,11 +3893,13 @@
         if(bh.ambience)bh.ambience.pause();bh.ambienceOn=false;document.getElementById('ambienceBtn').textContent='Off';
         if(bh.music)bh.music.pause();bh.current=null;syncTrackButtons();audioStatus('Recordings and bells stopped');
       }
-      let bhajanReturnFocus=null,bhajanInert=[];
+      let bhajanReturnFocus=null,bhajanInert=[],bhajanCalendar=false;
       function bhajanFocusItems(){return [...document.querySelectorAll('#bhajanModal button:not(:disabled),#bhajanModal input:not(:disabled),#bhajanModal a[href]')].filter(el=>el.getClientRects().length);}
       function openBhajan() {
         const modal=document.getElementById('bhajanModal');if(modal.classList.contains('visible'))return;
-        bhajanReturnFocus=document.activeElement;modal.classList.add('visible');
+        bhajanReturnFocus=document.activeElement;bhajanCalendar=document.getElementById('panchangPage').classList.contains('visible');
+        if(bhajanCalendar)document.getElementById('panchangPage').classList.remove('visible');
+        modal.classList.add('visible');
         // Keep the background out of keyboard and assistive-technology navigation.
         bhajanInert=[];let child=modal;
         while(child.parentElement&&child.parentElement!==document.documentElement){for(const sibling of child.parentElement.children){if(sibling!==child&&!sibling.inert){sibling.inert=true;bhajanInert.push(sibling);}}child=child.parentElement;}
@@ -3897,6 +3907,7 @@
       }
       function closeBhajan(){
         document.getElementById('bhajanModal').classList.remove('visible');bhajanInert.forEach(el=>el.inert=false);bhajanInert=[];
+        if(bhajanCalendar)document.getElementById('panchangPage').classList.add('visible');bhajanCalendar=false;
         if(bhajanReturnFocus?.isConnected)bhajanReturnFocus.focus();
       }
       function initBhajanEvents() {
@@ -3928,4 +3939,4 @@
       init();
     </script>
   </body>
-  </html>
+                     </html>
