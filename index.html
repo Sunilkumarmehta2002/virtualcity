@@ -3426,6 +3426,7 @@
           trunk.position.set(x, 1, z);
           trunk.castShadow = true;
           scene.add(trunk);
+          outdoorSolids.push([x,z,.75]); // Trunk radius .3 plus walking clearance.
           
           // Foliage
           const foliageGeo = new THREE.ConeGeometry(1.5, 4, 8);
@@ -3886,4 +3887,4 @@
       init();
     </script>
   </body>
-        </html>
+                                                                   </html>
