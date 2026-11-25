@@ -48,6 +48,7 @@
       .bhajan-card .sub { font-size: 13px; opacity: .8; margin-bottom: 14px; }
       .bhajan-track { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: rgba(255,215,0,0.08);
         border: 1px solid rgba(255,215,0,0.35); color: #FFE9A8; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; font: inherit; }
+      .bhajan-card :is(button,input,a):focus-visible { outline:3px solid #ffe173; outline-offset:3px; }
       .bhajan-track.playing { background: rgba(255,107,0,0.25); border-color: var(--saffron); }
       .bhajan-track small { display: block; opacity: .7; font-size: 11px; }
       .bhajan-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 14px; }
@@ -1347,10 +1348,10 @@
       </div>
 
 
-    <div class="bhajan-modal" id="bhajanModal">
+    <div class="bhajan-modal" id="bhajanModal" role="dialog" aria-modal="true" aria-labelledby="bhajanTitle" aria-describedby="bhajanIntro">
       <div class="bhajan-card">
-        <h2>भजन और ध्वनि</h2>
-        <div class="sub">Bhajan &amp; temple sound. Starts only when you tap play.</div>
+        <h2 id="bhajanTitle">भजन और ध्वनि</h2>
+        <div class="sub" id="bhajanIntro">Bhajan &amp; temple sound. Starts only when you tap play. Close keeps sound playing; Stop ends it.</div>
         <button class="bhajan-track" data-track="omnava" aria-pressed="false"><span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
         <button class="bhajan-track" data-track="sherawali" aria-pressed="false"><span>Kumaon devotional recording<small>Traditional hindu song, 0:51</small></span></button>
         <div class="bhajan-row"><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
@@ -3843,12 +3844,29 @@
         if(bh.ambience)bh.ambience.pause();bh.ambienceOn=false;document.getElementById('ambienceBtn').textContent='Off';
         if(bh.music)bh.music.pause();bh.current=null;syncTrackButtons();audioStatus('Recordings and bells stopped');
       }
-      function openBhajan() { document.getElementById('bhajanModal').classList.add('visible'); }
+      let bhajanReturnFocus=null,bhajanInert=[];
+      function bhajanFocusItems(){return [...document.querySelectorAll('#bhajanModal button:not(:disabled),#bhajanModal input:not(:disabled),#bhajanModal a[href]')].filter(el=>el.getClientRects().length);}
+      function openBhajan() {
+        const modal=document.getElementById('bhajanModal');if(modal.classList.contains('visible'))return;
+        bhajanReturnFocus=document.activeElement;modal.classList.add('visible');
+        // Keep the background out of keyboard and assistive-technology navigation.
+        bhajanInert=[];let child=modal;
+        while(child.parentElement&&child.parentElement!==document.documentElement){for(const sibling of child.parentElement.children){if(sibling!==child&&!sibling.inert){sibling.inert=true;bhajanInert.push(sibling);}}child=child.parentElement;}
+        bhajanFocusItems()[0]?.focus();
+      }
+      function closeBhajan(){
+        document.getElementById('bhajanModal').classList.remove('visible');bhajanInert.forEach(el=>el.inert=false);bhajanInert=[];
+        if(bhajanReturnFocus?.isConnected)bhajanReturnFocus.focus();
+      }
       function initBhajanEvents() {
         document.querySelectorAll('.bhajan-track').forEach(b => b.addEventListener('click', () => playTrack(b.dataset.track)));
         document.getElementById('ambienceBtn').addEventListener('click', toggleAmbience);
         document.getElementById('stopBtn').addEventListener('click', ()=>stopAllAudio());
-        document.getElementById('closeBhajan').addEventListener('click', () => document.getElementById('bhajanModal').classList.remove('visible'));
+        document.getElementById('closeBhajan').addEventListener('click',closeBhajan);
+        document.getElementById('bhajanModal').addEventListener('keydown',e=>{
+          if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeBhajan();}
+          if(e.key==='Tab'){const items=bhajanFocusItems(),first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+        });
         document.getElementById('muteBtn').addEventListener('click', () => { bh.muted = !bh.muted; applyVolume();audioStatus(bh.muted?'Recordings muted':'Recordings unmuted'); });
         document.getElementById('volumeSlider').addEventListener('input', e => { bh.volume = e.target.value / 100; bh.muted = false; applyVolume(); });
       }
