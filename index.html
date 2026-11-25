@@ -2002,9 +2002,18 @@
         renderer.domElement.addEventListener('click', onTempleClick);
         renderer.domElement.addEventListener('touchend', onTempleClick);
         
-        // Animation loop
+        // Stop hidden 3D work while the full-screen calendar or another tab is shown.
+        let cityFrame = null;
+        const appPage = document.getElementById('app-container'), calendarPage = document.getElementById('panchangPage');
+        const cityVisible = () => !document.hidden && appPage.classList.contains('visible') && !calendarPage.classList.contains('visible');
+        function syncCityAnimation() {
+          if (!cityVisible()) { if (cityFrame !== null) cancelAnimationFrame(cityFrame); cityFrame = null; return; }
+          if (cityFrame === null) { _envLast = performance.now(); cityFrame = requestAnimationFrame(animate); }
+        }
         function animate() {
-          requestAnimationFrame(animate);
+          cityFrame = null;
+          if (!cityVisible()) return;
+          cityFrame = requestAnimationFrame(animate);
           controls.update();
           
           // Update only registered decorations, not every loaded mesh and visitor bone.
@@ -2019,7 +2028,11 @@
           updateLabelVisibility();
           renderer.render(scene, camera);
         }
-        animate();
+        const pageObserver = new MutationObserver(syncCityAnimation);
+        pageObserver.observe(appPage, { attributes: true, attributeFilter: ['class'] });
+        pageObserver.observe(calendarPage, { attributes: true, attributeFilter: ['class'] });
+        document.addEventListener('visibilitychange', syncCityAnimation);
+        syncCityAnimation();
       }
 
       function makeLabelSprite(text, sub) {
@@ -3896,4 +3909,4 @@
       init();
     </script>
   </body>
-            </html>
+  </html>
