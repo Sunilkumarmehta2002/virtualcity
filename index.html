@@ -1290,6 +1290,10 @@
     #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide,body.on-sky .city-legend{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
 #settingsDialog{margin:auto;width:min(92vw,440px);max-height:88dvh;overflow:auto;padding:24px;border:1px solid #d6b65c;border-radius:18px;background:#160d24;color:#fff0cd;font:15px 'Noto Sans Devanagari',sans-serif}
 #settingsDialog::backdrop{background:rgba(4,1,10,.88)}#settingsDialog h2{font-size:23px;color:#ffe173;margin-bottom:14px}#settingsDialog p{font-size:13px;line-height:1.65;margin:12px 0}#settingsDialog button{display:block;width:100%;min-height:44px;margin:10px 0;padding:10px;border:1px solid #d6b65c;border-radius:10px;color:#ffe9a8;background:#34203f;font:inherit;cursor:pointer}#settingsDialog button:disabled{opacity:.45;cursor:default}#settingsDialog button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
+      @media(prefers-reduced-motion:reduce){
+        .mandala,.mandala::before,.mandala-inner,.om-symbol,.audio-prompt{animation:none}
+        #om-gate,.temple-panel,.city-legend{transition:none}
+      }
 </style>
   </head>
   <body>
@@ -2532,7 +2536,7 @@
           const p=skyProject(nx,nz),clamped=Math.max(-2.15,Math.min(2.15,p.side)),t=Math.max(0,Math.min(1.13,p.t));
           walk.x=SKY.ax+SKY.dx*t+SKY.px*clamped;walk.z=SKY.az+SKY.dz*t+SKY.pz*clamped;
           if(m>.05)walk.t+=dt*8;
-          camera.position.set(walk.x,skyHeight(t)+1.7+Math.sin(walk.t)*.025*Math.min(1,m),walk.z);camera.rotation.set(walk.pitch,walk.yaw,0);
+          camera.position.set(walk.x,skyHeight(t)+1.7+(decorationMotion.matches?0:Math.sin(walk.t)*.025*Math.min(1,m)),walk.z);camera.rotation.set(walk.pitch,walk.yaw,0);
           if(t>1.105){walk.skyScenic=false;walk.approach=false;document.body.classList.remove('on-sky');document.getElementById('skyGuide').hidden=true;enterGallery();}
           return;
         }
@@ -2571,7 +2575,7 @@
           if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
           else if(sel.value!=='' || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.value='';document.getElementById('galleryOfferings').disabled=true;document.getElementById('galleryOfferings').title='Choose a deity to open offerings'; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;stopGalleryAarti();status.textContent='Choose a deity for Darshan, or walk into a shrine bay · 12 statues available · 2 pending'; }
         }
-        camera.position.set(walk.x, (walk.hall?18:0)+1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
+        camera.position.set(walk.x, (walk.hall?18:0)+1.7 + (decorationMotion.matches?0:Math.sin(walk.t) * 0.04 * Math.min(1, m)), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
       }
 
