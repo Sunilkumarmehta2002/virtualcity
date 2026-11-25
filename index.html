@@ -435,6 +435,7 @@
       #walkKnob { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.75); pointer-events:none; }
       #galleryGuide { display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:32; background:rgba(20,10,40,.92); border:1px solid #9b7c23; border-radius:12px; padding:8px; color:#ffe9a8; max-width:calc(100vw - 32px); box-sizing:border-box; font-size:12px; text-align:center; }
       #galleryGuide select, #galleryGuide button { background:#30203c; color:#fff1c4; border:1px solid #9b7c23; border-radius:6px; padding:7px; max-width:100%; min-height:44px; touch-action:manipulation; }
+      #galleryGuide button:disabled { opacity:.48; cursor:not-allowed; }
       #galleryGuide select:focus-visible, #galleryGuide button:focus-visible { outline:2px solid #ffe173; outline-offset:2px; }
       @media (max-width:1023px) { #galleryGuide { bottom:calc(var(--gallery-nav-height, 84px) + 8px); } }
       #galleryCredit[hidden] { display:none; }
@@ -1303,12 +1304,12 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryOfferings">पूजा · Offerings</button> <button id="galleryAarti" hidden>आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
+      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity" aria-describedby="galleryStatus"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryOfferings" disabled title="Choose a deity to open offerings">पूजा · Offerings</button> <button id="galleryAarti" hidden>आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
       <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
         <div>
-          <div class="greeting" id="greeting">🙏 नमस्ते</div>
+          <div class="greeting" id="greeting">नमस्ते</div>
           <div class="panchang-mini" id="panchangMini">Loading...</div>
         </div>
         <div class="sky-toggle">
@@ -2505,7 +2506,7 @@
           const k=Math.round((walk.x-GAL.ox+21)/7), inBay=Math.abs(walk.z)>3.65 && k>=0 && k<7;
           const sel=document.getElementById('gallerySelect');
           if(inBay) { const id=TEMPLES[k+(walk.z>0?7:0)].id; if(sel.value!==id){sel.value=id;updateGalleryStatus(id);} }
-          else if(sel.selectedIndex!==-1 || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.selectedIndex=-1; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;stopGalleryAarti();status.textContent='Connecting passage · 14 shrine bays · 12 statues available · 2 statues pending'; }
+          else if(sel.value!=='' || document.getElementById('galleryStatus').dataset.zone!=='passage') { sel.value='';document.getElementById('galleryOfferings').disabled=true;document.getElementById('galleryOfferings').title='Choose a deity to open offerings'; const status=document.getElementById('galleryStatus');status.dataset.zone='passage';document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;stopGalleryAarti();status.textContent='Choose a deity for Darshan, or walk into a shrine bay · 12 statues available · 2 pending'; }
         }
         camera.position.set(walk.x, (walk.hall?18:0)+1.7 + Math.sin(walk.t) * 0.04 * Math.min(1, m), walk.z);
         camera.rotation.set(walk.pitch, walk.yaw, 0);
@@ -3041,6 +3042,7 @@
         updateGalleryStatus(id);
       }
       function updateGalleryStatus(id) {
+        const offerings=document.getElementById('galleryOfferings');offerings.disabled=!TEMPLES.some(t=>t.id===id);offerings.title=offerings.disabled?'Choose a deity to open offerings':'Open offerings for the selected deity';
         const position=installedDeities.indexOf(id);document.getElementById('galleryPosition').textContent=position<0?'Statue pending':(position+1)+' / '+installedDeities.length+' statues';
         if(id==='durga'&&GAL.scans.durga==='pending')GAL.loadDurga();if(id==='ram'&&GAL.scans.ram==='pending')GAL.loadRama();if(id==='ganesh'&&GAL.scans.ganesh==='pending')GAL.loadGanesha();
         document.getElementById('galleryRetry').hidden=GAL.scans[id]!=='error';
@@ -3059,6 +3061,7 @@
         document.getElementById('themePanel').hidden=true;leaveSkyApproach();buildGallery();
         const sel = document.getElementById('gallerySelect');
         if (!sel.options.length) {
+          const prompt=document.createElement('option');prompt.value='';prompt.textContent='Choose a deity for Darshan';prompt.disabled=true;sel.add(prompt);
           TEMPLES.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = t.god.hindi + ' · ' + t.god.english; sel.add(o); });
           sel.addEventListener('change', () => visitGalleryNiche(sel.value));
           document.getElementById('galleryExit').addEventListener('click', () => document.getElementById('galBtn').click());
@@ -3066,7 +3069,8 @@
         document.getElementById('galleryRetry').hidden=true;document.getElementById('galleryAarti').hidden=true;document.getElementById('galleryCredit').hidden=true;
         document.getElementById('galleryGuide').style.display = 'block'; document.body.classList.add('in-gallery');
         document.getElementById('galleryStatus').textContent = 'Sky Mandir · 12 statues available · 2 statues pending · choose a niche';
-        sel.selectedIndex = -1;document.getElementById('galleryPosition').textContent='12 statues';
+        sel.value = '';document.getElementById('galleryPosition').textContent='12 statues';
+        document.getElementById('galleryOfferings').disabled=true;document.getElementById('galleryOfferings').title='Choose a deity to open offerings';
         GAL.group.visible=true;SKY.group.visible=false;document.body.classList.remove('portal-crossing');void document.body.offsetWidth;document.body.classList.add('portal-crossing');setTimeout(()=>document.body.classList.remove('portal-crossing'),650);walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
         const hint = document.getElementById('walkHint');
         hint.textContent = 'Sky Mandir · 14 connected shrine bays · choose a deity or walk through the doorways';
@@ -3609,11 +3613,11 @@
         const hour = new Date().getHours();
         let greeting;
         
-        if (hour < 5) greeting = '🌙 शुभ रात्रि';
-        else if (hour < 12) greeting = '🌅 सुप्रभात';
-        else if (hour < 17) greeting = '☀️ नमस्ते';
-        else if (hour < 20) greeting = '🌆 शुभ संध्या';
-        else greeting = '🌙 शुभ रात्रि';
+        if (hour < 5) greeting = 'शुभ रात्रि';
+        else if (hour < 12) greeting = 'सुप्रभात';
+        else if (hour < 17) greeting = 'नमस्ते';
+        else if (hour < 20) greeting = 'शुभ संध्या';
+        else greeting = 'शुभ रात्रि';
         
         document.getElementById('greeting').textContent = greeting;
       }
@@ -3852,4 +3856,4 @@
       init();
     </script>
   </body>
-                                                       </html>
+  </html>
