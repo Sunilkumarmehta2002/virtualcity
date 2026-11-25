@@ -1213,6 +1213,14 @@
         #om-gate .audio-prompt { display:none; }
       }
       @media(max-width:359px) { .sky-toggle { position:fixed; top:60px; left:12px; right:auto; } }
+      @media(max-width:600px){
+        .top-bar { flex-direction:column;align-items:stretch;padding:10px 12px;gap:12px; }
+        .top-bar > div:first-child { padding-right:68px;min-height:48px; }
+        .panchang-mini { text-align:left; }
+        .sky-toggle { position:static;align-self:flex-start;gap:0;padding:3px;max-width:100%; }
+        .sky-btn,.follow-btn,.walk-btn { display:flex;align-items:center;justify-content:center;min-width:40px;min-height:44px;padding:4px;flex-shrink:0; }
+        .city-legend { top:130px; }
+      }
       .gallery-stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.gallery-stepper span{font-size:11px}#galleryControls { display:none; }
       #galleryGuide.compact #galleryDetails { display:none; }
       @media(max-width:1023px) {
@@ -2046,7 +2054,7 @@
         const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
         const items = labels.map(l => ({ l, d: camera.position.distanceTo(l.position) })).sort((a, b) => a.d - b.d);
         const placed = [];
-        const topSafe = w < 600 ? 82 : 78, botSafe = w < 600 ? 105 : 24;
+        const topSafe = w < 600 ? 126 : 78, botSafe = w < 600 ? 105 : 24;
         const sideSafe = w < 600 ? 8 : 125;
         const focal = h / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
         items.forEach(({ l, d }) => {
@@ -3887,4 +3895,4 @@
       init();
     </script>
   </body>
-                                                                   </html>
+  </html>
