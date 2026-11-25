@@ -1033,6 +1033,7 @@
       #prasadStatus{color:#ffe9a8;font-size:13px;text-align:center;max-width:360px;min-height:20px}
       #prasadCopyFallback{width:min(100%,360px);min-height:110px;padding:12px;color:#fff;background:#20152c;border:1px solid #d4af37}
       #prasadModal button:disabled{opacity:.5;cursor:wait}
+      #prasadModal :is(button,textarea):focus-visible{outline:3px solid #ffe173;outline-offset:3px}
       /* ========== PRASAD CARD ========== */
       .prasad-modal {
         position: fixed;
@@ -3588,7 +3589,13 @@
       document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePanchangDisplay();});
 
       // ==================== PRASAD ====================
-      let prasadTemple=null,prasadReturnFocus=null,prasadRender=0;
+      let prasadTemple=null,prasadReturnFocus=null,prasadRender=0,prasadInert=[];
+      function prasadFocusItems(){return [...document.querySelectorAll('#prasadModal button:not(:disabled),#prasadModal textarea:not([hidden])')].filter(el=>el.getClientRects().length);}
+      function closePrasad(){
+        document.getElementById('prasadModal').classList.remove('visible');prasadInert.forEach(el=>el.inert=false);prasadInert=[];
+        const target=walk.hall?document.getElementById('galleryOfferings'):prasadReturnFocus;
+        if(target?.isConnected&&target.getClientRects().length&&!target.disabled)target.focus();
+      }
       const prasadSite='https://sunilkumarmehta2002.github.io/virtualcity/';
       function prasadMessage(){return `${prasadTemple.god.hindi} · ${prasadTemple.nameHindi}\n${prasadTemple.blessing}\nDigital Prasad blessing card · Devnagari\n${prasadSite}`;}
       function prasadStatus(text){document.getElementById('prasadStatus').textContent=text;}
@@ -3598,7 +3605,10 @@
         document.getElementById('prasadCanvas').setAttribute('aria-label',`${temple.god.hindi}. ${temple.nameHindi}. ${temple.blessing}. Digital blessing card.`);
         const ticket=++prasadRender,save=document.getElementById('shareDownload');save.disabled=true;
         document.getElementById('prasadCopyFallback').hidden=true;prasadStatus('Preparing your digital blessing card…');
-        document.getElementById('prasadModal').classList.add('visible');document.getElementById('closePrasad').focus();
+        const modal=document.getElementById('prasadModal');modal.classList.add('visible');
+        prasadInert=[];let child=modal;
+        while(child.parentElement&&child.parentElement!==document.documentElement){for(const sibling of child.parentElement.children){if(sibling!==child&&!sibling.inert){sibling.inert=true;prasadInert.push(sibling);}}child=child.parentElement;}
+        document.getElementById('closePrasad').focus();
         try{
           await Promise.all([document.fonts.load('600 44px "Noto Sans Devanagari"'),document.fonts.load('400 32px "Noto Sans Devanagari"')]);
           if(ticket!==prasadRender)return;
@@ -3754,15 +3764,12 @@
         });
         
         // Close prasad
-        document.getElementById('closePrasad').addEventListener('click', () => {
-          document.getElementById('prasadModal').classList.remove('visible');
-          (walk.hall?document.getElementById('galleryOfferings'):prasadReturnFocus)?.focus();
-        });
+        document.getElementById('closePrasad').addEventListener('click', closePrasad);
         
         document.getElementById('prasadModal').addEventListener('keydown',e=>{
           if(e.key==='Escape'){e.preventDefault();document.getElementById('closePrasad').click();}
           if(e.key==='Tab'){
-            const items=[...document.querySelectorAll('#prasadModal button:not(:disabled),#prasadModal textarea:not([hidden])')],first=items[0],last=items[items.length-1];
+            const items=prasadFocusItems(),first=items[0],last=items[items.length-1];
             if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
           }
         });
