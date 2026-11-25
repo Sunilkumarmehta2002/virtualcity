@@ -2455,6 +2455,7 @@
       }
 
 
+      const visitorClearance=1.1; // Shared player/visitor personal-space boundary in metres.
       const walk = { on: false, x: -2.8, z: 28.9, yaw: 0, pitch: 0, jx: 0, jy: 0, keys: {}, saved: null, t: 0 };
       function setupWalk() {
         const b = document.getElementById('walkBtn'), joy = document.getElementById('walkJoy'), knob = document.getElementById('walkKnob'), hint = document.getElementById('walkHint');
@@ -2565,7 +2566,12 @@
         });
         if (!walk.hall) envAnimals.forEach(pp => {
           const ex = nx - pp.position.x, ez = nz - pp.position.z, ed = Math.hypot(ex, ez);
-          if (ed < 0.6 && ed > 0.0001) { nx = pp.position.x + ex / ed * 0.6; nz = pp.position.z + ez / ed * 0.6; }
+          if (ed < visitorClearance) {
+            const previous=Math.hypot(walk.x-pp.position.x,walk.z-pp.position.z);
+            const ux=ed>.0001?ex/ed:previous>.0001?(walk.x-pp.position.x)/previous:Math.sin(walk.yaw);
+            const uz=ed>.0001?ez/ed:previous>.0001?(walk.z-pp.position.z)/previous:Math.cos(walk.yaw);
+            nx=pp.position.x+ux*visitorClearance;nz=pp.position.z+uz*visitorClearance;
+          }
         });
         if (m > 0.05) walk.t += dt * 8;
         walk.x = nx; walk.z = nz;
@@ -3197,7 +3203,7 @@
           const nx = an.position.x + Math.sin(an.rotation.y) * sp, nz = an.position.z + Math.cos(an.rotation.y) * sp;
           let hit = blocked(nx, nz);
           if (!hit) for (let oj = 0; oj < envAnimals.length; oj++) { if (oj !== ai && Math.hypot(nx - envAnimals[oj].position.x, nz - envAnimals[oj].position.z) < 0.7) { hit = true; break; } }
-          if (!hit && walk.on && Math.hypot(nx - walk.x, nz - walk.z) < 1.1) hit = true;
+          if (!hit && walk.on && Math.hypot(nx - walk.x, nz - walk.z) < visitorClearance) hit = true;
           if (hit) { u.target = null; u.wait = 0.4 + Math.random(); return; }
           u.moving=true;an.position.x = nx; an.position.z = nz;
           an.userData.legs.forEach((l, i) => { l.rotation.x = Math.sin(t * 5 * u.sp + (i % 2) * 3.14) * 0.5; });
@@ -3980,4 +3986,4 @@
       init();
     </script>
   </body>
-  </html>
+          </html>
