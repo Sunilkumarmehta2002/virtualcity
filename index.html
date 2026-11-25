@@ -1319,7 +1319,7 @@
         
         <div class="entry-buttons">
           <button class="btn-divine" id="enterCity">
-            🚪 मंदिर नगरी में प्रवेश करें | Enter Sacred City
+            मंदिर नगरी में प्रवेश करें | Enter Sacred City
           </button>
           <button class="btn-divine btn-secondary" id="showPanchang">
             पंचांग · Calendar information
@@ -1328,7 +1328,7 @@
       </div>
 
       <div class="audio-prompt" id="audioPrompt">
-        🙏 दिव्य ध्वनि के लिए टैप करें | Tap for Divine Sound
+        दिव्य ध्वनि के लिए टैप करें | Tap for Divine Sound
       </div>
     </div>
 
@@ -1362,7 +1362,7 @@
       <div class="temple-panel" id="templePanel">
         <button class="close-panel" id="closePanel">×</button>
         <div class="temple-panel-header">
-          <span class="temple-symbol" id="panelSymbol">🕉️</span>
+          <span class="temple-symbol" id="panelSymbol" aria-hidden="true"><svg class="vc-icon" viewBox="0 0 24 24" focusable="false"><path d="M3 9 12 3l9 6H3Zm2 2v8m5-8v8m4-8v8m5-8v8M3 21h18"/></svg></span>
           <div class="temple-names">
             <h2 id="panelNameHindi">मंदिर</h2>
             <h3 id="panelNameEnglish">Temple</h3>
@@ -1370,10 +1370,10 @@
         </div>
         <div class="temple-mantra" id="panelMantra">ॐ</div>
         <div class="temple-actions">
-          <button class="temple-action-btn" id="btnGallery">🏛️ Gallery niche</button>
-          <button class="temple-action-btn" id="btnDarshan">🙏 दर्शन करें</button>
-          <button class="temple-action-btn" id="btnAarti">🪔 आरती करें</button>
-          <button class="temple-action-btn" id="btnPrasad">🎁 प्रसाद लें</button>
+          <button class="temple-action-btn" id="btnGallery">Gallery niche</button>
+          <button class="temple-action-btn" id="btnDarshan">दर्शन करें · Darshan</button>
+          <button class="temple-action-btn" id="btnAarti">आरती करें · Aarti</button>
+          <button class="temple-action-btn" id="btnPrasad">प्रसाद लें · Prasad</button>
         </div>
       </div>
 
@@ -3549,7 +3549,7 @@
       function selectTemple(temple) {
         currentTemple = temple;
         
-        document.getElementById('panelSymbol').textContent = temple.symbol;
+        // The shared temple drawing avoids platform-specific emoji glyphs.
         document.getElementById('panelNameHindi').textContent = temple.nameHindi;
         document.getElementById('panelNameEnglish').textContent = temple.nameEnglish;
         document.getElementById('panelMantra').textContent = temple.mantra;
@@ -3986,4 +3986,4 @@
       init();
     </script>
   </body>
-          </html>
+  </html>
