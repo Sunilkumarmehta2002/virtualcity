@@ -1759,6 +1759,7 @@
       let malaCount = 0;
       let scene, camera, renderer, controls;
       let templeObjects = [];
+      const cityDecorations=[];const decorationMotion=matchMedia('(prefers-reduced-motion: reduce)');
       let skyMode = 'dusk';
 
       // ==================== AUDIO ENGINE ====================
@@ -1877,6 +1878,7 @@
       }
 
       // ==================== STARFIELD ====================
+      let stopStarfield=()=>{};
       function initStarfield() {
         const canvas = document.getElementById('starfield-canvas');
         const ctx = canvas.getContext('2d');
@@ -1888,6 +1890,8 @@
         resize();
         window.addEventListener('resize', resize);
         
+        let stopped=false,frame=null;const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+        stopStarfield=()=>{stopped=true;if(frame!==null)cancelAnimationFrame(frame);window.removeEventListener('resize',resize);};
         const stars = [];
         for (let i = 0; i < 200; i++) {
           stars.push({
@@ -1900,6 +1904,7 @@
         }
         
         function animate() {
+          if(stopped||document.getElementById('om-gate').classList.contains('hidden')){stopStarfield();return;}
           ctx.fillStyle = 'rgba(4, 1, 10, 0.1)';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
@@ -1919,7 +1924,7 @@
             }
           });
           
-          requestAnimationFrame(animate);
+          if(!reduced.matches)frame=requestAnimationFrame(animate);
         }
         animate();
       }
@@ -1994,18 +1999,12 @@
           requestAnimationFrame(animate);
           controls.update();
           
-          // Rotate chakras
-          scene.traverse(obj => {
-            if (obj.userData.isChakra) {
-              obj.rotation.y += 0.02;
-            }
-            if (obj.userData.isTodayRing) {
-              obj.material.opacity = 0.4 + Math.sin(Date.now() * 0.003) * 0.25;
-            }
-            if (obj.userData.isFlag) {
-              obj.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
-            }
-          });
+          // Update only registered decorations, not every loaded mesh and visitor bone.
+          if(!decorationMotion.matches){const t=performance.now();for(const obj of cityDecorations){
+            if(obj.userData.isChakra)obj.rotation.y+=.02;
+            if(obj.userData.isTodayRing)obj.material.opacity=.4+Math.sin(t*.003)*.25;
+            if(obj.userData.isFlag)obj.rotation.z=Math.sin(t*.002)*.1;
+          }}
           
           envTick();
           camera.updateMatrixWorld(true);
@@ -2082,7 +2081,7 @@
             );
             ring.rotation.x = -Math.PI / 2;
             ring.position.set(t.position[0], 0.05, t.position[2]);
-            ring.userData.isTodayRing = true;
+            ring.userData.isTodayRing = true;cityDecorations.push(ring);
             scene.add(ring);
           }
         });
@@ -3268,7 +3267,7 @@
           const chakra = new THREE.Mesh(chakraGeo, chakraMat);
           chakra.position.y = 5 + i * 1.5;
           chakra.rotation.x = Math.PI / 4;
-          chakra.userData.isChakra = true;
+          chakra.userData.isChakra = true;cityDecorations.push(chakra);
           scene.add(chakra);
         }
       }
@@ -3378,7 +3377,7 @@
         });
         const flag = new THREE.Mesh(flagGeo, flagMat);
         flag.position.set(0.3 * scale, 1 + 3 * scale + spireHeight + 1.2 * scale, 0);
-        flag.userData.isFlag = true;
+        flag.userData.isFlag = true;cityDecorations.push(flag);
         group.add(flag);
         
         // Entrance pillars
@@ -3647,7 +3646,7 @@
         
         // Enter city
         document.getElementById('enterCity').addEventListener('click', () => {
-          document.getElementById('om-gate').classList.add('hidden');
+          document.getElementById('om-gate').classList.add('hidden');stopStarfield();
           document.getElementById('app-container').classList.add('visible');
           initCity();
           setTimeout(() => document.getElementById('cityLegend').classList.add('faded'), 10000);
@@ -3658,7 +3657,7 @@
         
         // Show panchang from entry
         document.getElementById('showPanchang').addEventListener('click', () => {
-          document.getElementById('om-gate').classList.add('hidden');
+          document.getElementById('om-gate').classList.add('hidden');stopStarfield();
           document.getElementById('panchangPage').classList.add('visible');
           updatePanchangDisplay();
         });
@@ -3887,4 +3886,4 @@
       init();
     </script>
   </body>
-  </html>
+        </html>
