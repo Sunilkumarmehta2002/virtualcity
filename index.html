@@ -1999,9 +1999,21 @@
           renderer.setSize(container.clientWidth, container.clientHeight);
         });
         
-        // Click handler
-        renderer.domElement.addEventListener('click', onTempleClick);
-        renderer.domElement.addEventListener('touchend', onTempleClick);
+        // Only a short, single-pointer tap selects a temple. Orbit/look gestures do not.
+        const cityCanvas=renderer.domElement;let templeTap=null;const templePointers=new Set();
+        cityCanvas.addEventListener('pointerdown',e=>{
+          templePointers.add(e.pointerId);
+          if(templePointers.size!==1||!e.isPrimary||e.button!==0){templeTap=null;return;}
+          templeTap={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+        });
+        cityCanvas.addEventListener('pointermove',e=>{if(templeTap?.id===e.pointerId&&Math.hypot(e.clientX-templeTap.x,e.clientY-templeTap.y)>8)templeTap.moved=true;});
+        cityCanvas.addEventListener('pointerup',e=>{
+          const tap=templeTap;templePointers.delete(e.pointerId);templeTap=null;
+          if(tap?.id===e.pointerId&&!tap.moved&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=8&&!walk.hall&&!walk.approach)onTempleClick(e);
+        });
+        const cancelTempleTap=e=>{templePointers.delete(e.pointerId);templeTap=null;};
+        cityCanvas.addEventListener('pointercancel',cancelTempleTap);cityCanvas.addEventListener('lostpointercapture',cancelTempleTap);
+        window.addEventListener('blur',()=>{templePointers.clear();templeTap=null;});
         
         // Stop hidden 3D work while the full-screen calendar or another tab is shown.
         let cityFrame = null;
@@ -3468,8 +3480,8 @@
         event.preventDefault();
         
         const rect = renderer.domElement.getBoundingClientRect();
-        const x = ((event.clientX || event.changedTouches?.[0]?.clientX) - rect.left) / rect.width * 2 - 1;
-        const y = -((event.clientY || event.changedTouches?.[0]?.clientY) - rect.top) / rect.height * 2 + 1;
+        const x = (event.clientX - rect.left) / rect.width * 2 - 1;
+        const y = -(event.clientY - rect.top) / rect.height * 2 + 1;
         
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
