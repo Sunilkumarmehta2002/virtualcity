@@ -28,6 +28,7 @@
     
     <style>
       /* ========== DIVINE CSS SYSTEM ========== */
+      #city-canvas canvas:focus-visible { outline:3px solid #ffe173; outline-offset:-4px; }
       .city-legend { position: fixed; left: 50%; top: 64px; transform: translateX(-50%); max-width: min(92vw, 520px);
         background: rgba(20,5,30,0.78); color: #FFE9A8; border: 1px solid rgba(255,215,0,0.5); border-radius: 12px;
         padding: 8px 14px; font-size: 13px; text-align: center; z-index: 40; pointer-events: none;
@@ -1991,6 +1992,8 @@
         renderer.toneMappingExposure = 1.35;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.domElement.tabIndex=0;
+        renderer.domElement.setAttribute('aria-label','3D city view. In walking mode use WASD or arrow keys to move, Q and E to turn. Tab to leave the view.');
         container.appendChild(renderer.domElement);
         
         // Controls
@@ -2455,6 +2458,7 @@
       }
 
 
+      function focusCityView(){renderer?.domElement.focus({preventScroll:true});}
       const visitorClearance=1.1; // Shared player/visitor personal-space boundary in metres.
       const walk = { on: false, x: -2.8, z: 28.9, yaw: 0, pitch: 0, jx: 0, jy: 0, keys: {}, saved: null, t: 0 };
       function setupWalk() {
@@ -2473,7 +2477,7 @@
             walk.boxes = templeObjects.filter(o => o.userData.temple).map(o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o).expandByScalar(0.8); });
             window.__vc.walkBoxes = walk.boxes;
             camera.rotation.order = 'YXZ';
-            b.title = 'Walking (tap to return to city view)';
+            b.title = 'Walking (tap to return to city view)';focusCityView();
             hint.textContent = 'Drag to look · joystick or WASD to walk · gardens are open'; hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 5000);
           } else {
             leaveSkyApproach();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); document.getElementById('galBtn')?.classList.remove('active'); controls.enabled = true;
@@ -2664,7 +2668,7 @@
         const sanctuaryGlow=new THREE.PointLight(0xffcf83,10,27,1.2);sanctuaryGlow.position.set(0,24,end-3);g.add(sanctuaryGlow);
         const fill=new THREE.DirectionalLight(0xffdea4,1.15);fill.position.set(12,35,end+18);fill.target.position.set(0,18,end-4);g.add(fill,fill.target);SKY.fill=fill;
 
-        document.getElementById('skyWalk').onclick=()=>{document.querySelector('#skyGuide small').textContent='Drag to look · joystick / WASD to climb';walk.skyScenic=false;walk.yaw=-Math.PI/4;walk.pitch=.18;};document.getElementById('skyDirect').onclick=()=>{leaveSkyApproach();enterGallery();};document.getElementById('skyReturn').onclick=()=>document.getElementById('galBtn').click();
+        document.getElementById('skyWalk').onclick=()=>{document.querySelector('#skyGuide small').textContent='Drag to look · joystick / WASD to climb';walk.skyScenic=false;walk.yaw=-Math.PI/4;walk.pitch=.18;focusCityView();};document.getElementById('skyDirect').onclick=()=>{leaveSkyApproach();enterGallery();};document.getElementById('skyReturn').onclick=()=>document.getElementById('galBtn').click();
       }
 
       // ---------- Darshan Gallery: a walkable hall with one niche per deity ----------
@@ -3096,7 +3100,7 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && (walk.hall||walk.approach)) { document.getElementById('darshanModal').classList.remove('visible');leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title); return; }
+          if (walk.on && (walk.hall||walk.approach)) { document.getElementById('darshanModal').classList.remove('visible');leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title);focusCityView(); return; }
           if (!walk.on) wb.click();
           startSkyApproach(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
@@ -3144,7 +3148,7 @@
         document.getElementById('galleryStatus').textContent = 'Sky Mandir · 12 statues available · 2 statues pending · choose a niche';
         sel.value = '';document.getElementById('galleryPosition').textContent='12 statues';
         document.getElementById('galleryOfferings').disabled=true;document.getElementById('galleryOfferings').title='Choose a deity to open offerings';
-        GAL.group.visible=true;SKY.group.visible=false;document.body.classList.remove('portal-crossing');void document.body.offsetWidth;document.body.classList.add('portal-crossing');setTimeout(()=>document.body.classList.remove('portal-crossing'),650);walk.hall = true; walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
+        GAL.group.visible=true;SKY.group.visible=false;document.body.classList.remove('portal-crossing');void document.body.offsetWidth;document.body.classList.add('portal-crossing');setTimeout(()=>document.body.classList.remove('portal-crossing'),650);walk.hall = true;focusCityView(); walk.x = GAL.ox - 27; walk.z = 0; walk.yaw = -Math.PI / 2; walk.pitch = 0;
         const hint = document.getElementById('walkHint');
         hint.textContent = 'Sky Mandir · 14 connected shrine bays · choose a deity or walk through the doorways';
         hint.style.display = 'block'; setTimeout(() => { hint.style.display = 'none'; }, 10000);
@@ -3986,4 +3990,4 @@
       init();
     </script>
   </body>
-  </html>
+</html>
