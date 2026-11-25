@@ -2379,15 +2379,16 @@
         const b = document.getElementById('followBtn');
         if (!b) return;
         b.addEventListener('click', () => {
+          if(walk.on)document.getElementById('walkBtn').click();
           followIdx++;
           if (followIdx >= envAnimals.length) {
-            followIdx = -1; b.classList.remove('active'); b.title = 'Follow a devotee';
+            followIdx = -1; b.classList.remove('active'); b.title = 'Follow a devotee';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed','false');
             const d = new THREE.Vector3(0, 0, 0).sub(controls.target); controls.target.set(0, 0, 0); camera.position.add(d);
             return;
           }
           b.classList.add('active');
           const k = envAnimals[followIdx].userData.kind;
-          b.title = 'Following a ' + k + ' (tap for next)';
+          b.title = 'Following a ' + k + ' (tap for next)';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed','true');
           const p = envAnimals[followIdx].position;
           controls.target.set(p.x, 1, p.z);
           const far = camera.aspect < 1 ? 4 : 6;
@@ -2407,7 +2408,7 @@
           joy.style.display = walk.on ? 'block' : 'none';
           if (walk.on) {
             walk.saved = { p: camera.position.clone(), t: controls.target.clone() };
-            followIdx = -1; const fb = document.getElementById('followBtn'); if (fb) { fb.classList.remove('active'); fb.title = 'Follow a devotee'; }
+            followIdx = -1; const fb = document.getElementById('followBtn'); if (fb) { fb.classList.remove('active'); fb.title = 'Follow a devotee';fb.setAttribute('aria-label',fb.title);fb.setAttribute('aria-pressed','false'); }
             controls.enabled = false;
             walk.hall = false; walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0;
             walk.boxes = templeObjects.filter(o => o.userData.temple).map(o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o).expandByScalar(0.8); });
@@ -3895,4 +3896,4 @@
       init();
     </script>
   </body>
-  </html>
+            </html>
