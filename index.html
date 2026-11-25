@@ -1349,14 +1349,14 @@
 
     <div class="bhajan-modal" id="bhajanModal">
       <div class="bhajan-card">
-        <h2>🎶 भजन और ध्वनि</h2>
+        <h2>भजन और ध्वनि</h2>
         <div class="sub">Bhajan &amp; temple sound. Starts only when you tap play.</div>
-        <button class="bhajan-track" data-track="omnava">🔱 <span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
-        <button class="bhajan-track" data-track="sherawali">🎵 <span>Kumaon devotional recording<small>Traditional hindu song, 0:51</small></span></button>
-        <div class="bhajan-row"><span>🔔</span><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
-        <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn">🔊</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
-        <div class="bhajan-row"><button class="bhajan-btn" id="stopBtn">⏹ Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div>
-        <div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>
+        <button class="bhajan-track" data-track="omnava" aria-pressed="false"><span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
+        <button class="bhajan-track" data-track="sherawali" aria-pressed="false"><span>Kumaon devotional recording<small>Traditional hindu song, 0:51</small></span></button>
+        <div class="bhajan-row"><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
+        <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn" aria-pressed="false">Mute</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
+        <div class="bhajan-row"><button class="bhajan-btn" id="stopBtn">Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div>
+        <p id="bhajanStatus" role="status" aria-live="polite">Sound starts only when you choose Play or a recording.</p><div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>
         Temple bell: "Indian Temple Bell" by ganiket, Freesound, <a href="https://freesound.org/people/ganiket/sounds/466652/" target="_blank" rel="noopener">CC0</a>.<br>
         Two Kumaon recordings by Yann, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
         (<a href="https://commons.wikimedia.org/wiki/File:Om_Navashivam,_traditional_hindu_song,_Kumaon,_Uttarakhand,_India.ogg" target="_blank" rel="noopener">source 1</a>,
@@ -3795,40 +3795,53 @@
         sherawali: () => import('./audio/sherawali.js'),
         bell: () => import('./audio/bell.js')
       };
-      const bh = { music: null, ambience: null, current: null, volume: 0.6, muted: false, ambienceOn: false };
+      const bh = { music: null, ambience: null, current: null, volume: 0.6, muted: false, ambienceOn: false, musicRequest:0, ambienceRequest:0, pendingMusic:null, pendingAmbience:false };
+      function audioStatus(text){document.getElementById('bhajanStatus').textContent=text;}
+      function syncTrackButtons(){document.querySelectorAll('.bhajan-track').forEach(b=>{const active=bh.current===b.dataset.track; b.classList.toggle('playing',active);b.setAttribute('aria-pressed',String(active));});}
       function applyVolume() {
         const v = bh.muted ? 0 : bh.volume;
         if (bh.music) bh.music.volume = v;
         if (bh.ambience) bh.ambience.volume = Math.min(1, v * 0.5);
-        document.getElementById('muteBtn').textContent = bh.muted || bh.volume === 0 ? '🔇' : '🔊';
+        const mute=document.getElementById('muteBtn');mute.textContent=bh.muted?'Unmute':'Mute';mute.setAttribute('aria-pressed',String(bh.muted));
       }
       async function playTrack(key) {
-        const btns = document.querySelectorAll('.bhajan-track');
-        if (bh.current === key && bh.music && !bh.music.paused) { bh.music.pause(); bh.current = null; btns.forEach(b => b.classList.remove('playing')); return; }
+        const request=++bh.musicRequest;
+        if(bh.pendingMusic===key || (bh.current===key&&bh.music&&!bh.music.paused)){
+          if(bh.music)bh.music.pause();bh.current=null;bh.pendingMusic=null;syncTrackButtons();audioStatus('Recording stopped');return;
+        }
         if(isSoundOn){isSoundOn=false;syncAmbientTheme();}
-        const mod = await TRACKS[key]();
-        if (bh.music) bh.music.pause();
-        bh.music = new Audio(mod.default);
-        bh.music.loop = true;
-        bh.current = key;
-        applyVolume();
-        try { await bh.music.play(); } catch (e) { bh.current = null; return; }
-        btns.forEach(b => b.classList.toggle('playing', b.dataset.track === key));
+        if(bh.music)bh.music.pause();bh.current=null;bh.pendingMusic=key;syncTrackButtons();audioStatus('Loading recording…');
+        let media;
+        try{
+          const mod=await TRACKS[key]();
+          if(request!==bh.musicRequest)return;
+          media=new Audio(mod.default);media.loop=true;bh.music=media;applyVolume();
+          await media.play();
+          if(request!==bh.musicRequest){media.pause();return;}
+          bh.pendingMusic=null;bh.current=key;syncTrackButtons();audioStatus(bh.muted||bh.volume===0?'Recording playing, muted':'Recording playing');
+        }catch(e){
+          if(media)media.pause();if(request!==bh.musicRequest)return;
+          bh.pendingMusic=null;bh.current=null;syncTrackButtons();audioStatus('Recording could not play. Tap the recording to try again.');
+        }
       }
       async function toggleAmbience() {
-        const btn = document.getElementById('ambienceBtn');
-        if (bh.ambienceOn) { bh.ambience.pause(); bh.ambienceOn = false; btn.textContent = 'Off'; return; }
+        const request=++bh.ambienceRequest,btn=document.getElementById('ambienceBtn');
+        if(bh.ambienceOn||bh.pendingAmbience){if(bh.ambience)bh.ambience.pause();bh.ambienceOn=false;bh.pendingAmbience=false;btn.textContent='Off';audioStatus('Temple bells stopped');return;}
         if(isSoundOn){isSoundOn=false;syncAmbientTheme();}
-        if (!bh.ambience) { bh.ambience = new Audio((await TRACKS.bell()).default); bh.ambience.loop = true; }
-        applyVolume();
-        try { await bh.ambience.play(); bh.ambienceOn = true; btn.textContent = 'On'; } catch (e) { /* needs a tap */ }
+        bh.pendingAmbience=true;btn.textContent='Loading…';audioStatus('Loading temple bells…');
+        let media;
+        try{
+          const mod=await TRACKS.bell();if(request!==bh.ambienceRequest)return;
+          media=new Audio(mod.default);bh.ambience=media;media.loop=true;applyVolume();await media.play();
+          if(request!==bh.ambienceRequest){media.pause();return;}
+          bh.pendingAmbience=false;bh.ambienceOn=true;btn.textContent='On';audioStatus(bh.muted||bh.volume===0?'Temple bells playing, muted':'Temple bells playing');
+        }catch(e){if(media)media.pause();if(request!==bh.ambienceRequest)return;bh.pendingAmbience=false;bh.ambienceOn=false;btn.textContent='Off';audioStatus('Temple bells could not play. Tap Off to try again.');}
       }
       function stopAllAudio(includeTheme=true) {
+        ++bh.musicRequest;++bh.ambienceRequest;bh.pendingMusic=null;bh.pendingAmbience=false;
         if(includeTheme&&isSoundOn){isSoundOn=false;syncAmbientTheme();}
         if(bh.ambience)bh.ambience.pause();bh.ambienceOn=false;document.getElementById('ambienceBtn').textContent='Off';
-        if (bh.music) bh.music.pause();
-        bh.current = null;
-        document.querySelectorAll('.bhajan-track').forEach(b => b.classList.remove('playing'));
+        if(bh.music)bh.music.pause();bh.current=null;syncTrackButtons();audioStatus('Recordings and bells stopped');
       }
       function openBhajan() { document.getElementById('bhajanModal').classList.add('visible'); }
       function initBhajanEvents() {
@@ -3836,7 +3849,7 @@
         document.getElementById('ambienceBtn').addEventListener('click', toggleAmbience);
         document.getElementById('stopBtn').addEventListener('click', ()=>stopAllAudio());
         document.getElementById('closeBhajan').addEventListener('click', () => document.getElementById('bhajanModal').classList.remove('visible'));
-        document.getElementById('muteBtn').addEventListener('click', () => { bh.muted = !bh.muted; applyVolume(); });
+        document.getElementById('muteBtn').addEventListener('click', () => { bh.muted = !bh.muted; applyVolume();audioStatus(bh.muted?'Recordings muted':'Recordings unmuted'); });
         document.getElementById('volumeSlider').addEventListener('input', e => { bh.volume = e.target.value / 100; bh.muted = false; applyVolume(); });
       }
 
