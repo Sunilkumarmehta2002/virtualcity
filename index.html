@@ -1273,6 +1273,8 @@
     #themePanel{position:fixed;right:14px;top:82px;z-index:1002;width:248px;box-sizing:border-box;padding:14px;border:1px solid #c8a768;border-radius:14px;background:#160f28f5;color:#fff0cd;font:13px Lora,serif;box-shadow:0 10px 35px #0006}#themePanel[hidden]{display:none}#themePanel p{font-size:11px;line-height:1.5;margin:8px 0}#themePanel button{min-height:44px;border:1px solid #a98b55;border-radius:8px;background:#382646;color:#fff0cd;padding:8px}#themePanel label{display:flex;align-items:center;gap:8px;margin:10px 0}#themePanel input{width:145px;accent-color:#e7bc68}#themePanel .theme-row{display:flex;justify-content:space-between;gap:10px}
     body.portal-crossing::after{content:'';position:fixed;inset:0;z-index:280;pointer-events:none;background:radial-gradient(ellipse,#fff0bb,#ba91dc88 45%,transparent 80%);animation:portalFade .65s ease-out both;}@keyframes portalFade{0%{opacity:.85}100%{opacity:0}}@media(prefers-reduced-motion:reduce){body.portal-crossing::after{animation:none;display:none}}
     #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide,body.on-sky .city-legend{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
+#settingsDialog{margin:auto;width:min(92vw,440px);max-height:88dvh;overflow:auto;padding:24px;border:1px solid #d6b65c;border-radius:18px;background:#160d24;color:#fff0cd;font:15px 'Noto Sans Devanagari',sans-serif}
+#settingsDialog::backdrop{background:rgba(4,1,10,.88)}#settingsDialog h2{font-size:23px;color:#ffe173;margin-bottom:14px}#settingsDialog p{font-size:13px;line-height:1.65;margin:12px 0}#settingsDialog button{display:block;width:100%;min-height:44px;margin:10px 0;padding:10px;border:1px solid #d6b65c;border-radius:10px;color:#ffe9a8;background:#34203f;font:inherit;cursor:pointer}#settingsDialog button:disabled{opacity:.45;cursor:default}#settingsDialog button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
 </style>
   </head>
   <body>
@@ -1509,6 +1511,16 @@
       </nav>
     </div>
 
+    <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+      <h2 id="settingsTitle">सेटिंग · View settings</h2>
+      <button id="settingsClose" autofocus>बंद करें · Close</button>
+      <p id="settingsStatus" role="status"></p>
+      <button id="settingsAutoSky">Use automatic IST sky</button>
+      <button id="settingsZoom">Reset zoom to 1.0×</button>
+      <p>View controls apply to this visit only. Enter the city to enable them.</p>
+      <p>Drag to look around. In Walk mode, use the joystick or WASD. Use + and − for optical zoom. Darshan and offerings are inside Sky Mandir.</p>
+      <p>Sound is optional. Use Bhajan for recordings and Stop, or the speaker button for the ambient theme. No sound starts from this panel.</p>
+    </dialog>
     <!-- ========== PRASAD MODAL ========== -->
     <div class="prasad-modal" id="prasadModal" role="dialog" aria-modal="true" aria-label="Digital Prasad card">
       <button class="prasad-close" id="closePrasad" aria-label="Close Prasad card">×</button>
@@ -3668,8 +3680,17 @@
         document.getElementById('greeting').textContent = greeting;
       }
 
+      function syncViewSettings(){
+        document.getElementById('settingsAutoSky').disabled=!scene;document.getElementById('settingsZoom').disabled=!scene;
+        document.getElementById('settingsStatus').textContent=!scene?'City not entered yet.':skyManual?'Sky: manual selection.':'Sky: automatic, Indian Standard Time.';
+      }
       // ==================== EVENT LISTENERS ====================
       function initEventListeners() {
+        const settings=document.getElementById('settingsDialog');
+        settings.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const items=[...settings.querySelectorAll('button:not(:disabled)')],first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+        document.getElementById('settingsClose').addEventListener('click',()=>settings.close());
+        document.getElementById('settingsAutoSky').addEventListener('click',()=>{if(!scene)return;skyManual=false;skyMode=istSkyMode();document.querySelectorAll('.sky-btn').forEach(b=>b.classList.toggle('active',b.dataset.sky===skyMode));updateSkyLighting();syncViewSettings();});
+        document.getElementById('settingsZoom').addEventListener('click',()=>{if(!scene)return;document.getElementById('zoomReset').click();document.getElementById('settingsStatus').textContent='Zoom reset to 1.0×.';});
         // Sound toggle
         document.getElementById('themeClose').addEventListener('click',()=>document.getElementById('themePanel').hidden=true);
         document.getElementById('themePower').addEventListener('click',()=>{initAudio();isSoundOn=!isSoundOn;syncAmbientTheme();});
@@ -3805,6 +3826,7 @@
         document.querySelectorAll('.nav-item').forEach(item => {
           item.addEventListener('click', () => {
             const page = item.dataset.page;
+            if(page==='settings'){syncViewSettings();document.getElementById('settingsDialog').showModal();return;}
             
             // Audio is an overlay: preserve Calendar beneath it, including cold entry.
             if(page==='bhajan'){
@@ -3939,4 +3961,4 @@
       init();
     </script>
   </body>
-                     </html>
+  </html>
