@@ -3110,7 +3110,7 @@
         const gb = document.getElementById('galBtn'), wb = document.getElementById('walkBtn');
         if (!gb || !wb) return;
         gb.addEventListener('click', () => {
-          if (walk.on && (walk.hall||walk.approach)) { document.getElementById('darshanModal').classList.remove('visible');leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title);focusCityView(); return; }
+          if (walk.on && (walk.hall||walk.approach)) { document.getElementById('walkHint').style.display='none';document.getElementById('darshanModal').classList.remove('visible');leaveSkyApproach();stopGalleryAarti();walk.hall = false; document.getElementById('galleryGuide').style.display = 'none'; document.body.classList.remove('in-gallery'); walk.x = -2.8; walk.z = 28.9; walk.yaw = -0.097; walk.pitch = 0; gb.classList.remove('active'); gb.title = 'Climb to the Sky Mandir'; gb.setAttribute('aria-label', gb.title);focusCityView(); return; }
           if (!walk.on) wb.click();
           startSkyApproach(); gb.classList.add('active'); gb.title = 'Leave gallery and return outdoors'; gb.setAttribute('aria-label', gb.title);
         });
