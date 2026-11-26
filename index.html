@@ -1349,6 +1349,8 @@ body.in-gallery.shrine-focus #galleryGuide{width:auto!important;left:50%!importa
 body.in-gallery.shrine-focus #galleryGuide>:not(#galleryView):not(#galleryExit){display:none!important}
 body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){display:none!important}
 #galleryView:focus-visible{outline:3px solid #fff0ad;outline-offset:2px}
+
+@media(max-height:500px) and (orientation:landscape){#om-gate .entry-buttons{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px}#om-gate .entry-buttons .btn-divine{margin:0;padding:10px 14px;min-height:44px;font-size:12px}#om-gate .om-container{padding:12px}#om-gate .om-symbol{font-size:70px}#om-gate .title{font-size:24px;margin:6px 0}#om-gate .tagline{font-size:14px}#om-gate .tagline-english{font-size:12px;margin-bottom:14px}}
 </style>
   </head>
   <body>
@@ -1375,6 +1377,9 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         <div class="entry-buttons">
           <button class="btn-divine" id="enterCity">
             मंदिर नगरी में प्रवेश करें | Enter Sacred City
+          </button>
+          <button class="btn-divine btn-secondary" id="enterMandir">
+            सीधे दर्शन · Enter Sky Mandir
           </button>
           <button class="btn-divine btn-secondary" id="showPanchang">
             पंचांग · Calendar information
@@ -3795,6 +3800,17 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
           if (isSoundOn) playConchSound();
         });
         
+        // A direct, silent shrine route for visitors who do not want to walk first.
+        document.getElementById('enterMandir').addEventListener('click',()=>{
+          document.getElementById('enterCity').click();
+          requestAnimationFrame(()=>requestAnimationFrame(()=>{
+          if(!walk.on)document.getElementById('walkBtn').click();
+          enterGallery();document.getElementById('galBtn').classList.add('active');
+          document.getElementById('galBtn').title='Leave gallery and return outdoors';
+          document.getElementById('galBtn').setAttribute('aria-label','Leave gallery and return outdoors');
+          visitGalleryNiche('krishna');document.getElementById('gallerySelect').focus();
+          }));
+        });
         // Show panchang from entry
         document.getElementById('showPanchang').addEventListener('click', () => {
           document.getElementById('om-gate').classList.add('hidden');stopStarfield();
