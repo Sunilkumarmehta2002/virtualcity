@@ -1327,6 +1327,12 @@
         #galleryNavigation .gallery-stepper button { min-width:60px;font-size:11px; }
         #galleryGuide { max-height:calc(100dvh - 42px)!important; }
       }
+
+/* Audio actions stay reachable on short and narrow screens. */
+.bhajan-header{position:sticky;top:-20px;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0d0420;margin:-20px -20px 14px;padding:14px 20px;border-bottom:1px solid #6a581c}
+.bhajan-header h2{margin:0;font-size:20px}.bhajan-quick{display:flex;gap:8px;flex-shrink:0}.bhajan-btn{min-width:44px;min-height:44px}.bhajan-row input[type=range]{min-height:44px;min-width:0}.bhajan-card{overscroll-behavior:contain;scroll-padding-top:86px}
+@media(max-width:1023px){.sky-btn,.follow-btn,.walk-btn{min-width:44px;min-height:44px}}
+@media(max-width:400px){.bhajan-header{flex-wrap:wrap;padding:10px 16px}.bhajan-header h2{font-size:18px}.bhajan-quick{margin-left:auto}}
 </style>
   </head>
   <body>
@@ -1413,13 +1419,13 @@
 
     <div class="bhajan-modal" id="bhajanModal" role="dialog" aria-modal="true" aria-labelledby="bhajanTitle" aria-describedby="bhajanIntro">
       <div class="bhajan-card">
-        <h2 id="bhajanTitle">भजन और ध्वनि</h2>
+        <header class="bhajan-header"><h2 id="bhajanTitle">भजन और ध्वनि</h2><div class="bhajan-quick"><button class="bhajan-btn" id="stopBtn">Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div></header>
         <div class="sub" id="bhajanIntro">Bhajan &amp; temple sound. Starts only when you tap play. Close keeps sound playing; Stop ends it.</div>
         <button class="bhajan-track" data-track="omnava" aria-pressed="false"><span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
         <button class="bhajan-track" data-track="sherawali" aria-pressed="false"><span>Kumaon devotional recording<small>Traditional hindu song, 0:51</small></span></button>
         <div class="bhajan-row"><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn" aria-pressed="false">Mute</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
-        <div class="bhajan-row"><button class="bhajan-btn" id="stopBtn">Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div>
+
         <p id="bhajanStatus" role="status" aria-live="polite">Sound starts only when you choose Play or a recording.</p><div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>
         Temple bell: "Indian Temple Bell" by ganiket, Freesound, <a href="https://freesound.org/people/ganiket/sounds/466652/" target="_blank" rel="noopener">CC0</a>.<br>
         Two Kumaon recordings by Yann, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
