@@ -1333,6 +1333,15 @@
 .bhajan-header h2{margin:0;font-size:20px}.bhajan-quick{display:flex;gap:8px;flex-shrink:0}.bhajan-btn{min-width:44px;min-height:44px}.bhajan-row input[type=range]{min-height:44px;min-width:0}.bhajan-card{overscroll-behavior:contain;scroll-padding-top:86px}
 @media(max-width:1023px){.sky-btn,.follow-btn,.walk-btn{min-width:44px;min-height:44px}}
 @media(max-width:400px){.bhajan-header{flex-wrap:wrap;padding:10px 16px}.bhajan-header h2{font-size:18px}.bhajan-quick{margin-left:auto}}
+
+/* Short-screen blessing view: keep the card and actions visible together. */
+@media(max-width:1023px) and (max-height:500px) and (orientation:landscape){
+#prasadModal.visible{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(220px,1.2fr);max-width:100%;;grid-template-rows:auto auto auto;align-content:center;justify-content:center;align-items:center;column-gap:24px;row-gap:12px;padding:24px 72px 24px 24px}
+#prasadCard{grid-column:1;grid-row:1/4;width:min(300px,calc((100dvh - 48px)*9/11));justify-self:center}
+#prasadModal .share-buttons{grid-column:2;grid-row:1;justify-content:center;gap:10px}
+#prasadStatus{grid-column:2;grid-row:2;margin:0;justify-self:center}
+#prasadCopyFallback{grid-column:2;grid-row:3;min-height:70px;max-height:110px}
+}
 </style>
   </head>
   <body>
