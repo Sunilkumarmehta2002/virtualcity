@@ -1312,6 +1312,21 @@
         body.on-sky #viewZoom { left:18px; right:auto; bottom:138px; flex-direction:row; }
         body.on-sky #skyGuide { left:auto; right:12px; bottom:12px; transform:none; width:calc(100vw - 232px); max-width:360px; padding:8px; max-height:calc(100dvh - 88px); overflow-y:auto; }
       }
+
+      @media(max-width:1023px) {
+        #galleryNavigation { margin-top:8px; }
+        #galleryNavigation select { width:100%;min-height:44px;font-size:14px;margin:0; }
+        #galleryNavigation .gallery-stepper button { min-width:80px;min-height:44px;font-size:13px; }
+        #galleryGuide > button { min-height:44px; }
+        #galleryDetails { max-height:190px;overflow-y:auto;overscroll-behavior:contain; }
+        #galleryDetails > button { min-height:44px;font-size:13px; }
+        #galleryCredit { padding:4px;line-height:1.45; }
+        #galleryGuide small { font-size:11px; }
+      }
+      @media(max-width:1023px) and (max-height:500px) and (orientation:landscape) {
+        #galleryNavigation .gallery-stepper button { min-width:60px;font-size:11px; }
+        #galleryGuide { max-height:calc(100dvh - 42px)!important; }
+      }
 </style>
   </head>
   <body>
@@ -1353,7 +1368,7 @@
     <!-- ========== MAIN APP ========== -->
     <div id="app-container">
       <!-- Top Bar -->
-      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryDetails"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity" aria-describedby="galleryStatus"></select> <button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryOfferings" disabled title="Choose a deity to open offerings">पूजा · Offerings</button> <button id="galleryAarti" hidden>आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
+      <div id="skyGuide" hidden><strong>स्वर्ग पथ · Celestial approach</strong><small>Cloud bridge to the elevated Darshan Mandir</small><button id="skyWalk">सीढ़ियाँ · Walk stairs</button><button id="skyDirect">सीधे दर्शन · Enter now</button><button id="skyReturn">नगर · Return</button></div><div id="galleryGuide"><button id="galleryControls" aria-expanded="true" aria-controls="galleryDetails">Hide controls</button> <button id="galleryExit">बाहर · Exit</button><div id="galleryNavigation"><div class="gallery-stepper"><button id="galleryPrevious" aria-label="Previous installed statue">‹ Previous</button><span id="galleryPosition" aria-live="polite">12 statues</span><button id="galleryNext" aria-label="Next installed statue">Next ›</button></div><select id="gallerySelect" aria-label="Choose gallery deity" aria-describedby="galleryStatus"></select> </div><div id="galleryDetails"><button id="galleryRetry" hidden>फिर कोशिश · Retry statue</button> <button id="galleryOfferings" disabled title="Choose a deity to open offerings">पूजा · Offerings</button> <button id="galleryAarti" hidden>आरती · Aarti</button><small id="galleryStatus" role="status" aria-live="polite"></small><small id="galleryCredit" hidden style="font-size:10px">Lakshmi by <a style="color:#ffe9a8" href="https://sketchfab.com/3d-models/indian-goddes-lakshmi-statue-a3d5c26fced4444b9f32dd7e76706a99" target="_blank" rel="noopener">Baardus</a>, <a style="color:#ffe9a8" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY4.0</a>. Geometry compressed; new materials/scale.</small></div></div>
       <div id="viewZoom" role="group" aria-label="View zoom controls"><button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button><small id="zoomLevel" aria-live="polite">1.0×</small><button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomReset" aria-label="Reset zoom" title="Reset zoom">Reset</button></div>
       <div id="walkJoy"><div id="walkKnob"></div></div><div id="walkHint">Drag to look · joystick or WASD to walk</div>
       <div class="top-bar">
@@ -3095,7 +3110,7 @@
       }
       function setupGalleryBtn() {
         const panel=document.getElementById('galleryGuide'), toggle=document.getElementById('galleryControls');
-        function setCompact(compact){panel.classList.toggle('compact',compact);toggle.setAttribute('aria-expanded',String(!compact));toggle.textContent=compact?'Gallery controls':'Hide controls';}
+        function setCompact(compact){panel.classList.toggle('compact',compact);toggle.setAttribute('aria-expanded',String(!compact));toggle.textContent=compact?'Offerings & details':'Hide details';}
         toggle.addEventListener('click',()=>setCompact(!panel.classList.contains('compact')));
         const narrow=window.matchMedia('(max-width:1023px)');
         setCompact(narrow.matches);narrow.addEventListener('change',e=>setCompact(e.matches));
@@ -4007,4 +4022,4 @@
       init();
     </script>
   </body>
-                                     </html>
+  </html>
