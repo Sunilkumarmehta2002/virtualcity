@@ -1595,7 +1595,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
       </nav>
     </div>
 
-    <aside id="graphicsRecovery" role="alert" hidden><strong>3D view paused</strong><p>Your browser lost the 3D connection. It may recover automatically. If this notice stays, reload the city to try again.</p><button id="graphicsReload">Reload city</button><small>Reload starts a new visit and stops any sound.</small></aside>
+    <aside id="graphicsRecovery" role="alert" hidden><strong id="graphicsRecoveryTitle">3D view paused</strong><p id="graphicsRecoveryText">Your browser lost the 3D connection. It may recover automatically. If this notice stays, reload the city to try again.</p><button id="graphicsReload">Reload city</button><small>Reload starts a new visit and stops any sound.</small></aside>
     <dialog id="settingsDialog" aria-labelledby="settingsTitle">
       <h2 id="settingsTitle">सेटिंग · View settings</h2>
       <button id="settingsClose" autofocus>बंद करें · Close</button>
@@ -2037,7 +2037,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
 
       // ==================== 3D CITY ====================
       function initCity() {
-        if (scene) return; // Every entry route shares one city, controls and animation loop.
+        if (scene) return true; // Every entry route shares one city, controls and animation loop.
         const container = document.getElementById('city-canvas');
         
         // Scene
@@ -2050,7 +2050,16 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         if (container.clientWidth < 600) camera.position.set(46, 40, 46);
         
         // Renderer
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        try{renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });}
+        catch(error){
+          scene=null;camera=null;renderer=null;updatePanchangDisplay();updateGreeting();
+          document.getElementById('panchangPage').classList.remove('visible');
+          document.getElementById('graphicsRecoveryTitle').textContent='3D view could not start';
+          document.getElementById('graphicsRecoveryText').textContent='Your browser could not open the 3D view. You can still use Calendar and Bhajan. Try reloading, or open Devnagari in a browser with WebGL enabled.';
+          document.getElementById('graphicsRecovery').hidden=false;
+          return false;
+        }
+        document.getElementById('graphicsRecovery').hidden=true;
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2151,6 +2160,8 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         document.addEventListener('visibilitychange', syncCityAnimation);
         renderer.domElement.addEventListener('webglcontextlost',e=>{
           e.preventDefault();cityContextLost=true;syncCityAnimation();
+          document.getElementById('graphicsRecoveryTitle').textContent='3D view paused';
+          document.getElementById('graphicsRecoveryText').textContent='Your browser lost the 3D connection. It may recover automatically. If this notice stays, reload the city to try again.';
           walk.keys={};walk.jx=walk.jy=0;
           document.getElementById('graphicsRecovery').hidden=false;
         });
@@ -2158,6 +2169,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
           cityContextLost=false;document.getElementById('graphicsRecovery').hidden=true;syncCityAnimation();
         });
         syncCityAnimation();
+        return true;
       }
 
       function makeLabelSprite(text, sub) {
@@ -3820,7 +3832,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         document.getElementById('enterCity').addEventListener('click', () => {
           document.getElementById('om-gate').classList.add('hidden');stopStarfield();
           document.getElementById('app-container').classList.add('visible');
-          initCity();
+          if(!initCity())return;
           setTimeout(() => document.getElementById('cityLegend').classList.add('faded'), 10000);
           updatePanchangDisplay();
           updateGreeting();
@@ -3830,6 +3842,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         // A direct, silent shrine route for visitors who do not want to walk first.
         document.getElementById('enterMandir').addEventListener('click',()=>{
           document.getElementById('enterCity').click();
+          if(!renderer)return;
           requestAnimationFrame(()=>requestAnimationFrame(()=>{
           if(!walk.on)document.getElementById('walkBtn').click();
           enterGallery();document.getElementById('galBtn').classList.add('active');
@@ -3952,7 +3965,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
             }
             if(page==='city'||page==='darshan'){
               document.getElementById('app-container').classList.add('visible');
-              initCity();updatePanchangDisplay();updateGreeting();
+              if(!initCity())return;updatePanchangDisplay();updateGreeting();
             }
             // Hide all pages
             document.getElementById('panchangPage').classList.remove('visible');
