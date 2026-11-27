@@ -1301,7 +1301,7 @@
       /* ========== UTILITY CLASSES ========== */
       .hidden { display: none !important; }
       .visible { display: flex !important; }
-    #themePanel{position:fixed;right:14px;top:82px;z-index:1002;width:248px;box-sizing:border-box;padding:14px;border:1px solid #c8a768;border-radius:14px;background:#160f28f5;color:#fff0cd;font:13px Lora,serif;box-shadow:0 10px 35px #0006}#themePanel[hidden]{display:none}#themePanel p{font-size:11px;line-height:1.5;margin:8px 0}#themePanel button{min-height:44px;border:1px solid #a98b55;border-radius:8px;background:#382646;color:#fff0cd;padding:8px}#themePanel label{display:flex;align-items:center;gap:8px;margin:10px 0}#themePanel input{width:145px;accent-color:#e7bc68}#themePanel .theme-row{display:flex;justify-content:space-between;gap:10px}
+    #themePanel{position:fixed;right:14px;top:82px;z-index:1002;width:248px;box-sizing:border-box;padding:14px;border:1px solid #c8a768;border-radius:14px;background:#160f28f5;color:#fff0cd;font:13px Lora,serif;box-shadow:0 10px 35px #0006}#themePanel[hidden]{display:none}#themePanel p{font-size:11px;line-height:1.5;margin:8px 0}#themePanel button{min-height:44px;border:1px solid #a98b55;border-radius:8px;background:#382646;color:#fff0cd;padding:8px}#themePanel label{display:flex;align-items:center;gap:8px;margin:10px 0}#themePanel input{width:145px;min-height:44px;margin:0;accent-color:#e7bc68;touch-action:manipulation}#themePanel :focus-visible{outline:3px solid #fff0ad;outline-offset:3px}#themePanel .theme-row{display:flex;justify-content:space-between;gap:10px}
     body.portal-crossing::after{content:'';position:fixed;inset:0;z-index:280;pointer-events:none;background:radial-gradient(ellipse,#fff0bb,#ba91dc88 45%,transparent 80%);animation:portalFade .65s ease-out both;}@keyframes portalFade{0%{opacity:.85}100%{opacity:0}}@media(prefers-reduced-motion:reduce){body.portal-crossing::after{animation:none;display:none}}
     #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide,body.on-sky .city-legend{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
 #settingsDialog{margin:auto;width:min(92vw,440px);max-height:88dvh;overflow:auto;padding:24px;border:1px solid #d6b65c;border-radius:18px;background:#160d24;color:#fff0cd;font:15px 'Noto Sans Devanagari',sans-serif}
@@ -3779,12 +3779,14 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         document.getElementById('settingsAutoSky').addEventListener('click',()=>{if(!scene)return;skyManual=false;skyMode=istSkyMode();document.querySelectorAll('.sky-btn').forEach(b=>b.classList.toggle('active',b.dataset.sky===skyMode));updateSkyLighting();syncViewSettings();});
         document.getElementById('settingsZoom').addEventListener('click',()=>{if(!scene)return;document.getElementById('zoomReset').click();document.getElementById('settingsStatus').textContent='Zoom reset to 1.0×.';});
         // Sound toggle
-        document.getElementById('themeClose').addEventListener('click',()=>document.getElementById('themePanel').hidden=true);
+        const closeThemeControls=()=>{document.getElementById('themePanel').hidden=true;const button=document.getElementById('soundToggle');if(button.getClientRects().length)button.focus({preventScroll:true});};
+        document.getElementById('themeClose').addEventListener('click',closeThemeControls);
+        document.getElementById('themePanel').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeThemeControls();}});
         document.getElementById('themePower').addEventListener('click',()=>{initAudio();isSoundOn=!isSoundOn;syncAmbientTheme();});
         document.getElementById('themeVolume').addEventListener('input',e=>{ambientVolume=Number(e.target.value)/100;if(ambientTheme){ambientTheme.master.gain.setTargetAtTime(isSoundOn?ambientVolume:0,audioContext.currentTime,.1);window.__ambientTheme.volume=ambientVolume;}});
         document.getElementById('soundToggle').addEventListener('click', () => {
           initAudio();
-          isSoundOn = !isSoundOn;document.getElementById('themePanel').hidden=false;
+          isSoundOn = !isSoundOn;document.getElementById('themePanel').hidden=false;document.getElementById('themeVolume').focus({preventScroll:true});
 
           syncAmbientTheme();
         });
@@ -4060,4 +4062,4 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
       init();
     </script>
   </body>
-        </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </html>
