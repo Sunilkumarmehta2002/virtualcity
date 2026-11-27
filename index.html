@@ -43,6 +43,7 @@
       .bhajan-modal { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center;
         background: rgba(4,1,10,0.82); backdrop-filter: blur(8px); }
       .bhajan-modal.visible { display: flex; }
+      body:has(#bhajanModal.visible) :is(#soundToggle,#themePanel){display:none;}
       .bhajan-card { width: min(94vw, 460px); max-height: 88vh; overflow-y: auto; background: #0d0420; border: 2px solid var(--divine-gold);
         border-radius: 18px; padding: 20px; color: #FFE9A8; font-family: 'Noto Sans Devanagari','Lora',sans-serif; }
       .bhajan-card h2 { font-size: 22px; color: var(--divine-gold); margin-bottom: 4px; }
