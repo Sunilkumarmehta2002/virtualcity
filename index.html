@@ -3661,14 +3661,20 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         }
       }
 
+      function closeOfferings(){
+        document.getElementById('darshanModal').classList.remove('visible');
+        const target=walk.hall?document.getElementById('galleryOfferings'):renderer?.domElement;
+        if(target&&!target.disabled&&target.getClientRects().length)target.focus({preventScroll:true});
+      }
       function performAarti() {
         document.getElementById('darshanModal').classList.remove('visible');
         const id=document.getElementById('gallerySelect').value;
-        if(walk.hall&&GAL.scans[id]==='ready')startGalleryAarti();
+        if(walk.hall&&GAL.scans[id]==='ready'){startGalleryAarti();document.getElementById('galleryAarti').focus({preventScroll:true});}
         else if(walk.hall&&['pending','loading'].includes(GAL.scans[id])){
           requestedGalleryAarti=id;
           document.getElementById('galleryStatus').textContent='Loading statue for your Aarti request · changing deity or Exit cancels it';
         }else document.getElementById('galleryStatus').textContent='Aarti is unavailable until this statue can load';
+        if(document.activeElement.closest('#darshanModal'))document.getElementById('galleryOfferings').focus({preventScroll:true});
       }
 
       // ==================== PANCHANG ====================
@@ -3846,8 +3852,9 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         });
         
         // Close darshan
-        document.getElementById('closeDarshan').addEventListener('click', () => {
-          document.getElementById('darshanModal').classList.remove('visible');document.getElementById('galleryOfferings').focus();
+        document.getElementById('closeDarshan').addEventListener('click',closeOfferings);
+        document.getElementById('darshanModal').addEventListener('keydown',e=>{
+          if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeOfferings();}
         });
         
         // Darshan actions
@@ -4050,4 +4057,4 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
       init();
     </script>
   </body>
-  </html>
+        </html>
