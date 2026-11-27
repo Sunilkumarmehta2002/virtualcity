@@ -3943,6 +3943,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
             document.getElementById('darshanModal').classList.remove('visible');
             
             if (page === 'city') {
+              if(walk.on&&(walk.hall||walk.approach))document.getElementById('galBtn').click();
               document.getElementById('app-container').classList.add('visible');
             } else if (page === 'panchang') {
               document.getElementById('panchangPage').classList.add('visible');
