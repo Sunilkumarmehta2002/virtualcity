@@ -2126,8 +2126,8 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         
         // Pause hidden 3D work behind Calendar or Bhajan, and in background tabs.
         let cityFrame = null, cityContextLost = false;
-        const appPage = document.getElementById('app-container'), calendarPage = document.getElementById('panchangPage'), bhajanPage = document.getElementById('bhajanModal');
-        const cityVisible = () => !cityContextLost && !document.hidden && appPage.classList.contains('visible') && !calendarPage.classList.contains('visible') && !bhajanPage.classList.contains('visible');
+        const appPage = document.getElementById('app-container'), calendarPage = document.getElementById('panchangPage'), bhajanPage = document.getElementById('bhajanModal'), prasadPage = document.getElementById('prasadModal'), settingsPage = document.getElementById('settingsDialog');
+        const cityVisible = () => !cityContextLost && !document.hidden && appPage.classList.contains('visible') && !calendarPage.classList.contains('visible') && !bhajanPage.classList.contains('visible') && !prasadPage.classList.contains('visible') && !settingsPage.open;
         function syncCityAnimation() {
           if (!cityVisible()) { if (cityFrame !== null) cancelAnimationFrame(cityFrame); cityFrame = null; return; }
           if (cityFrame === null) { _envLast = performance.now(); cityFrame = requestAnimationFrame(animate); }
@@ -2157,6 +2157,8 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         pageObserver.observe(appPage, { attributes: true, attributeFilter: ['class'] });
         pageObserver.observe(calendarPage, { attributes: true, attributeFilter: ['class'] });
         pageObserver.observe(bhajanPage, { attributes: true, attributeFilter: ['class'] });
+        pageObserver.observe(prasadPage, { attributes: true, attributeFilter: ['class'] });
+        pageObserver.observe(settingsPage, { attributes: true, attributeFilter: ['open'] });
         document.addEventListener('visibilitychange', syncCityAnimation);
         renderer.domElement.addEventListener('webglcontextlost',e=>{
           e.preventDefault();cityContextLost=true;syncCityAnimation();
