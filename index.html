@@ -362,9 +362,12 @@
       /* Three.js Canvas Container */
       #city-canvas {
         flex: 1;
+        min-height: 0;
         width: 100%;
         position: relative;
+        overflow: hidden;
       }
+      #city-canvas canvas { display:block; }
 
       /* ========== TOP BAR ========== */
       .top-bar {
