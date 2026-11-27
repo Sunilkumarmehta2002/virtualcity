@@ -1305,6 +1305,7 @@
     #themePanel{position:fixed;right:14px;top:82px;z-index:1002;width:248px;box-sizing:border-box;padding:14px;border:1px solid #c8a768;border-radius:14px;background:#160f28f5;color:#fff0cd;font:13px Lora,serif;box-shadow:0 10px 35px #0006}#themePanel[hidden]{display:none}#themePanel p{font-size:11px;line-height:1.5;margin:8px 0}#themePanel button{min-height:44px;border:1px solid #a98b55;border-radius:8px;background:#382646;color:#fff0cd;padding:8px}#themePanel label{display:flex;align-items:center;gap:8px;margin:10px 0}#themePanel input{width:145px;min-height:44px;margin:0;accent-color:#e7bc68;touch-action:manipulation}#themePanel :focus-visible{outline:3px solid #fff0ad;outline-offset:3px}#themePanel .theme-row{display:flex;justify-content:space-between;gap:10px}
     body.portal-crossing::after{content:'';position:fixed;inset:0;z-index:280;pointer-events:none;background:radial-gradient(ellipse,#fff0bb,#ba91dc88 45%,transparent 80%);animation:portalFade .65s ease-out both;}@keyframes portalFade{0%{opacity:.85}100%{opacity:0}}@media(prefers-reduced-motion:reduce){body.portal-crossing::after{animation:none;display:none}}
     #skyGuide {position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:34;background:rgba(21,17,39,.94);border:1px solid #f6d68a;border-radius:16px;padding:12px 18px;text-align:center;color:#fff0c9;box-shadow:0 12px 45px #0006;max-width:calc(100vw - 28px);box-sizing:border-box;}#skyGuide[hidden]{display:none}#skyGuide small{display:block;font-size:11px;margin:6px 0;}#skyGuide button{background:#443151;color:#fff2c9;border:1px solid #bb9959;border-radius:8px;padding:10px;min-height:44px;margin:3px;}body.on-sky .bottom-nav{display:none}body.on-sky #dayGuide,body.on-sky .city-legend{display:none}body.on-sky #walkJoy,body.on-sky #viewZoom{bottom:210px;}@media(max-width:600px){#skyGuide{bottom:12px;width:310px;}}
+#graphicsRecovery{position:fixed;top:82px;left:50%;transform:translateX(-50%);z-index:1200;width:min(90vw,380px);box-sizing:border-box;padding:18px;background:#160d24;color:#fff0cd;border:2px solid #d6b65c;border-radius:14px;font:14px 'Noto Sans Devanagari',sans-serif;box-shadow:0 10px 40px #0009}#graphicsRecovery[hidden]{display:none}#graphicsRecovery strong{font-size:20px;color:#ffe173}#graphicsRecovery p{margin:10px 0;line-height:1.6}#graphicsRecovery button{display:block;min-height:44px;width:100%;margin:12px 0;padding:10px;border:1px solid #d6b65c;border-radius:8px;background:#34203f;color:#fff0cd;font:inherit;cursor:pointer}#graphicsRecovery small{display:block;line-height:1.5}#graphicsRecovery button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
 #settingsDialog{margin:auto;width:min(92vw,440px);max-height:88dvh;overflow:auto;padding:24px;border:1px solid #d6b65c;border-radius:18px;background:#160d24;color:#fff0cd;font:15px 'Noto Sans Devanagari',sans-serif}
 #settingsDialog::backdrop{background:rgba(4,1,10,.88)}#settingsDialog h2{font-size:23px;color:#ffe173;margin-bottom:14px}#settingsDialog p{font-size:13px;line-height:1.65;margin:12px 0}#settingsDialog button{display:block;width:100%;min-height:44px;margin:10px 0;padding:10px;border:1px solid #d6b65c;border-radius:10px;color:#ffe9a8;background:#34203f;font:inherit;cursor:pointer}#settingsDialog button:disabled{opacity:.45;cursor:default}#settingsDialog button:focus-visible{outline:3px solid #fff0ad;outline-offset:3px}
       @media(prefers-reduced-motion:reduce){
@@ -1594,6 +1595,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
       </nav>
     </div>
 
+    <aside id="graphicsRecovery" role="alert" hidden><strong>3D view paused</strong><p>Your browser lost the 3D connection. It may recover automatically. If this notice stays, reload the city to try again.</p><button id="graphicsReload">Reload city</button><small>Reload starts a new visit and stops any sound.</small></aside>
     <dialog id="settingsDialog" aria-labelledby="settingsTitle">
       <h2 id="settingsTitle">सेटिंग · View settings</h2>
       <button id="settingsClose" autofocus>बंद करें · Close</button>
@@ -2114,9 +2116,9 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         window.addEventListener('blur',()=>{templePointers.clear();templeTap=null;});
         
         // Pause hidden 3D work behind Calendar or Bhajan, and in background tabs.
-        let cityFrame = null;
+        let cityFrame = null, cityContextLost = false;
         const appPage = document.getElementById('app-container'), calendarPage = document.getElementById('panchangPage'), bhajanPage = document.getElementById('bhajanModal');
-        const cityVisible = () => !document.hidden && appPage.classList.contains('visible') && !calendarPage.classList.contains('visible') && !bhajanPage.classList.contains('visible');
+        const cityVisible = () => !cityContextLost && !document.hidden && appPage.classList.contains('visible') && !calendarPage.classList.contains('visible') && !bhajanPage.classList.contains('visible');
         function syncCityAnimation() {
           if (!cityVisible()) { if (cityFrame !== null) cancelAnimationFrame(cityFrame); cityFrame = null; return; }
           if (cityFrame === null) { _envLast = performance.now(); cityFrame = requestAnimationFrame(animate); }
@@ -2137,13 +2139,24 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
           envTick();
           camera.updateMatrixWorld(true);
           updateLabelVisibility();
-          renderer.render(scene, camera);
+          try{renderer.render(scene, camera);}catch(error){
+            if(!renderer.getContext().isContextLost())throw error;
+            cityContextLost=true;syncCityAnimation();document.getElementById('graphicsRecovery').hidden=false;
+          }
         }
         const pageObserver = new MutationObserver(syncCityAnimation);
         pageObserver.observe(appPage, { attributes: true, attributeFilter: ['class'] });
         pageObserver.observe(calendarPage, { attributes: true, attributeFilter: ['class'] });
         pageObserver.observe(bhajanPage, { attributes: true, attributeFilter: ['class'] });
         document.addEventListener('visibilitychange', syncCityAnimation);
+        renderer.domElement.addEventListener('webglcontextlost',e=>{
+          e.preventDefault();cityContextLost=true;syncCityAnimation();
+          walk.keys={};walk.jx=walk.jy=0;
+          document.getElementById('graphicsRecovery').hidden=false;
+        });
+        renderer.domElement.addEventListener('webglcontextrestored',()=>{
+          cityContextLost=false;document.getElementById('graphicsRecovery').hidden=true;syncCityAnimation();
+        });
         syncCityAnimation();
       }
 
@@ -3775,6 +3788,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
       }
       // ==================== EVENT LISTENERS ====================
       function initEventListeners() {
+        document.getElementById('graphicsReload').addEventListener('click',()=>location.reload());
         const settings=document.getElementById('settingsDialog');
         settings.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const items=[...settings.querySelectorAll('button:not(:disabled)')],first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
         document.getElementById('settingsClose').addEventListener('click',()=>settings.close());
