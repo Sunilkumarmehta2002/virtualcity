@@ -1356,6 +1356,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
 #galleryView:focus-visible{outline:3px solid #fff0ad;outline-offset:2px}
 
 @media(max-height:500px) and (orientation:landscape){#om-gate .entry-buttons{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px}#om-gate .entry-buttons .btn-divine{margin:0;padding:10px 14px;min-height:44px;font-size:12px}#om-gate .om-container{padding:12px}#om-gate .om-symbol{font-size:70px}#om-gate .title{font-size:24px;margin:6px 0}#om-gate .tagline{font-size:14px}#om-gate .tagline-english{font-size:12px;margin-bottom:14px}}
+.pan-controls{max-width:760px;margin:0 auto 20px;display:flex;gap:14px;flex-wrap:wrap;padding:0 20px;color:#ffe4a4;align-items:end}.pan-controls :is(input,select){display:block;padding:12px;font:inherit;max-width:100%;border-radius:8px}.pan-controls button{padding:12px}.pan-controls label{min-width:0} #bhSeek{width:100%;min-height:44px;accent-color:#ffd700}.bh-player{padding:12px;border:1px solid #786328;border-radius:12px;margin:12px 0}.bh-player button{padding:9px 14px}
 </style>
   </head>
   <body>
@@ -1449,7 +1450,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         <div class="sub" id="bhajanIntro">Bhajan &amp; temple sound. Starts only when you tap play. Close keeps sound playing; Stop ends it.</div>
         <button class="bhajan-track" data-track="omnava" aria-pressed="false"><span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
         <button class="bhajan-track" data-track="sherawali" aria-pressed="false"><span>Kumaon devotional recording<small>Traditional hindu song, 0:51</small></span></button>
-        <div class="bhajan-row"><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
+        <div class="bh-player"><strong id="bhNow">Choose a recording</strong><div id="bhClock" aria-live="off">0:00 / 0:00</div><input id="bhSeek" type="range" min="0" max="1000" value="0" disabled aria-label="Recording position"><div><button id="bhPause" class="bhajan-btn" disabled>Pause</button><label><input id="bhLoop" type="checkbox" checked> Repeat</label></div></div><div class="bhajan-row"><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn" aria-pressed="false">Mute</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
 
         <p id="bhajanStatus" role="status" aria-live="polite">Sound starts only when you choose Play or a recording.</p><div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>
@@ -1557,10 +1558,10 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
         <h1 class="panchang-title">पंचांग · Calendar</h1>
         <p class="panchang-date" id="panchangDate"></p>
         
-        <p class="calendar-note">भारत का नागरिक दिनांक · Indian civil date (IST)<br>Not a calculated Panchang or ritual timetable.</p>
+        <p class="calendar-note">Calculated at local sunrise · IST · Calculation preview</p>
       </div>
 
-      <div class="panchang-grid" id="panchangGrid">
+      <div class="pan-controls"><label>Date <input id="panDate" type="date" min="2026-01-01" max="2027-12-31"></label><label>City <select id="panCity"><option value="jodhpur">Jodhpur</option><option value="delhi">New Delhi</option></select></label><button id="panToday" class="bhajan-btn">Today</button></div><div class="panchang-grid" id="panchangGrid">
         <!-- Filled by JS -->
       </div>
 
@@ -1623,7 +1624,8 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
     </div>
 
     <!-- ========== JAVASCRIPT ========== -->
-    <script type="module">
+    <script src="./astronomy221.min.js"></script>
+<script type="module">
       import * as THREE from 'three';
       import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
       import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -3715,17 +3717,29 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         const get=key=>parts.find(p=>p.type===key).value;
         return {key:`${get('year')}-${get('month')}-${get('day')}`,weekday:get('weekday'),label:new Intl.DateTimeFormat('hi-IN',{timeZone:'Asia/Kolkata',weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(now)};
       }
+      const PAN_CITIES={jodhpur:{name:'Jodhpur',lat:26.2389,lon:73.0243},delhi:{name:'New Delhi',lat:28.6139,lon:77.2090}};
+      const PAN_TITHIS=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi'];
+      const PAN_NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishtha','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+      const PAN_YOGA=['Vishkambha','Priti','Ayushman','Saubhagya','Shobhana','Atiganda','Sukarma','Dhriti','Shula','Ganda','Vriddhi','Dhruva','Vyaghata','Harshana','Vajra','Siddhi','Vyatipata','Variyana','Parigha','Shiva','Siddha','Sadhya','Shubha','Shukla','Brahma','Indra','Vaidhriti'];
+      const panNorm=x=>((x%360)+360)%360;
+      function panAngles(d){const sun=Astronomy.SunPosition(d).elon,moon=Astronomy.EclipticGeoMoon(d).lon,years=(d-new Date('2000-01-01T12:00:00Z'))/86400000/365.25,aya=23.857092+years*50.290966/3600;return{tithi:panNorm(moon-sun),nakshatra:panNorm(moon-aya),yoga:panNorm(sun+moon-2*aya),karana:panNorm(moon-sun)};}
+      function panEnd(d,key,width){const v=panAngles(d)[key],gap=(Math.floor(v/width)+1)*width-v;let lo=d.getTime(),hi=lo+48*3600000;for(let i=0;i<35;i++){const m=(lo+hi)/2;if(panNorm(panAngles(new Date(m))[key]-v)<gap)lo=m;else hi=m;}return new Date(hi);}
+      function panKarana(i){return i===0?'Kimstughna':i===57?'Shakuni':i===58?'Chatushpada':i===59?'Naga':['Bava','Balava','Kaulava','Taitila','Garaja','Vanija','Vishti'][(i-1)%7];}
+      function panTithi(i){return(i<15?'Shukla ':'Krishna ')+(i===14?'Purnima':i===29?'Amavasya':PAN_TITHIS[i%15]);}
       let lastCalendarDate='';
-      function updatePanchangDisplay() {
-        const civil=indiaCivilDate();lastCalendarDate=civil.key;
-        document.getElementById('panchangMini').textContent=`${civil.label} · IST`;
-        document.getElementById('panchangDate').textContent=civil.label;
-        document.getElementById('panchangGrid').innerHTML=`
-          <div class="panchang-item"><div class="panchang-item-label">नागरिक वार · Civil weekday</div><div class="panchang-item-value">${civil.weekday}</div><div class="panchang-item-english">Indian Standard Time · UTC+05:30</div></div>
-          <div class="panchang-item"><div class="panchang-item-label">तिथि, नक्षत्र, पक्ष व मास</div><div class="panchang-item-value calendar-pending">अभी सत्यापित नहीं</div><div class="panchang-item-english">Verified astronomical data is not connected.</div></div>`;
-        document.getElementById('festivalList').innerHTML=`
-          <div class="calendar-note calendar-source"><h4>पूजा व व्रत से पहले पुष्टि करें</h4><p>स्थानीय पंचांग या मंदिर से तिथि, व्रत, त्योहार और पूजा का समय जाँचें। यहाँ त्योहारों की तारीखें या उलटी गिनती नहीं दिखाई जा रही हैं।</p><p>Confirm observances with your local Panchang or temple. Devnagari does not currently provide verified festival dates, sunrise times or ritual timings.</p><a href="https://mausam.imd.gov.in/responsive/rashtriyPanchang.php" target="_blank" rel="noopener noreferrer">IMD Rashtriya Panchang reference ↗</a><small>External reference, not a live data connection or a location-specific timetable.</small></div>`;
+      function panTime(d,key){d=new Date(Math.round(d.getTime()/60000)*60000);const day=indiaCivilDate(d).key;return new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true}).format(d)+(day===key?'':` · ${new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short'}).format(d)}`);}
+      function updatePanchangDisplay(){
+        const civil=indiaCivilDate();lastCalendarDate=civil.key;document.getElementById('panchangMini').textContent=`${civil.label} · IST`;
+        const date=document.getElementById('panDate'),city=document.getElementById('panCity');if(!date.value)date.value=civil.key;
+        const key=date.value,loc=PAN_CITIES[city.value];document.getElementById('panchangDate').textContent=`${key} · ${loc.name} · IST`;
+        if(!/^202[67]-\d\d-\d\d$/.test(key)||Number.isNaN(new Date(key+'T00:00:00+05:30').getTime())||indiaCivilDate(new Date(key+'T00:00:00+05:30')).key!==key){document.getElementById('panchangGrid').textContent='Choose a date in 2026 or 2027 for this preview.';return;}
+        const start=new Date(key+'T00:00:00+05:30'),obs=new Astronomy.Observer(loc.lat,loc.lon,0),rise=Astronomy.SearchRiseSet('Sun',obs,1,start,1),set=Astronomy.SearchRiseSet('Sun',obs,-1,start,1);if(!rise||!set){document.getElementById('panchangGrid').textContent='Sunrise or sunset unavailable for this selection.';return;}
+        const a=panAngles(rise.date),rows=[['वार · Weekday',new Intl.DateTimeFormat('en-IN',{weekday:'long',timeZone:'Asia/Kolkata'}).format(rise.date),'At local sunrise'],['तिथि · Tithi',panTithi(Math.floor(a.tithi/12)),'Ends '+panTime(panEnd(rise.date,'tithi',12),key)],['नक्षत्र · Nakshatra',PAN_NAK[Math.floor(a.nakshatra/(40/3))],'Ends '+panTime(panEnd(rise.date,'nakshatra',40/3),key)],['योग · Yoga',PAN_YOGA[Math.floor(a.yoga/(40/3))],'Ends '+panTime(panEnd(rise.date,'yoga',40/3),key)],['करण · Karana',panKarana(Math.floor(a.karana/6)),'Ends '+panTime(panEnd(rise.date,'karana',6),key)],['सूर्योदय / सूर्यास्त',panTime(rise.date,key)+' / '+panTime(set.date,key),'Sun upper edge, standard refraction']];
+        document.getElementById('panchangGrid').innerHTML=rows.map(([l,v,n])=>`<div class="panchang-item"><div class="panchang-item-label">${l}</div><div class="panchang-item-value" style="font-size:22px">${v}</div><div class="panchang-item-english">${n}</div></div>`).join('');
+        document.getElementById('festivalList').innerHTML='<div class="calendar-note calendar-source"><h4>Calculation preview · गणना पूर्वावलोकन</h4><p>Five limbs at the selected city\'s sunrise. Astronomy Engine 2.1.19; approximate mean Lahiri sidereal correction. Times rounded to the minute. Supported preview: 2026 and 2027, Jodhpur and New Delhi. Tested sample dates are close to published references, but conventions can differ by a few minutes. No festival, fasting, lunar-month or muhurat recommendations yet. Confirm ritual timings with your local Panchang or temple.</p><p>City coordinates: Jodhpur 26.2389N, 73.0243E; New Delhi 28.6139N, 77.2090E. No location access needed.</p><a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener">Astronomy Engine (MIT)</a> · <a href="https://mausam.imd.gov.in/responsive/rashtriyPanchang.php" target="_blank" rel="noopener">IMD reference</a></div>';
+        window.__panchangPreview={key,city:city.value,rows};
       }
+      document.getElementById('panDate').addEventListener('change',updatePanchangDisplay);document.getElementById('panCity').addEventListener('change',updatePanchangDisplay);document.getElementById('panToday').onclick=()=>{document.getElementById('panDate').value=indiaCivilDate().key;updatePanchangDisplay();};
       setInterval(()=>{if(indiaCivilDate().key!==lastCalendarDate)updatePanchangDisplay();},60000);
       document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePanchangDisplay();});
 
@@ -4010,7 +4024,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         const mute=document.getElementById('muteBtn');mute.textContent=bh.muted?'Unmute':'Mute';mute.setAttribute('aria-pressed',String(bh.muted));
       }
       async function playTrack(key) {
-        const request=++bh.musicRequest;
+        bh.playerStopped=false;const request=++bh.musicRequest;
         if(bh.pendingMusic===key || (bh.current===key&&bh.music&&!bh.music.paused)){
           if(bh.music)bh.music.pause();bh.current=null;bh.pendingMusic=null;syncTrackButtons();audioStatus('Recording stopped');return;
         }
@@ -4020,7 +4034,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         try{
           const mod=await TRACKS[key]();
           if(request!==bh.musicRequest)return;
-          media=new Audio(mod.default);media.loop=true;bh.music=media;applyVolume();
+          media=new Audio(mod.default);media.loop=document.getElementById('bhLoop').checked;bh.music=media;wireBhPlayer(media,key);applyVolume();
           await media.play();
           if(request!==bh.musicRequest){media.pause();return;}
           bh.pendingMusic=null;bh.current=key;syncTrackButtons();audioStatus(bh.muted||bh.volume===0?'Recording playing, muted':'Recording playing');
@@ -4028,6 +4042,12 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
           if(media)media.pause();if(request!==bh.musicRequest)return;
           bh.pendingMusic=null;bh.current=null;syncTrackButtons();audioStatus('Recording could not play. Tap the recording to try again.');
         }
+      }
+      function bhTime(t){return Number.isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';}
+      function wireBhPlayer(media,key){
+        document.getElementById('bhNow').textContent=document.querySelector(`[data-track="${key}"] span`).childNodes[0].textContent;
+        const refresh=()=>{if(bh.music!==media)return;const valid=Number.isFinite(media.duration)&&media.duration>0;document.getElementById('bhClock').textContent=bhTime(media.currentTime)+' / '+bhTime(media.duration);const seek=document.getElementById('bhSeek');seek.disabled=!valid;seek.value=valid?Math.round(media.currentTime/media.duration*1000):0;const btn=document.getElementById('bhPause');btn.disabled=!!bh.playerStopped;btn.textContent=media.paused?'Resume':'Pause';};
+        for(const event of ['loadedmetadata','timeupdate','pause','playing','ended'])media.addEventListener(event,refresh);refresh();
       }
       async function toggleAmbience() {
         const request=++bh.ambienceRequest,btn=document.getElementById('ambienceBtn');
@@ -4043,10 +4063,10 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         }catch(e){if(media)media.pause();if(request!==bh.ambienceRequest)return;bh.pendingAmbience=false;bh.ambienceOn=false;btn.textContent='Off';audioStatus('Temple bells could not play. Tap Off to try again.');}
       }
       function stopAllAudio(includeTheme=true) {
-        ++bh.musicRequest;++bh.ambienceRequest;bh.pendingMusic=null;bh.pendingAmbience=false;
+        bh.playerStopped=true;++bh.musicRequest;++bh.ambienceRequest;bh.pendingMusic=null;bh.pendingAmbience=false;
         if(includeTheme&&isSoundOn){isSoundOn=false;syncAmbientTheme();}
         if(bh.ambience)bh.ambience.pause();bh.ambienceOn=false;document.getElementById('ambienceBtn').textContent='Off';
-        if(bh.music)bh.music.pause();bh.current=null;syncTrackButtons();audioStatus('Recordings and bells stopped');
+        if(bh.music)bh.music.pause();bh.current=null;if(bh.music){bh.music.currentTime=0;}document.getElementById('bhClock').textContent='0:00 / 0:00';document.getElementById('bhSeek').value=0;document.getElementById('bhPause').disabled=true;document.getElementById('bhNow').textContent='Choose a recording';document.getElementById('bhSeek').disabled=true;syncTrackButtons();audioStatus('Recordings and bells stopped');
       }
       let bhajanReturnFocus=null,bhajanInert=[],bhajanCalendar=false;
       function bhajanFocusItems(){return [...document.querySelectorAll('#bhajanModal button:not(:disabled),#bhajanModal input:not(:disabled),#bhajanModal a[href]')].filter(el=>el.getClientRects().length);}
@@ -4067,6 +4087,9 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
       }
       function initBhajanEvents() {
         document.querySelectorAll('.bhajan-track').forEach(b => b.addEventListener('click', () => playTrack(b.dataset.track)));
+        document.getElementById('bhPause').onclick=async()=>{const m=bh.music;if(!m)return;if(m.paused){try{await m.play();audioStatus('Recording playing');}catch{audioStatus('Could not resume. Tap the recording to retry.');}}else{m.pause();audioStatus('Recording paused');}};
+        document.getElementById('bhLoop').onchange=e=>{if(bh.music)bh.music.loop=e.target.checked;};
+        document.getElementById('bhSeek').oninput=e=>{if(bh.music&&Number.isFinite(bh.music.duration)){bh.music.currentTime=bh.music.duration*Number(e.target.value)/1000;}};
         document.getElementById('ambienceBtn').addEventListener('click', toggleAmbience);
         document.getElementById('stopBtn').addEventListener('click', ()=>stopAllAudio());
         document.getElementById('closeBhajan').addEventListener('click',closeBhajan);
