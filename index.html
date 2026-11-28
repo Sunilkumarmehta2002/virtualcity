@@ -1362,7 +1362,7 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
   <body>
     <!-- Sound Toggle -->
     <button class="sound-toggle" id="soundToggle" title="Enable ambient theme" aria-label="Enable ambient theme" aria-pressed="false"><svg class="vc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 4 6 8H3v8h3l5 4Z"/><path class="sound-muted" d="m16 9 5 6m0-6-5 6"/><path class="sound-playing" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button>
-    <section id="themePanel" hidden aria-label="Ambient theme controls"><strong id="themeStatus">Ambient theme off</strong><p>Original soft tone bed. Optional sound for a quiet visit.</p><label>Volume <input id="themeVolume" type="range" min="0" max="60" value="28" aria-label="Ambient theme volume"></label><div class="theme-row"><button id="themePower">Play theme</button><button id="themeClose" aria-label="Close theme controls">Close</button></div><p>Playing a bhajan pauses this theme.</p></section>
+    <section id="themePanel" hidden aria-label="Devotional theme controls"><strong id="themeStatus">Devotional theme off</strong><p>Mahalakshmi Ashtakam, sung by P. B. Sreenivas. Repeats softly during your visit. Starts only after a tap.</p><label>Volume <input id="themeVolume" type="range" min="0" max="60" value="28" aria-label="Devotional theme volume"></label><div class="theme-row"><button id="themePower">Play theme</button><button id="themeClose" aria-label="Close theme controls">Close</button></div><p>Playing a bhajan pauses this theme.</p></section>
 
     <!-- ========== OM GATE ENTRY ========== -->
     <div id="om-gate">
@@ -1448,12 +1448,14 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
       <div class="bhajan-card">
         <header class="bhajan-header"><h2 id="bhajanTitle">भजन और ध्वनि</h2><div class="bhajan-quick"><button class="bhajan-btn" id="stopBtn">Stop</button><button class="bhajan-btn" id="closeBhajan">Close</button></div></header>
         <div class="sub" id="bhajanIntro">Bhajan &amp; temple sound. Starts only when you tap play. Close keeps sound playing; Stop ends it.</div>
-        <button class="bhajan-track" data-track="omnava" aria-pressed="false"><span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
+        <button class="bhajan-track" data-track="chalisa" aria-pressed="false"><span>Hanuman Chalisa<small>P. B. Sreenivas, 13:25</small></span></button>
+<button class="bhajan-track" data-track="lakshmi" aria-pressed="false"><span>Mahalakshmi Ashtakam<small>P. B. Sreenivas, 4:04</small></span></button>
+<button class="bhajan-track" data-track="omnava" aria-pressed="false"><span>Om Navashivam<small>Devotional song, Kumaon, 1:55</small></span></button>
         <button class="bhajan-track" data-track="sherawali" aria-pressed="false"><span>Kumaon devotional recording<small>Traditional hindu song, 0:51</small></span></button>
         <div class="bh-player"><strong id="bhNow">Choose a recording</strong><div id="bhClock" aria-live="off">0:00 / 0:00</div><input id="bhSeek" type="range" min="0" max="1000" value="0" disabled aria-label="Recording position"><div><button id="bhPause" class="bhajan-btn" disabled>Pause</button><label><input id="bhLoop" type="checkbox" checked> Repeat</label></div></div><div class="bhajan-row"><span style="flex:1">Temple bells ambience</span><button class="bhajan-btn" id="ambienceBtn">Off</button></div>
         <div class="bhajan-row"><button class="bhajan-btn" id="muteBtn" aria-pressed="false">Mute</button><input type="range" id="volumeSlider" min="0" max="100" value="60" aria-label="Volume"></div>
 
-        <p id="bhajanStatus" role="status" aria-live="polite">Sound starts only when you choose Play or a recording.</p><div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>
+        <p id="bhajanStatus" role="status" aria-live="polite">Sound starts only when you choose Play or a recording.</p><div class="bhajan-credits">Textures: Poly Haven (CC0) monastery_stone_floor by Amal Kumar, large_sandstone_blocks by Rob Tuytel.<br>Recordings used under open licences:<br>Hanuman Chalisa (music: M. Ranga Rao) and Mahalakshmi Ashtakam, sung by P. B. Sreenivas. © Saregama Carnatic Classical. From <a href="https://commons.wikimedia.org/wiki/File:Best_of_P.B._Sreenivas_Devotional_Hits_-_Sri_Krishna_Ashtaga_-_Sri_Hanuman_Chalisa_-_Carnatic_Music.webm" target="_blank" rel="noopener">Best of P.B. Sreenivas Devotional Hits</a>, <a href="https://creativecommons.org/licenses/by/3.0/deed.en" target="_blank" rel="noopener">CC BY 3.0</a>. Extracted at 09:40–23:05 and 05:36–09:40; converted to mono 56 kbps MP3. Mahalakshmi also repeats as the optional devotional theme. No endorsement implied.<br>
         Temple bell: "Indian Temple Bell" by ganiket, Freesound, <a href="https://freesound.org/people/ganiket/sounds/466652/" target="_blank" rel="noopener">CC0</a>.<br>
         Two Kumaon recordings by Yann, Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
         (<a href="https://commons.wikimedia.org/wiki/File:Om_Navashivam,_traditional_hindu_song,_Kumaon,_Uttarakhand,_India.ogg" target="_blank" rel="noopener">source 1</a>,
@@ -1848,19 +1850,20 @@ body.in-gallery.shrine-focus :is(#walkJoy,#viewZoom,#walkHint,.bottom-nav){displ
       let audioContext = null;
       let isSoundOn = false;
       let ambientTheme=null,ambientVolume=.28;
-      function syncAmbientTheme(){
-        if(!audioContext)return;
-        if(!ambientTheme){
-          const master=audioContext.createGain();master.gain.value=0;master.connect(audioContext.destination);
-          const voices=[130.81,196,261.63,329.63].map((f,i)=>{const o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=f;g.gain.value=[.10,.055,.035,.022][i];o.connect(g);g.connect(master);o.start();return o;});
-          ambientTheme={master,voices};
-        }
-        if(isSoundOn){audioContext.resume();if(typeof stopAllAudio==='function')stopAllAudio(false);}
-        document.getElementById('themeStatus').textContent=isSoundOn?'Ambient theme on':'Ambient theme off';document.getElementById('themePower').textContent=isSoundOn?'Mute theme':'Play theme';
-        ambientTheme.master.gain.cancelScheduledValues(audioContext.currentTime);ambientTheme.master.gain.setTargetAtTime(isSoundOn?ambientVolume:0,audioContext.currentTime,.18);
-        const b=document.getElementById('soundToggle');b.title=isSoundOn?'Mute ambient theme':'Enable ambient theme';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',String(isSoundOn));
-        if(!isSoundOn)audioContext.suspend();
-        window.__ambientTheme={enabled:isSoundOn,voices:4,state:audioContext.state,volume:ambientVolume};
+      const devotionalAudioCache=new Map();
+      async function devotionalAudio234(name){
+        if(devotionalAudioCache.has(name))return devotionalAudioCache.get(name);
+        const job=(async()=>{const count=name==='hanuman-chalisa'?32:10;const pieces=[];for(let i=0;i<count;i++){const r=await fetch('./audio/audio/'+name+'234-'+i+'.txt');if(!r.ok)throw Error('Audio download failed');pieces.push((await r.text()).replace(/\s/g,''));}const raw=atob(pieces.join('')),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);const expected=name==='hanuman-chalisa'?'7a03a12d4a97f8ac88a05d0e3b94886ce869df432c32e2050f1814dfb3661e87':'509dc74806ebf351f6e163a6f3a971486fcb4a277d3719375dd3f338ef025ad2';const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(x=>x.toString(16).padStart(2,'0')).join('');if(digest!==expected)throw Error('Audio integrity check failed');return URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));})();devotionalAudioCache.set(name,job);try{return await job;}catch(e){devotionalAudioCache.delete(name);throw e;}
+      }
+      let themeRequest=0;
+      async function syncAmbientTheme(){
+        const request=++themeRequest;
+        if(!ambientTheme){ambientTheme=new Audio();ambientTheme.loop=true;ambientTheme.preload='none';}
+        ambientTheme.volume=ambientVolume;
+        const status=document.getElementById('themeStatus'),power=document.getElementById('themePower'),button=document.getElementById('soundToggle');
+        const sync=()=>{status.textContent=isSoundOn?'Devotional theme on':'Devotional theme off';power.textContent=isSoundOn?'Mute theme':'Play theme';button.title=isSoundOn?'Mute devotional theme':'Play devotional theme';button.setAttribute('aria-label',button.title);button.setAttribute('aria-pressed',String(isSoundOn));window.__ambientTheme={enabled:isSoundOn,volume:ambientVolume,paused:ambientTheme.paused,loop:ambientTheme.loop};};
+        if(isSoundOn){stopAllAudio(false);status.textContent='Loading devotional theme…';try{if(!ambientTheme.src)ambientTheme.src=await devotionalAudio234('mahalakshmi');if(request!==themeRequest||!isSoundOn)return;await ambientTheme.play();if(request!==themeRequest){if(!isSoundOn)ambientTheme.pause();return;}}catch{if(request!==themeRequest)return;isSoundOn=false;sync();status.textContent='Could not play. Tap Play theme to retry.';return;}}
+        else ambientTheme.pause();sync();
       }
 
       let currentTemple = null;
@@ -3827,7 +3830,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
         document.getElementById('themeClose').addEventListener('click',closeThemeControls);
         document.getElementById('themePanel').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeThemeControls();}});
         document.getElementById('themePower').addEventListener('click',()=>{initAudio();isSoundOn=!isSoundOn;syncAmbientTheme();});
-        document.getElementById('themeVolume').addEventListener('input',e=>{ambientVolume=Number(e.target.value)/100;if(ambientTheme){ambientTheme.master.gain.setTargetAtTime(isSoundOn?ambientVolume:0,audioContext.currentTime,.1);window.__ambientTheme.volume=ambientVolume;}});
+        document.getElementById('themeVolume').addEventListener('input',e=>{ambientVolume=Number(e.target.value)/100;if(ambientTheme){ambientTheme.volume=ambientVolume;if(window.__ambientTheme)window.__ambientTheme.volume=ambientVolume;}});
         document.getElementById('soundToggle').addEventListener('click', () => {
           initAudio();
           isSoundOn = !isSoundOn;document.getElementById('themePanel').hidden=false;document.getElementById('themeVolume').focus({preventScroll:true});
@@ -4012,7 +4015,9 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
       const TRACKS = {
         omnava: () => import('./audio/omnava.js'),
         sherawali: () => import('./audio/sherawali.js'),
-        bell: () => import('./audio/bell.js')
+        bell: () => import('./audio/bell.js'),
+chalisa: async()=>({default:await devotionalAudio234('hanuman-chalisa')}),
+lakshmi: async()=>({default:await devotionalAudio234('mahalakshmi')})
       };
       const bh = { music: null, ambience: null, current: null, volume: 0.6, muted: false, ambienceOn: false, musicRequest:0, ambienceRequest:0, pendingMusic:null, pendingAmbience:false };
       function audioStatus(text){document.getElementById('bhajanStatus').textContent=text;}
@@ -4087,7 +4092,7 @@ const holder=new THREE.Group(),body=g.scene;holder.add(body);const bb=new THREE.
       }
       function initBhajanEvents() {
         document.querySelectorAll('.bhajan-track').forEach(b => b.addEventListener('click', () => playTrack(b.dataset.track)));
-        document.getElementById('bhPause').onclick=async()=>{const m=bh.music;if(!m)return;if(m.paused){try{await m.play();audioStatus('Recording playing');}catch{audioStatus('Could not resume. Tap the recording to retry.');}}else{m.pause();audioStatus('Recording paused');}};
+        document.getElementById('bhPause').onclick=async()=>{const m=bh.music;if(!m)return;if(m.paused){if(isSoundOn){isSoundOn=false;syncAmbientTheme();}try{await m.play();audioStatus('Recording playing');}catch{audioStatus('Could not resume. Tap the recording to retry.');}}else{m.pause();audioStatus('Recording paused');}};
         document.getElementById('bhLoop').onchange=e=>{if(bh.music)bh.music.loop=e.target.checked;};
         document.getElementById('bhSeek').oninput=e=>{if(bh.music&&Number.isFinite(bh.music.duration)){bh.music.currentTime=bh.music.duration*Number(e.target.value)/1000;}};
         document.getElementById('ambienceBtn').addEventListener('click', toggleAmbience);
